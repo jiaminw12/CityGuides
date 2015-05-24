@@ -61,12 +61,12 @@ public class MainActivity extends Activity  {
 		// adding nav drawer items to array
 		// Home
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-		// Find People
+		// Search
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-		// Photos
+		// Maps
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		// Communities, Will add a counter here
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
 		// Pages
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 		
@@ -165,7 +165,7 @@ public class MainActivity extends Activity  {
 			fragment = new HomeFragment();
 			break;
 		case 1:
-			fragment = new GuideFragment();
+			fragment = new SearchFragment();
 			break;
 		case 2:
 			fragment = new MapsFragment();
@@ -174,7 +174,7 @@ public class MainActivity extends Activity  {
 			fragment = new TripPlannerFragment();
 			break;
 		case 4:
-			fragment = new SearchFragment();
+			fragment = new LoginFragment();
 			break;
 			
 		default:

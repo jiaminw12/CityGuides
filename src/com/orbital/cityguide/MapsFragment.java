@@ -1,0 +1,124 @@
+package com.orbital.cityguide;
+
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MapsFragment extends Fragment {
+
+	MapView mMapView;
+	private GoogleMap googleMap;
+
+	public MapsFragment() {
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		boolean result = isNetworkAvailable();
+
+		if (result == false) {
+			AlertDialog alertDialog = new AlertDialog.Builder(
+				this.getActivity()).create();
+			alertDialog.setMessage("Please enable internet connection!");
+			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			alertDialog.show();
+		}
+
+		View rootView = inflater.inflate(R.layout.fragment_maps, container,
+				false);
+
+		mMapView = (MapView) rootView.findViewById(R.id.mapView);
+		mMapView.onCreate(savedInstanceState);
+
+		mMapView.onResume();// needed to get the map to display immediately
+
+		try {
+			MapsInitializer.initialize(getActivity().getApplicationContext());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		googleMap = mMapView.getMap();
+		// latitude and longitude
+		double latitude = 1.300661;
+		double longitude = 103.874389;
+
+		// create marker
+		MarkerOptions marker = new MarkerOptions().position(
+				new LatLng(latitude, longitude)).title("Hello Maps");
+
+		// Changing marker icon
+		marker.icon(BitmapDescriptorFactory
+				.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+
+		// adding marker
+		googleMap.addMarker(marker);
+		CameraPosition cameraPosition = new CameraPosition.Builder()
+				.target(new LatLng(1.300661, 103.874389)).zoom(12).build();
+		googleMap.animateCamera(CameraUpdateFactory
+				.newCameraPosition(cameraPosition));
+
+		return rootView;
+
+	}
+
+	public boolean isNetworkAvailable() {
+		ConnectivityManager connManager = (ConnectivityManager) this
+				.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// if no network is available networkInfo will be null
+		// otherwise check if we are connected
+		if (mWifi != null && mWifi.isConnected()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		mMapView.onResume();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		mMapView.onPause();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		mMapView.onDestroy();
+	}
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		mMapView.onLowMemory();
+	}
+}

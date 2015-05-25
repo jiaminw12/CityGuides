@@ -26,6 +26,8 @@ public class MapsFragment extends Fragment {
 
 	MapView mMapView;
 	private GoogleMap googleMap;
+	
+	String title, alertboxmsg;
 
 	public MapsFragment() {
 	}
@@ -37,14 +39,9 @@ public class MapsFragment extends Fragment {
 		boolean result = isNetworkAvailable();
 
 		if (result == false) {
-			AlertDialog alertDialog = new AlertDialog.Builder(
-				this.getActivity()).create();
-			alertDialog.setMessage("Please enable internet connection!");
-			alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-				}
-			});
-			alertDialog.show();
+			title = "Message";
+			alertboxmsg = "No internet connection!";
+			popupMessage(title,alertboxmsg);
 		}
 
 		View rootView = inflater.inflate(R.layout.fragment_maps, container,
@@ -120,5 +117,21 @@ public class MapsFragment extends Fragment {
 	public void onLowMemory() {
 		super.onLowMemory();
 		mMapView.onLowMemory();
+	}
+	
+	public void popupMessage(String title, String msg){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+		builder.setTitle(title)
+				.setMessage(msg)
+				.setNegativeButton(android.R.string.ok,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.cancel();
+							}
+						});
+
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 }

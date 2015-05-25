@@ -13,7 +13,7 @@
         <item >Search</item>
         <item >Maps</item>
         <item >Trip Planner</item>
-        <item >Login</item>
+        <item >Logout</item>
     </string-array>
     
     <!-- Nav Drawer List Item Icons -->
@@ -25,6 +25,11 @@
         <item>@drawable/ic_planner</item>
         <item>@drawable/ic_login</item>
     </array>
+    
+    <string-array name="genderArray">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
     
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>

@@ -40,7 +40,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.orbital.cityguide.NavigationList"
+            android:name="com.orbital.cityguide.AfterLoginNavigationList"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.orbital.cityguide.Login"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden" >
             <intent-filter>

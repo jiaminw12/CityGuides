@@ -13,6 +13,7 @@
         <item >Search</item>
         <item >Maps</item>
         <item >Trip Planner</item>
+        <item >Login</item>
         <item >Logout</item>
     </string-array>
     

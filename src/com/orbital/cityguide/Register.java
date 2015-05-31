@@ -2,7 +2,14 @@ package com.orbital.cityguide;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -46,14 +53,16 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
+	private static final String LOGIN_URL = "http://192.168.1.7/City_Guide/registration.php";
+	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_MESSAGE = "message";
+
 	// declare variables
 	EditText userName;
-	EditText fullname;
 	EditText pw;
 	EditText confirmPassword;
-	EditText email1;
-	EditText phoneNo;
-	TextView date;
+	EditText emailAddr;
+	TextView birthDate;
 	ImageButton pickdate;
 	Spinner Gender = null;
 	ImageView imageView;
@@ -64,17 +73,20 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 	Button submit;
 	Button takePic = null;
 
-	int yy, mm, dd;
+	int yy, mm, dd, success;
 	String title, alertboxmsg;
 	protected ArrayAdapter<CharSequence> genderAdapter;
+
+	// JSON parser class
+	JSONParser jsonParser = new JSONParser();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.register);
 		addListenerOnButton();
-		
-		date = (TextView) findViewById(R.id.age);
+
+		birthDate = (TextView) findViewById(R.id.age);
 		final Calendar c = Calendar.getInstance();
 		yy = c.get(Calendar.YEAR);
 		mm = c.get(Calendar.MONTH);
@@ -87,7 +99,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 		pickdate.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				DatePickerFragment newFragment = new DatePickerFragment();
-				String choseDate = date.getText().toString();
+				String choseDate = birthDate.getText().toString();
 				Bundle args = new Bundle();
 				args.putString("dateText", choseDate);
 				newFragment.setArguments(args);
@@ -99,41 +111,38 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 		this.genderAdapter = ArrayAdapter.createFromResource(this,
 				R.array.genderArray, android.R.layout.simple_spinner_item);
 		Gender.setAdapter(this.genderAdapter);
+
+		submitButton();
 	}
 
 	public void submitButton() {
 		userName = (EditText) findViewById(R.id.username);
-		fullname = (EditText) findViewById(R.id.fullName);
 		pw = (EditText) findViewById(R.id.password);
 		confirmPassword = (EditText) findViewById(R.id.confirmpw);
-		email1 = (EditText) findViewById(R.id.email);
-		phoneNo = (EditText) findViewById(R.id.phoneNum);
-		date = (TextView) findViewById(R.id.age);
+		emailAddr = (EditText) findViewById(R.id.email);
+		birthDate = (TextView) findViewById(R.id.age);
 		Gender = (Spinner) findViewById(R.id.gender);
 		imageView = (ImageView) findViewById(R.id.imgView);
-		
+
 		submit = (Button) findViewById(R.id.submit);
 
 		submit.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
 				String username = userName.getText().toString();
-				String fullName = fullname.getText().toString();
 				String password = pw.getText().toString();
 				String confirmPwd = confirmPassword.getText().toString();
-				String DOB = date.getText().toString();
+				String date = birthDate.getText().toString();
 				String gender = Gender.getSelectedItem().toString();
-				String email = email1.getText().toString();
-				String hp = phoneNo.getText().toString();
-				String userType = "Member";
-				String imageFile = "";
+				String emailAddress = emailAddr.getText().toString();
+				String image = "";
 
-				if (username.matches("") || fullName.matches("")
-						|| password.matches("") || DOB.matches("")
-						|| gender.matches("") || email.matches("")) {
+				if (username.matches("") || password.matches("")
+						|| date.matches("") || gender.matches("")
+						|| emailAddress.matches("")) {
 					title = "Error Message";
 					alertboxmsg = "Please fill in all information needed.";
-					popupMessage(title,alertboxmsg);
+					popupMessage(title, alertboxmsg);
 				} else if (password.matches(confirmPwd)) {
 					boolean hasDrawable = (imageView.getDrawable() != null);
 					if (hasDrawable) {
@@ -141,10 +150,50 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 								.getDrawable()).getBitmap();
 						ByteArrayOutputStream stream = new ByteArrayOutputStream();
 						bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-						byte[] image = stream.toByteArray();
-						imageFile = Base64
-								.encodeToString(image, Base64.DEFAULT);
+						byte[] imageFile = stream.toByteArray();
+						image = Base64
+								.encodeToString(imageFile, Base64.DEFAULT);
 					}
+
+					try {
+						List<NameValuePair> params = new ArrayList<NameValuePair>();
+						params.add(new BasicNameValuePair("username", username));
+						params.add(new BasicNameValuePair("emailAddress",
+								emailAddress));
+						params.add(new BasicNameValuePair("password", password));
+						params.add(new BasicNameValuePair("date", date));
+						params.add(new BasicNameValuePair("image", image));
+						params.add(new BasicNameValuePair("gender", gender));
+
+						StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+								.permitAll().build();
+						StrictMode.setThreadPolicy(policy);
+
+						JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL,
+								"POST", params);
+						if (json != null) {
+							success = json.getInt(TAG_SUCCESS);
+							if (success == 1) {
+								title = "Message";
+								alertboxmsg = "User created!";
+								popupMessage(title, alertboxmsg);
+								Intent nextActivity = new Intent(Register.this,
+										Login.class);
+								startActivity(nextActivity);
+							} else if (success == 0) {
+								title = "Message";
+								alertboxmsg = json.getString(TAG_MESSAGE);
+								popupMessage(title, alertboxmsg);
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				} else {
+					title = "Error Message";
+					alertboxmsg = "Password incorrect.";
+					popupMessage(title, alertboxmsg);
+
 				}
 			}
 		});
@@ -157,8 +206,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent nextActivity = new Intent(Register.this,
-						MainActivity.class);
+				Intent nextActivity = new Intent(Register.this, Login.class);
 				startActivity(nextActivity);
 			}
 		});
@@ -298,7 +346,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 
 	// Updates the date in the TextView
 	private void updateDisplay() {
-		date.setText(new StringBuilder()
+		birthDate.setText(new StringBuilder()
 				// Month is 0 based, just add 1
 				.append(yy).append("-")
 				.append(mm < 9 ? ("0" + (mm + 1)) : mm + 1).append("-")

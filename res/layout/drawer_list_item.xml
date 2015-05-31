@@ -4,15 +4,6 @@
     android:layout_height="48dp"
     android:background="@drawable/list_selector" >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/circleView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/face" />
-
     <ImageView
         android:id="@+id/icon"
         android:layout_width="25dp"

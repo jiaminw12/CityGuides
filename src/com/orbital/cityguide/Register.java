@@ -12,7 +12,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -53,7 +55,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
-	private static final String LOGIN_URL = "http://192.168.1.7/City_Guide/registration.php";
+	private static final String REGISTER_URL = "http://192.168.1.7/City_Guide/registration.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
 
@@ -141,7 +143,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 						|| date.matches("") || gender.matches("")
 						|| emailAddress.matches("")) {
 					title = "Error Message";
-					alertboxmsg = "Please fill in all information needed.";
+					alertboxmsg = "Required field(s) is missing.";
 					popupMessage(title, alertboxmsg);
 				} else if (password.matches(confirmPwd)) {
 					boolean hasDrawable = (imageView.getDrawable() != null);
@@ -169,7 +171,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 								.permitAll().build();
 						StrictMode.setThreadPolicy(policy);
 
-						JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL,
+						JSONObject json = jsonParser.makeHttpRequest(REGISTER_URL,
 								"POST", params);
 						if (json != null) {
 							success = json.getInt(TAG_SUCCESS);
@@ -177,9 +179,8 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 								title = "Message";
 								alertboxmsg = "User created!";
 								popupMessage(title, alertboxmsg);
-								Intent nextActivity = new Intent(Register.this,
-										Login.class);
-								startActivity(nextActivity);
+								Intent LoginFragment = new Intent();
+								startActivity(LoginFragment);
 							} else if (success == 0) {
 								title = "Message";
 								alertboxmsg = json.getString(TAG_MESSAGE);
@@ -206,8 +207,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent nextActivity = new Intent(Register.this, Login.class);
-				startActivity(nextActivity);
+				finish();
 			}
 		});
 

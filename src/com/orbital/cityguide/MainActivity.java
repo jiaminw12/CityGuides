@@ -175,9 +175,7 @@ public class MainActivity extends Activity  {
 			fragment = new TripPlannerFragment();
 			break;
 		case 4:
-			Intent login = new Intent();
-			login.setClass(this, Login.class);
-			startActivity(login);
+			fragment = new LoginFragment();
 			break;
 			
 		default:

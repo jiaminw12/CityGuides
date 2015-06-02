@@ -179,8 +179,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 								title = "Message";
 								alertboxmsg = "User created!";
 								popupMessage(title, alertboxmsg);
-								Intent LoginFragment = new Intent();
-								startActivity(LoginFragment);
+								finish();
 							} else if (success == 0) {
 								title = "Message";
 								alertboxmsg = json.getString(TAG_MESSAGE);

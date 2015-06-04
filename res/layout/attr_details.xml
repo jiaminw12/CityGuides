@@ -20,28 +20,104 @@
             android:layout_height="wrap_content"
             android:stretchColumns="*" >
 
+            <!-- Title -->
+
             <TableRow
                 android:id="@+id/tableRow1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="100px" >
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp">
 
-                <ImageView android:id="@+id/imageViewId" >
-                </ImageView>
+                <TextView
+                    android:id="@+id/title_Attr"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
             </TableRow>
-            
+
+            <!-- Image -->
+
             <TableRow
                 android:id="@+id/tableRow2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="100px" >
-				<TextView
-				    android:id="@+id/details"></TextView>
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp">
+
+                <ImageView android:id="@+id/imageViewId" >
+                </ImageView>
             </TableRow>
-            
-         <!-- Mapview -->
-         <!-- Comments -->
-            
+
+            <!-- Detail -->
+
+            <TableRow
+                android:id="@+id/tableRow3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp" >
+
+                <TextView
+                    android:id="@+id/details"
+                    android:layout_weight="1"
+                    android:ellipsize="none"
+                    android:maxLines="100"
+                    android:scrollHorizontally="false"
+                    android:textSize="15sp" />
+            </TableRow>
+
+            <!-- Link -->
+
+            <TableRow
+                android:id="@+id/tableRow4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp" >
+
+                <TextView
+                    android:id="@+id/weblink"
+                    android:textSize="15sp"
+                    android:autoLink="web" />
+            </TableRow>
+
+            <!-- Opening Hours -->
+
+            <TableRow
+                android:id="@+id/tableRow5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp" >
+
+                <TextView android:id="@+id/open_hrs" >
+                </TextView>
+            </TableRow>
+
+            <!-- Mapview -->
+
+            <TableRow
+                android:id="@+id/tableRow6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100px"
+                android:layout_marginBottom="20dp" >
+
+                <com.google.android.gms.maps.MapView
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/mapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </TableRow>
+
+            <!-- Comments -->
+
+            <TableRow
+                android:id="@+id/tableRow7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="100px" >
+            </TableRow>
         </TableLayout>
     </ScrollView>
 

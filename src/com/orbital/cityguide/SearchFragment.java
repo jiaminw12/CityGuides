@@ -32,7 +32,7 @@ public class SearchFragment extends ListFragment {
 
 	JSONParser jParser = new JSONParser();
 
-	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAllAttractions.php";
+	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAllAttractions.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -77,7 +77,7 @@ public class SearchFragment extends ListFragment {
 				// Starting new intent
 				Intent in = new Intent(getActivity(), AttractionDetails.class);
 				// sending aid to next activity
-				in.putExtra(TAG_AID, aid);
+				in.putExtra("AID", aid);
 
 				// starting new activity and expecting some response back
 				startActivity(in);
@@ -109,11 +109,11 @@ public class SearchFragment extends ListFragment {
 				int success = json.getInt(TAG_SUCCESS);
 
 				if (success == 1) {
-					// products found
+					// attractions found
 					// Getting Array of Products
 					mAttractions = json.getJSONArray(TAG_ATTRACTION);
 
-					// looping through All Products
+					// looping through All Attractions
 					for (int i = 0; i < mAttractions.length(); i++) {
 						JSONObject c = mAttractions.getJSONObject(i);
 

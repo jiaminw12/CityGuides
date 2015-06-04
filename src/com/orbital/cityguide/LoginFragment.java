@@ -1,6 +1,7 @@
 package com.orbital.cityguide;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -8,27 +9,41 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class LoginFragment extends Fragment {
 
 	Button register;
 	Button clickHere;
 	Button login;
+	private LoginButton loginFacebook;
+	CallbackManager callbackManager;
 
 	EditText userName;
 	EditText pw;
@@ -36,9 +51,12 @@ public class LoginFragment extends Fragment {
 	String title, alertboxmsg;
 	int success;
 
-	private static final String LOGIN_URL = "http://192.168.1.7/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://192.168.1.5/City_Guide/login.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
+
+	// Your Facebook APP ID
+	private static String APP_ID = "1599241106995105"; // Replace your App ID here
 
 	// JSON parser class
 	JSONParser jsonParser = new JSONParser();
@@ -46,7 +64,6 @@ public class LoginFragment extends Fragment {
 	public LoginFragment() {
 	}
 
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
@@ -56,6 +73,46 @@ public class LoginFragment extends Fragment {
 		login = (Button) rootView.findViewById(R.id.login);
 		userName = (EditText) rootView.findViewById(R.id.username);
 		pw = (EditText) rootView.findViewById(R.id.password);
+		
+		/*FacebookSdk.sdkInitialize(getActivity());
+        callbackManager = CallbackManager.Factory.create();
+        loginFacebook = (LoginButton) rootView.findViewById(R.id.FBlogin_button);
+        loginFacebook.setReadPermissions(Arrays.asList("public_profile, email, user_birthday"));
+        loginFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+	        @Override
+	        public void onSuccess(LoginResult loginResult) {
+	        	Toast.makeText(getActivity(),"Success",Toast.LENGTH_SHORT).show();
+	        	GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(
+                                    JSONObject object,
+                                    GraphResponse response) {
+                                // Application code
+                                Log.v("LoginActivity", response.toString());
+                                //String id = user.optString("id");
+                                //String firstName = user.optString("first_name");
+                                //String lastName = user.optString("last_name");
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender, birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
+	        }
+
+	        @Override
+	        public void onCancel() {
+	        	Toast.makeText(getActivity(),"fail",Toast.LENGTH_SHORT).show();
+	        }
+
+	        @Override
+	        public void onError(FacebookException exception) {
+	        	Toast.makeText(getActivity(),"error",Toast.LENGTH_SHORT).show();
+	        }
+	    });    */
+		
 		setRetainInstance(true);
 		return rootView;
 	}

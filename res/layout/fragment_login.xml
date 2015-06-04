@@ -112,8 +112,8 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/linearLayout3"
             android:orientation="vertical" >
-<!-- 
-            <com.facebook.login.widget.LoginButton
+
+            <!-- <com.facebook.login.widget.LoginButton
                 android:id="@+id/FBlogin_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,7 +1,6 @@
 package com.orbital.cityguide;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -10,26 +9,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.method.LinkMovementMethod;
 import android.util.Base64;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AttractionDetails extends Activity {
-
-	// manages all of our attractions in a list.
-	private ArrayList<HashMap<String, String>> mAttractionsList;
 
 	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAttraction.php";
 	private static final String TAG_SUCCESS = "success";
@@ -59,12 +57,14 @@ public class AttractionDetails extends Activity {
 	TextView mLink;
 	TextView mOpenHrs;
 	MapView mMapView;
-	//private GoogleMap googleMap;
+	private GoogleMap googleMap;
+	// Progress Dialog
+	private ProgressDialog pDialog;
 
 	String attr_id, title, alertboxmsg;
 	int success;
-
-	// http://localhost/city_guide/images
+	
+	static final LatLng TutorialsPoint = new LatLng(21 , 57);
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -80,93 +80,127 @@ public class AttractionDetails extends Activity {
 		mLink = (TextView) findViewById(R.id.weblink);
 		mOpenHrs = (TextView) findViewById(R.id.open_hrs);
 		mMapView = (MapView) findViewById(R.id.mapView);
-
-		getAttrDetails();
-	}
-
-	public void getAttrDetails() {
+		mMapView.onCreate(savedInstanceState);
+		mMapView.onResume();
 
 		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_id", attr_id));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jsonParser.makeHttpRequest(READATTR_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttractions = json.getJSONArray(TAG_ATTRACTION);
-
-					// looping through All Attractions
-					for (int i = 0; i < mAttractions.length(); i++) {
-						JSONObject c = mAttractions.getJSONObject(i);
-
-						// Storing each json item in variable
-						String id = c.getString(TAG_AID);
-						String title = c.getString(TAG_TITLE);
-						String desc = c.getString(TAG_DESC);
-						String addr = c.getString(TAG_ADDR);
-						String lat = c.getString(TAG_LAT);
-						String mlong = c.getString(TAG_LONG);
-						String openHrs = c.getString(TAG_OHRS);
-						String img = c.getString(TAG_IMG);
-						String link = c.getString(TAG_LINK);
-
-						// mImageView.setImageBitmap(BitmapFactory.decodeFile("img"));
-						mTitle.setText(title);
-						mDetail.setText(desc);
-						mLink.setText(link);
-						mLink.setMovementMethod(LinkMovementMethod.getInstance());
-						
-						//setMap(lat, mlong, addr);
-
-					}
-				} else if (success == 0) {
-					title = "Message";
-					alertboxmsg = json.getString("Error!");
-					popupMessage(title, alertboxmsg);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setMap(String mLatitude, String mLongtitude, String mAddress) {
-
-		/*mMapView.onResume();// needed to get the map to display immediately
-
-		try {
-			MapsInitializer.initialize(this.getApplicationContext());
+			MapsInitializer.initialize(getApplicationContext());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		googleMap = mMapView.getMap();
-		// latitude and longitude
+
+		new GetAttrDetails().execute();
+	}
+
+	class GetAttrDetails extends AsyncTask<String, String, String> {
+
+		/**
+		 * Before starting background thread Show Progress Dialog
+		 * */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(AttractionDetails.this);
+			pDialog.setMessage("Loading attraction details. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		/**Getting product details in background thread**/
+		protected String doInBackground(String... params) {
+
+			// updating UI from Background Thread
+			runOnUiThread(new Runnable() {
+				public void run() {
+
+					try {
+						List<NameValuePair> params = new ArrayList<NameValuePair>();
+						params.add(new BasicNameValuePair("attr_id", attr_id));
+
+						StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+								.permitAll().build();
+						StrictMode.setThreadPolicy(policy);
+
+						JSONObject json = jsonParser.makeHttpRequest(
+								READATTR_URL, "POST", params);
+						if (json != null) {
+							success = json.getInt(TAG_SUCCESS);
+							if (success == 1) {
+								mAttractions = json
+										.getJSONArray(TAG_ATTRACTION);
+
+								// looping through All Attractions
+								for (int i = 0; i < mAttractions.length(); i++) {
+									JSONObject c = mAttractions
+											.getJSONObject(i);
+
+									// Storing each json item in variable
+									String id = c.getString(TAG_AID);
+									String title = c.getString(TAG_TITLE);
+									String desc = c.getString(TAG_DESC);
+									String addr = c.getString(TAG_ADDR);
+									String mlat = c.getString(TAG_LAT);
+									String mlong = c.getString(TAG_LONG);
+									String openHrs = c.getString(TAG_OHRS);
+									String img = c.getString(TAG_IMG);
+									String link = c.getString(TAG_LINK);
+
+									byte[] image = Base64.decode(img,
+											Base64.DEFAULT);
+									Bitmap bitmap = BitmapFactory
+											.decodeByteArray(image, 0,
+													image.length);
+									mImageView.setImageBitmap(bitmap);
+
+									mTitle.setText(title);
+									mDetail.setText(desc);
+									mOpenHrs.setText(openHrs);
+									mLink.setText(link);
+									mLink.setMovementMethod(LinkMovementMethod
+											.getInstance());
+
+									setMap(mlat, mlong, title, addr);
+								}
+							} else if (success == 0) {
+								title = "Message";
+								alertboxmsg = json.getString("Error!");
+								popupMessage(title, alertboxmsg);
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			return null;
+		}
+
+		/**After completing background task Dismiss the progress dialog**/
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog once got all details
+			pDialog.dismiss();
+		}
+	}
+
+	public void setMap(String mLatitude, String mLongtitude, String mTitle,
+			String mAddress) {
 		double latitude = Double.parseDouble(mLatitude);
 		double longitude = Double.parseDouble(mLongtitude);
-
 		// create marker
-		MarkerOptions marker = new MarkerOptions().position(
-				new LatLng(latitude, longitude)).title(mAddress);
-
-		// Changing marker icon
-		marker.icon(BitmapDescriptorFactory
-				.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-
-		// adding marker
+		MarkerOptions marker = new MarkerOptions()
+				.position(new LatLng(latitude, longitude)).title(mTitle)
+				.snippet(mAddress);
 		googleMap.addMarker(marker);
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(1.300661, 103.874389)).zoom(12).build();
+				.target(new LatLng(latitude, longitude)).zoom(12).build();
 		googleMap.animateCamera(CameraUpdateFactory
-				.newCameraPosition(cameraPosition));*/
+				.newCameraPosition(cameraPosition));
+
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -194,4 +228,6 @@ public class AttractionDetails extends Activity {
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+
+
 }

@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,116 +11,113 @@
     android:scrollbars="vertical"
     tools:context=".MainActivity" >
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical" >
 
-        <LinearLayout
-            android:id="@+id/linearLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_alignParentTop="true"
-            android:orientation="vertical" >
+        <TextView
+            android:id="@+id/Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="City Guide"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#9F000F"
+            android:textSize="30sp" />
 
-            <TextView
-                android:id="@+id/Name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_marginTop="20dp"
-                android:text="City Guide"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#9F000F"
-                android:textSize="30sp" />
-
-            <!--
+        <!--
                  <ImageView
                 android:id="@+id/Logo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/logo" />-->
-        </LinearLayout>
+                android:src="@drawable/logo" />
+        -->
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout2"
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/linearLayout1"
+        android:layout_below="@+id/linearLayout1"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/linearLayout1"
-            android:layout_below="@+id/linearLayout1"
-            android:orientation="vertical" >
+            android:layout_marginBottom="10dp"
+            android:background="#E5E4E2"
+            android:ems="10"
+            android:hint="Username"
+            android:lines="1"
+            android:padding="10dp"
+            android:singleLine="true" />
 
-            <EditText
-                android:id="@+id/username"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:background="#E5E4E2"
-                android:ems="10"
-                android:hint="Username"
-                android:lines="1"
-                android:padding="10dp"
-                android:singleLine="true" />
-
-            <EditText
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:layout_marginBottom="8dp"
-                android:background="#E5E4E2"
-                android:ems="10"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:lines="1"
-                android:padding="10dp"
-                android:singleLine="true" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout3"
+        <EditText
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/linearLayout2"
-            android:layout_marginTop="15dp"
-            android:orientation="horizontal" >
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:background="#E5E4E2"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:lines="1"
+            android:padding="10dp"
+            android:singleLine="true" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:background="@android:drawable/btn_default"
-                android:text="Log In" />
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal" >
 
-            <Button
-                android:id="@+id/register"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:background="@android:drawable/btn_default"
-                android:text="Register" />
+        <Button
+            android:id="@+id/login"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:text="Log In" />
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/register"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/btn_default"
+            android:text="Register" />
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/linearLayout3"
-            android:orientation="vertical" >
-<!-- 
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/linearLayout3"
+        android:orientation="vertical" >
+
+        <!--
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/FBlogin_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="30dp"
-                android:layout_marginTop="30dp" /> -->
-        </LinearLayout>
-    </RelativeLayout>
+                android:layout_marginTop="30dp" />
+        -->
+    </LinearLayout>
 
-</ScrollView>
+</RelativeLayout>

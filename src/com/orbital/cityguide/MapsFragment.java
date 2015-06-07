@@ -60,8 +60,8 @@ public class MapsFragment extends Fragment {
 
 		googleMap = mMapView.getMap();
 		// latitude and longitude
-		double latitude = 1.300661;
-		double longitude = 103.874389;
+		double latitude = 37.826237;
+		double longitude = -122.156982;
 
 		// create marker
 		MarkerOptions marker = new MarkerOptions().position(
@@ -74,9 +74,29 @@ public class MapsFragment extends Fragment {
 		// adding marker
 		googleMap.addMarker(marker);
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(1.300661, 103.874389)).zoom(12).build();
+				.target(new LatLng(latitude, longitude)).zoom(12).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
+		
+		//http://thuongnh.com/google-maps-android-v2-tutorial/
+		/*//Enable GPS
+		map.setMyLocationEnabled(true);
+		 
+		//Set the map to current location
+		map.setOnMyLocationChangeListener(new OnMyLocationChangeListener() {
+		 
+		    @Override
+		    public void onMyLocationChange(Location location) {
+		        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+		 
+		        //Zoom parameter is set to 14
+		        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(position, 14);
+		 
+		        //Use map.animateCamera(update) if you want moving effect
+		        map.moveCamera(update);
+		        mapView.onResume();
+		    }
+		});*/
 
 		return rootView;
 

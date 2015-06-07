@@ -9,9 +9,28 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical" >
+
+        <!-- Title -->
+
+        <TextView
+            android:id="@+id/title_Attr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="35sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout1"
         android:layout_marginTop="20dp" >
 
         <TableLayout
@@ -20,42 +39,30 @@
             android:layout_height="wrap_content"
             android:stretchColumns="*" >
 
-            <!-- Title -->
-
             <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp">
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:minHeight="200px" >
 
-                <TextView
-                    android:id="@+id/title_Attr"
-                    android:textSize="30sp"
-                    android:textStyle="bold" />
-            </TableRow>
+                <!-- Image -->
 
-            <!-- Image -->
-
-            <TableRow
-                android:id="@+id/tableRow2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp">
-
-                <ImageView android:id="@+id/imageViewId" >
+                <ImageView
+                    android:id="@+id/imageViewId"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" >
                 </ImageView>
             </TableRow>
 
             <!-- Detail -->
 
             <TableRow
-                android:id="@+id/tableRow3"
+                android:id="@+id/tableRow1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp" >
+                android:layout_marginBottom="20dp"
+                android:minHeight="100px" >
 
                 <TextView
                     android:id="@+id/details"
@@ -66,54 +73,62 @@
                     android:textSize="15sp" />
             </TableRow>
 
-            <!-- Link -->
-
-            <TableRow
-                android:id="@+id/tableRow4"
+            <TextView
+                android:id="@+id/title_fact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp" >
-
-                <TextView
-                    android:id="@+id/weblink"
-                    android:textSize="15sp"
-                    android:autoLink="web" />
-            </TableRow>
+                android:text="Facts"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <!-- Opening Hours -->
 
             <TableRow
-                android:id="@+id/tableRow5"
+                android:id="@+id/tableRow2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp" >
+                android:layout_marginBottom="10dp" >
 
                 <TextView android:id="@+id/open_hrs" >
                 </TextView>
             </TableRow>
 
+            <!-- Link -->
+
+            <TableRow
+                android:id="@+id/tableRow3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp" >
+
+                <TextView
+                    android:id="@+id/weblink"
+                    android:autoLink="web"
+                    android:textSize="15sp" />
+            </TableRow>
+
             <!-- Mapview -->
 
             <TableRow
-                android:id="@+id/tableRow6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="100px"
-                android:layout_marginBottom="20dp" >
+                android:id="@+id/tableRow4"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:minHeight="800px" >
 
                 <com.google.android.gms.maps.MapView
                     xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/mapView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
             </TableRow>
 
             <!-- Comments -->
 
             <TableRow
-                android:id="@+id/tableRow7"
+                android:id="@+id/tableRow5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="100px" >

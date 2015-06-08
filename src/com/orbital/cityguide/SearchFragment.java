@@ -39,6 +39,8 @@ public class SearchFragment extends ListFragment {
 	private static final String TAG_ATTRACTION = "attractions";
 	// An array of all of our attractions
 	private JSONArray mAttractions = null;
+	
+	String name_profile;
 
 	public SearchFragment() {
 	}
@@ -49,6 +51,9 @@ public class SearchFragment extends ListFragment {
 
 		View rootView = inflater.inflate(R.layout.fragment_search, container,
 				false);
+
+		Bundle bundle = this.getArguments();
+		name_profile = bundle.getString("profile_username", name_profile);
 
 		// Hashmap for ListView
 		mAttractionsList = new ArrayList<HashMap<String, String>>();
@@ -78,8 +83,7 @@ public class SearchFragment extends ListFragment {
 				Intent in = new Intent(getActivity(), AttractionDetails.class);
 				// sending aid to next activity
 				in.putExtra("AID", aid);
-
-				// starting new activity and expecting some response back
+				in.putExtra("profile_username", name_profile);
 				startActivity(in);
 			}
 		});

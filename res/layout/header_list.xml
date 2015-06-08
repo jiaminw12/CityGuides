@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="200dp">
+    
+    <ImageView
+      android:id="@+id/photo"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NAME"
         android:id="@+id/profile_name"
-        android:layout_below="@+id/circleView"
-        android:layout_marginTop="16dp"
         android:textColor="#ffffff"
         android:textSize="14sp"
-        android:layout_centerHorizontal="true" />
+       android:layout_alignTop="@+id/photo"
+       android:layout_toRightOf="@+id/photo" />
  
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="EMAIL ADDRESS"
         android:id="@+id/profile_email"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="20dp"
+        android:textSize="14sp"
         android:textColor="#ffffff"
-        android:layout_below="@+id/profile_address"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/profile_name"
+        android:layout_alignLeft="@+id/profile_name" />
  
 </RelativeLayout>

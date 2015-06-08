@@ -164,7 +164,6 @@ public class LoginFragment extends Fragment {
 								alertboxmsg = "Login successfully!";
 								popupMessage(title, alertboxmsg);
 
-								// go to eventList.java
 								Intent nextActivity = new Intent(getActivity(),
 										AfterLoginNavigationList.class);
 								Bundle extras = new Bundle();

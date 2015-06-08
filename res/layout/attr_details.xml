@@ -132,6 +132,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="100px" >
+
+                <Button
+                    android:id="@+id/addComment"
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:textColor="#ffffff"
+                    android:drawableLeft="@drawable/ic_comment"
+                    android:text="Write Your Review" />
             </TableRow>
         </TableLayout>
     </ScrollView>

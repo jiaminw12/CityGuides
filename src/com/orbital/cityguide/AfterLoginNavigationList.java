@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class AfterLoginNavigationList extends Activity {
 
@@ -42,11 +43,17 @@ public class AfterLoginNavigationList extends Activity {
 
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
+	
+	String name_profile;
+	Bundle bundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.navigation_list);
+		
+		Bundle extras = getIntent().getExtras();
+		name_profile = extras.getString("profile_username");
 
 		mTitle = mDrawerTitle = getTitle();
 
@@ -180,18 +187,34 @@ public class AfterLoginNavigationList extends Activity {
 		Fragment fragment = null;
 		switch (position) {
 		case 0:
+			fragment = new ViewProfileFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 1:
 			fragment = new HomeFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 2:
 			fragment = new SearchFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 3:
 			fragment = new MapsFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 4:
 			fragment = new TripPlannerFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 5:
 			Intent logout = new Intent();

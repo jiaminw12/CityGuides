@@ -1,5 +1,6 @@
 package com.orbital.cityguide;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,19 +19,29 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.method.LinkMovementMethod;
 import android.util.Base64;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class AttractionDetails extends Activity {
 
 	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAttraction.php";
+	private static final String ADDCOM_URL = "http://192.168.1.5/City_Guide/addComment.php";
+
 	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_MESSAGE = "message";
+
 	private static final String TAG_ATTRACTION = "attractions";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -61,10 +72,15 @@ public class AttractionDetails extends Activity {
 	// Progress Dialog
 	private ProgressDialog pDialog;
 
+	Button mComment;
+	EditText mCommentText;
+	RatingBar mRatingbar;
+
 	String attr_id, title, alertboxmsg;
+	String name_profile;
 	int success;
-	
-	static final LatLng TutorialsPoint = new LatLng(21 , 57);
+
+	static final LatLng TutorialsPoint = new LatLng(21, 57);
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,12 +89,14 @@ public class AttractionDetails extends Activity {
 
 		Bundle extras = getIntent().getExtras();
 		attr_id = extras.getString("AID");
-
+		name_profile = extras.getString("profile_username");
+		
 		mImageView = (ImageView) findViewById(R.id.imageViewId);
 		mTitle = (TextView) findViewById(R.id.title_Attr);
 		mDetail = (TextView) findViewById(R.id.details);
 		mLink = (TextView) findViewById(R.id.weblink);
 		mOpenHrs = (TextView) findViewById(R.id.open_hrs);
+
 		mMapView = (MapView) findViewById(R.id.mapView);
 		mMapView.onCreate(savedInstanceState);
 		mMapView.onResume();
@@ -88,10 +106,91 @@ public class AttractionDetails extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		googleMap = mMapView.getMap();
 
+		mRatingbar = (RatingBar) findViewById(R.id.ratingBar);
+		mComment = (Button) findViewById(R.id.addComment);
+		mComment.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				commentButton();
+			}
+		});
+
 		new GetAttrDetails().execute();
+	}
+
+	public void commentButton() {
+		LayoutInflater li = LayoutInflater.from(this);
+		View promptsView = li.inflate(R.layout.insert_comment, null);
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+		alertDialogBuilder.setView(promptsView);
+
+		mCommentText = (EditText) promptsView.findViewById(R.id.comment_box);
+		mRatingbar = (RatingBar) findViewById(R.id.ratingBar);
+		// set dialog message
+		alertDialogBuilder
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// get user input and set it to result
+						String attr_id = "";
+						String comment_text = mCommentText.getText().toString();
+						String rating = String.valueOf(mRatingbar.getRating());
+						String username = name_profile;
+						
+						if (comment_text.matches("") || attr_id.matches("") || username.matches("")) {
+							title = "Error Message";
+							alertboxmsg = "Required field(s) is missing.";
+							popupMessage(title, alertboxmsg);
+						} else {
+
+							try {
+								List<NameValuePair> params = new ArrayList<NameValuePair>();
+								params.add(new BasicNameValuePair("attr_id", attr_id));
+								params.add(new BasicNameValuePair("comment_text",
+										comment_text));
+								params.add(new BasicNameValuePair("rating", rating));
+								params.add(new BasicNameValuePair("username", username));
+
+								StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+										.permitAll().build();
+								StrictMode.setThreadPolicy(policy);
+
+								JSONObject json = jsonParser.makeHttpRequest(ADDCOM_URL,
+										"POST", params);
+								if (json != null) {
+									success = json.getInt(TAG_SUCCESS);
+									if (success == 1) {
+										title = "Message";
+										alertboxmsg = "Comment created!";
+										popupMessage(title, alertboxmsg);
+										finish();
+									} else if (success == 0) {
+										title = "Message";
+										alertboxmsg = json.getString(TAG_MESSAGE);
+										popupMessage(title, alertboxmsg);
+									}
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
+
 	}
 
 	class GetAttrDetails extends AsyncTask<String, String, String> {
@@ -109,7 +208,7 @@ public class AttractionDetails extends Activity {
 			pDialog.show();
 		}
 
-		/**Getting product details in background thread**/
+		/** Getting product details in background thread **/
 		protected String doInBackground(String... params) {
 
 			// updating UI from Background Thread
@@ -178,13 +277,13 @@ public class AttractionDetails extends Activity {
 			return null;
 		}
 
-		/**After completing background task Dismiss the progress dialog**/
+		/** After completing background task Dismiss the progress dialog **/
 		protected void onPostExecute(String file_url) {
 			// dismiss the dialog once got all details
 			pDialog.dismiss();
 		}
 	}
-
+	
 	public void setMap(String mLatitude, String mLongtitude, String mTitle,
 			String mAddress) {
 		double latitude = Double.parseDouble(mLatitude);
@@ -228,6 +327,5 @@ public class AttractionDetails extends Activity {
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
-
 
 }

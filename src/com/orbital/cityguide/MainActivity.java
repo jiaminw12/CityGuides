@@ -39,11 +39,16 @@ public class MainActivity extends Activity  {
 
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
+	
+	String name_profile;
+	Bundle bundle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.navigation_list);
+		
+		name_profile = "NULL";
 
 		mTitle = mDrawerTitle = getTitle();
 
@@ -164,15 +169,27 @@ public class MainActivity extends Activity  {
 		switch (position) {
 		case 0:
 			fragment = new HomeFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 1:
 			fragment = new SearchFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 2:
 			fragment = new MapsFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 3:
 			fragment = new TripPlannerFragment();
+			bundle = new Bundle();
+			bundle.putString("profile_username", name_profile);
+			fragment.setArguments(bundle);
 			break;
 		case 4:
 			fragment = new LoginFragment();

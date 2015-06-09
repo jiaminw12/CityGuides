@@ -32,7 +32,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AttractionDetails extends Activity {
 
@@ -76,11 +78,9 @@ public class AttractionDetails extends Activity {
 	EditText mCommentText;
 	RatingBar mRatingbar;
 
-	String attr_id, title, alertboxmsg;
+	String mAttr_id, title, alertboxmsg;
 	String name_profile;
 	int success;
-
-	static final LatLng TutorialsPoint = new LatLng(21, 57);
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,9 +88,9 @@ public class AttractionDetails extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		Bundle extras = getIntent().getExtras();
-		attr_id = extras.getString("AID");
+		mAttr_id = extras.getString("AID");
 		name_profile = extras.getString("profile_username");
-		
+
 		mImageView = (ImageView) findViewById(R.id.imageViewId);
 		mTitle = (TextView) findViewById(R.id.title_Attr);
 		mDetail = (TextView) findViewById(R.id.details);
@@ -113,7 +113,13 @@ public class AttractionDetails extends Activity {
 		mComment.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				commentButton();
+				if (name_profile.equalsIgnoreCase("NULL")) {
+					title = "Error Message";
+					alertboxmsg = "Please login!";
+					popupMessage(title, alertboxmsg);
+				} else {
+					commentButton();
+				}
 			}
 		});
 
@@ -121,25 +127,33 @@ public class AttractionDetails extends Activity {
 	}
 
 	public void commentButton() {
+
 		LayoutInflater li = LayoutInflater.from(this);
 		View promptsView = li.inflate(R.layout.insert_comment, null);
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder.setView(promptsView);
 
 		mCommentText = (EditText) promptsView.findViewById(R.id.comment_box);
-		mRatingbar = (RatingBar) findViewById(R.id.ratingBar);
+		mRatingbar = (RatingBar) promptsView.findViewById(R.id.ratingBar);
+		mRatingbar
+				.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
+					public void onRatingChanged(RatingBar ratingBar,
+							float rating, boolean fromUser) {
+					}
+				});
+
 		// set dialog message
 		alertDialogBuilder
 				.setCancelable(false)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// get user input and set it to result
-						String attr_id = "";
+						String attr_id = mAttr_id;
 						String comment_text = mCommentText.getText().toString();
 						String rating = String.valueOf(mRatingbar.getRating());
 						String username = name_profile;
-						
-						if (comment_text.matches("") || attr_id.matches("") || username.matches("")) {
+
+						if (comment_text.matches("") || attr_id.matches("")) {
 							title = "Error Message";
 							alertboxmsg = "Required field(s) is missing.";
 							popupMessage(title, alertboxmsg);
@@ -147,18 +161,21 @@ public class AttractionDetails extends Activity {
 
 							try {
 								List<NameValuePair> params = new ArrayList<NameValuePair>();
-								params.add(new BasicNameValuePair("attr_id", attr_id));
-								params.add(new BasicNameValuePair("comment_text",
-										comment_text));
-								params.add(new BasicNameValuePair("rating", rating));
-								params.add(new BasicNameValuePair("username", username));
+								params.add(new BasicNameValuePair("attr_id",
+										attr_id));
+								params.add(new BasicNameValuePair(
+										"comment_text", comment_text));
+								params.add(new BasicNameValuePair("rating",
+										rating));
+								params.add(new BasicNameValuePair("username",
+										username));
 
 								StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 										.permitAll().build();
 								StrictMode.setThreadPolicy(policy);
 
-								JSONObject json = jsonParser.makeHttpRequest(ADDCOM_URL,
-										"POST", params);
+								JSONObject json = jsonParser.makeHttpRequest(
+										ADDCOM_URL, "POST", params);
 								if (json != null) {
 									success = json.getInt(TAG_SUCCESS);
 									if (success == 1) {
@@ -168,7 +185,8 @@ public class AttractionDetails extends Activity {
 										finish();
 									} else if (success == 0) {
 										title = "Message";
-										alertboxmsg = json.getString(TAG_MESSAGE);
+										alertboxmsg = json
+												.getString(TAG_MESSAGE);
 										popupMessage(title, alertboxmsg);
 									}
 								}
@@ -217,7 +235,7 @@ public class AttractionDetails extends Activity {
 
 					try {
 						List<NameValuePair> params = new ArrayList<NameValuePair>();
-						params.add(new BasicNameValuePair("attr_id", attr_id));
+						params.add(new BasicNameValuePair("attr_id", mAttr_id));
 
 						StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 								.permitAll().build();
@@ -283,7 +301,7 @@ public class AttractionDetails extends Activity {
 			pDialog.dismiss();
 		}
 	}
-	
+
 	public void setMap(String mLatitude, String mLongtitude, String mTitle,
 			String mAddress) {
 		double latitude = Double.parseDouble(mLatitude);

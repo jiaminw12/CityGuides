@@ -202,6 +202,7 @@ public class AfterLoginNavigationList extends Activity {
 			fragment = new SearchFragment();
 			bundle = new Bundle();
 			bundle.putString("profile_username", name_profile);
+			Log.d("NAMEEEEEEEEEE", name_profile);
 			fragment.setArguments(bundle);
 			break;
 		case 3:

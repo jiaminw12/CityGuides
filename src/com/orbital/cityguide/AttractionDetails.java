@@ -75,6 +75,7 @@ public class AttractionDetails extends Activity {
 	private ProgressDialog pDialog;
 
 	Button mComment;
+	EditText mCommentTitle;
 	EditText mCommentText;
 	RatingBar mRatingbar;
 
@@ -133,6 +134,7 @@ public class AttractionDetails extends Activity {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 		alertDialogBuilder.setView(promptsView);
 
+		mCommentTitle = (EditText) promptsView.findViewById(R.id.mainTitle);
 		mCommentText = (EditText) promptsView.findViewById(R.id.comment_box);
 		mRatingbar = (RatingBar) promptsView.findViewById(R.id.ratingBar);
 		mRatingbar
@@ -149,11 +151,15 @@ public class AttractionDetails extends Activity {
 					public void onClick(DialogInterface dialog, int id) {
 						// get user input and set it to result
 						String attr_id = mAttr_id;
+						String comment_title = mCommentTitle.getText()
+								.toString();
 						String comment_text = mCommentText.getText().toString();
 						String rating = String.valueOf(mRatingbar.getRating());
 						String username = name_profile;
 
-						if (comment_text.matches("") || attr_id.matches("")) {
+						if (comment_title.matches("")
+								|| comment_text.matches("")
+								|| attr_id.matches("")) {
 							title = "Error Message";
 							alertboxmsg = "Required field(s) is missing.";
 							popupMessage(title, alertboxmsg);
@@ -163,6 +169,8 @@ public class AttractionDetails extends Activity {
 								List<NameValuePair> params = new ArrayList<NameValuePair>();
 								params.add(new BasicNameValuePair("attr_id",
 										attr_id));
+								params.add(new BasicNameValuePair(
+										"comment_title", comment_title));
 								params.add(new BasicNameValuePair(
 										"comment_text", comment_text));
 								params.add(new BasicNameValuePair("rating",

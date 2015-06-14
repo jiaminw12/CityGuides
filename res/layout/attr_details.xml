@@ -137,9 +137,34 @@
                     android:id="@+id/addComment"
                     android:layout_width="0dip"
                     android:layout_weight="1"
-                    android:textColor="#ffffff"
                     android:drawableLeft="@drawable/ic_comment"
-                    android:text="Write Your Review" />
+                    android:text="Write Your Review"
+                    android:textColor="#ffffff" />
+            </TableRow>
+            
+            <TextView
+                android:id="@+id/title_review"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reviews"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+            
+            <!-- List of Comments -->
+
+            <TableRow
+                android:id="@+id/tableRow6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="500px" >
+
+                <ListView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                </ListView>
             </TableRow>
         </TableLayout>
     </ScrollView>

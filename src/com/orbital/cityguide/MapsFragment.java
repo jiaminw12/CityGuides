@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsFragment extends Fragment {
 
+	EditText mSearch; 
 	MapView mMapView;
 	private GoogleMap googleMap;
 	
@@ -46,10 +48,11 @@ public class MapsFragment extends Fragment {
 
 		View rootView = inflater.inflate(R.layout.fragment_maps, container,
 				false);
-
+		mSearch = (EditText) rootView.findViewById(R.id.editTextLocation);
 		mMapView = (MapView) rootView.findViewById(R.id.mapView);
 		mMapView.onCreate(savedInstanceState);
 
+		mSearch.bringToFront();
 		mMapView.onResume();// needed to get the map to display immediately
 
 		try {

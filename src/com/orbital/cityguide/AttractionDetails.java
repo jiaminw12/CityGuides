@@ -1,7 +1,7 @@
 package com.orbital.cityguide;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+import com.orbital.cityguide.adapter.CommentListAdapter;
+import com.orbital.cityguide.model.CommentItem;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,7 +21,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -28,18 +29,15 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.RatingBar.OnRatingBarChangeListener;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
+import android.widget.RatingBar.*;
+import android.widget.SimpleAdapter;
 
 public class AttractionDetails extends Activity {
 
 	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAttraction.php";
 	private static final String ADDCOM_URL = "http://192.168.1.5/City_Guide/addComment.php";
+	private static final String READCOM_URL = "http://192.168.1.5/City_Guide/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
@@ -59,8 +57,20 @@ public class AttractionDetails extends Activity {
 	private static final String TAG_LINK = "attr_link";
 	private static final String TAG_APOI = "attr_POI";
 
+	private static final String TAG_COMMENT = "comments";
+	private static final String TAG_CT = "comment_title";
+	private static final String TAG_TEXT = "comment_text";
+	private static final String TAG_RATE = "rating";
+	private static final String TAG_DATE = "date_created";
+	private static final String TAG_USR_IMG = "image";
+	private static final String TAG_USR_NAME = "username";
+
 	// An array of all of our attractions
 	private JSONArray mAttractions = null;
+
+	// An array of all of comments
+	private JSONArray mComments = null;
+
 	// JSON parser class
 	JSONParser jsonParser = new JSONParser();
 
@@ -70,6 +80,8 @@ public class AttractionDetails extends Activity {
 	TextView mLink;
 	TextView mOpenHrs;
 	MapView mMapView;
+	TextView mReview;
+	ListView mList;
 	private GoogleMap googleMap;
 	// Progress Dialog
 	private ProgressDialog pDialog;
@@ -82,6 +94,9 @@ public class AttractionDetails extends Activity {
 	String mAttr_id, title, alertboxmsg;
 	String name_profile;
 	int success;
+
+	ArrayList<CommentItem> commentItem = null;
+	CommentListAdapter commentListAdapter;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -123,6 +138,8 @@ public class AttractionDetails extends Activity {
 				}
 			}
 		});
+
+		mReview = (TextView) findViewById(R.id.title_review);
 
 		new GetAttrDetails().execute();
 	}
@@ -221,9 +238,7 @@ public class AttractionDetails extends Activity {
 
 	class GetAttrDetails extends AsyncTask<String, String, String> {
 
-		/**
-		 * Before starting background thread Show Progress Dialog
-		 * */
+		/* Before starting background thread Show Progress Dialog */
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
@@ -295,6 +310,43 @@ public class AttractionDetails extends Activity {
 								popupMessage(title, alertboxmsg);
 							}
 						}
+
+						JSONObject json_comm = jsonParser.makeHttpRequest(
+								READCOM_URL, "POST", params);
+						if (json_comm != null) {
+							success = json_comm.getInt(TAG_SUCCESS);
+							if (success == 1) {
+								mReview.setVisibility(View.VISIBLE);
+
+								mComments = json_comm.getJSONArray(TAG_COMMENT);
+								commentItem = new ArrayList<CommentItem>();
+								ListView listview = (ListView) findViewById(R.id.list);
+								// looping through All Attractions
+								for (int i = 0; i < mComments.length(); i++) {
+									JSONObject c = mComments.getJSONObject(i);
+
+									CommentItem comItem = new CommentItem();
+
+									comItem.setUsr_img(c.getString(TAG_USR_IMG));
+									comItem.setTitle(c.getString(TAG_CT));
+									comItem.setRate(c.getString(TAG_RATE));
+									comItem.setUsername(c
+											.getString(TAG_USR_NAME));
+									comItem.setDescription(c
+											.getString(TAG_TEXT));
+									comItem.setDate(c.getString(TAG_DATE));
+
+									commentItem.add(comItem);
+								}
+								commentListAdapter = new CommentListAdapter(
+										getApplicationContext(),
+										R.layout.list_item_comment, commentItem);
+
+								listview.setAdapter(commentListAdapter);
+							} else if (success == 0) {
+							}
+						}
+
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
@@ -323,6 +375,10 @@ public class AttractionDetails extends Activity {
 				.target(new LatLng(latitude, longitude)).zoom(12).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
+
+	}
+
+	public void retrieveComment() {
 
 	}
 

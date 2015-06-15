@@ -1,7 +1,6 @@
 package com.orbital.cityguide;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -31,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import android.widget.RatingBar.*;
-import android.widget.SimpleAdapter;
 
 public class AttractionDetails extends Activity {
 
@@ -204,10 +202,8 @@ public class AttractionDetails extends Activity {
 								if (json != null) {
 									success = json.getInt(TAG_SUCCESS);
 									if (success == 1) {
-										title = "Message";
-										alertboxmsg = "Comment created!";
-										popupMessage(title, alertboxmsg);
 										finish();
+										startActivity(getIntent());
 									} else if (success == 0) {
 										title = "Message";
 										alertboxmsg = json
@@ -375,10 +371,6 @@ public class AttractionDetails extends Activity {
 				.target(new LatLng(latitude, longitude)).zoom(12).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
-
-	}
-
-	public void retrieveComment() {
 
 	}
 

@@ -38,6 +38,12 @@ public class CommentListAdapter extends ArrayAdapter<CommentItem> {
 		this.commentItem = commentItem;
 		this.count = commentItem.size();
 	}
+	
+	public void updateResults(ArrayList<CommentItem> commentItem) {
+		this.commentItem = commentItem;
+        //Triggers the list update
+        notifyDataSetChanged();
+    }
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

@@ -368,7 +368,7 @@ public class AttractionDetails extends Activity {
 				.snippet(mAddress);
 		googleMap.addMarker(marker);
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(latitude, longitude)).zoom(12).build();
+				.target(new LatLng(latitude, longitude)).zoom(20).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
 

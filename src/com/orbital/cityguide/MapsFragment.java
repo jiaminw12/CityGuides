@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -53,6 +54,9 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 	String title, alertboxmsg;
 
+	// GPS Location
+	GPSTracker gps;
+
 	// Progress Dialog
 	private ProgressDialog pDialog;
 
@@ -67,8 +71,10 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 	// places of interest
 	private Marker[] placeMarkers;
+
 	// max
 	private final int MAX_PLACES = 20;// most returned from google
+
 	// marker options
 	private MarkerOptions[] places;
 
@@ -87,13 +93,19 @@ public class MapsFragment extends Fragment implements LocationListener {
 		otherIcon = R.drawable.purple_point;
 
 		boolean result = isNetworkAvailable();
+		gps = new GPSTracker(this.getActivity());
 
 		if (result == false) {
-			title = "Message";
-			alertboxmsg = "No internet connection!";
+			title = "Internet Connection Status";
+			alertboxmsg = "Please enable internet.";
 			popupMessage(title, alertboxmsg);
+		} else if (result == true) {
+			if (!(gps.canGetLocation())) {
+				title = "GPS Status";
+				alertboxmsg = "Couldn't get location information. Please enable GPS.";
+				popupMessage(title, alertboxmsg);
+			}
 		}
-
 		View rootView = inflater.inflate(R.layout.fragment_maps, container,
 				false);
 		mSearch = (EditText) rootView.findViewById(R.id.editTextLocation);
@@ -110,68 +122,43 @@ public class MapsFragment extends Fragment implements LocationListener {
 		}
 
 		googleMap = mMapView.getMap();
-		// latitude and longitude
-		double latitude = 37.826237;
-		double longitude = -122.156982;
+		// Enable GPS
+		googleMap.setMyLocationEnabled(true);
 
 		// create marker array
 		placeMarkers = new Marker[MAX_PLACES];
 		// update location
 		updatePlaces();
 
-		// http://thuongnh.com/google-maps-android-v2-tutorial/
-		/*
-		 * //Enable GPS map.setMyLocationEnabled(true);
-		 * 
-		 * //Set the map to current location
-		 * map.setOnMyLocationChangeListener(new OnMyLocationChangeListener() {
-		 * 
-		 * @Override public void onMyLocationChange(Location location) { LatLng
-		 * position = new LatLng(location.getLatitude(),
-		 * location.getLongitude());
-		 * 
-		 * //Zoom parameter is set to 14 CameraUpdate update =
-		 * CameraUpdateFactory.newLatLngZoom(position, 14);
-		 * 
-		 * //Use map.animateCamera(update) if you want moving effect
-		 * map.moveCamera(update); mapView.onResume(); } });
-		 */
-
 		return rootView;
 
 	}
 
-	// location listener functions
-
-	public void onLocationChanged(Location location) {
-		Log.v("MyMapActivity", "location changed");
-		updatePlaces();
-	}
-
-	public void onProviderDisabled(String provider) {
-		Log.v("MyMapActivity", "provider disabled");
-	}
-
-	public void onProviderEnabled(String provider) {
-		Log.v("MyMapActivity", "provider enabled");
-	}
-
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		Log.v("MyMapActivity", "status changed");
-	}
-
 	private void updatePlaces() {
+
+		double lat = 0;
+		double lng = 0;
 		// get location manager
 		locMan = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
+		
 		// get last location
 		Location lastLoc = locMan
-				.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		// double lat = lastLoc.getLatitude();
-		// double lng = lastLoc.getLongitude();
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		gps = new GPSTracker(this.getActivity());
 
-		double lat = -33.8670522;
-		double lng = 151.1957362;
+		// check if GPS location can get
+		if (gps.canGetLocation()) {
+			Log.d("Your Location", "latitude:" + gps.getLatitude()
+					+ ", longitude: " + gps.getLongitude());
+			lat = gps.getLatitude();
+			lng = gps.getLongitude();
+		} else if (lastLoc != null){
+			lat = lastLoc.getLatitude();
+			lng = lastLoc.getLongitude();
+		}
+		
 		// create LatLng
 		LatLng lastLatLng = new LatLng(lat, lng);
 
@@ -181,7 +168,6 @@ public class MapsFragment extends Fragment implements LocationListener {
 		// create and set marker properties
 		userMarker = googleMap.addMarker(new MarkerOptions()
 				.position(lastLatLng).title("You are here")
-				.icon(BitmapDescriptorFactory.fromResource(userIcon))
 				.snippet("Your last recorded location"));
 		// move to location
 		CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -371,6 +357,34 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 		}
 
+	}
+
+	// location listener functions
+
+	public void onLocationChanged(Location location) {
+		Log.v("MyMapActivity", "location changed");
+		// updatePlaces();
+		LatLng position = new LatLng(location.getLatitude(),
+				location.getLongitude());
+
+		// Zoom parameter is set to 14
+		CameraUpdate update = CameraUpdateFactory.newLatLngZoom(position, 20);
+
+		// Use map.animateCamera(update) if you want moving effect
+		googleMap.moveCamera(update);
+		mMapView.onResume();
+	}
+
+	public void onProviderDisabled(String provider) {
+		Log.v("MyMapActivity", "provider disabled");
+	}
+
+	public void onProviderEnabled(String provider) {
+		Log.v("MyMapActivity", "provider enabled");
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		Log.v("MyMapActivity", "status changed");
 	}
 
 	public boolean isNetworkAvailable() {

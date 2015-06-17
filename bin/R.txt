@@ -625,6 +625,7 @@ int id age 0x7f0c009d
 int id aid 0x7f0c00a5
 int id alertTitle 0x7f0c0056
 int id always 0x7f0c003f
+int id autocomplete 0x7f0c0098
 int id automatic 0x7f0c0009
 int id beginning 0x7f0c0046
 int id book_now 0x7f0c002a
@@ -667,7 +668,6 @@ int id display_always 0x7f0c000a
 int id donate_with_google 0x7f0c002d
 int id drawer_layout 0x7f0c00ac
 int id dropdown 0x7f0c0045
-int id editTextLocation 0x7f0c0098
 int id edit_query 0x7f0c0068
 int id email 0x7f0c009c
 int id end 0x7f0c0047

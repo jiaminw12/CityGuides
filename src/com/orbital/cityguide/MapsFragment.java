@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -51,7 +53,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -91,14 +92,14 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 	// marker options
 	private MarkerOptions[] places;
-	
+
 	DownloadTask placesDownloadTask;
 	DownloadTask placeDetailsDownloadTask;
 	ParserTask placesParserTask;
 	ParserTask placeDetailsParserTask;
-	
-	final int PLACES=0;
-	final int PLACES_DETAILS=1;	
+
+	final int PLACES = 0;
+	final int PLACES_DETAILS = 1;
 
 	public MapsFragment() {
 	}
@@ -170,21 +171,26 @@ public class MapsFragment extends Fragment implements LocationListener {
 		// list
 		autocompleteView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-					long id) {
+			public void onItemClick(AdapterView<?> adapterView, View arg1,
+					int position, long id) {
 
-				ListView lv = (ListView) arg0;
-				SimpleAdapter adapter = (SimpleAdapter) arg0.getAdapter();
+				ListView lv = (ListView) adapterView;
 
-				HashMap<String, String> hm = (HashMap<String, String>) adapter
-						.getItem(index);
+				HashMap<String, String> selectedValue = (HashMap<String, String>) (lv
+						.getItemAtPosition(position));
+				autocompleteView.setText(selectedValue.get("description"));
+
+				InputMethodManager imm = (InputMethodManager) getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(autocompleteView.getWindowToken(),
+						0);
 
 				// Creating a DownloadTask to download Places details of the
 				// selected place
 				placeDetailsDownloadTask = new DownloadTask(PLACES_DETAILS);
 
 				// Getting url to the Google Places details api
-				String url = getPlaceDetailsUrl(hm.get("reference"));
+				String url = getPlaceDetailsUrl(selectedValue.get("reference"));
 
 				// Start downloading Google Place Details
 				// This causes to execute doInBackground() of DownloadTask class
@@ -410,6 +416,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 				// Setting the adapter
 				autocompleteView.setAdapter(adapter);
+				
 				break;
 			case PLACES_DETAILS:
 				HashMap<String, String> hm = result.get(0);
@@ -422,11 +429,12 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 				// Getting GoogleMap from SupportMapFragment
 				googleMap = mMapView.getMap();
-				
+
 				// remove any existing marker
 				if (userMarker != null)
+					googleMap.clear();
 					userMarker.remove();
-				
+
 				LatLng point = new LatLng(latitude, longitude);
 
 				CameraUpdate cameraPosition = CameraUpdateFactory
@@ -445,7 +453,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 				// Adding the marker in the Google Map
 				googleMap.addMarker(options);
-				
+
 				String latVal = String.valueOf(latitude);
 				String lngVal = String.valueOf(longitude);
 				String url;
@@ -459,11 +467,13 @@ public class MapsFragment extends Fragment implements LocationListener {
 							+ "&sensor="
 							+ URLEncoder.encode("true", "UTF-8")
 							+ "&types="
-							+ URLEncoder.encode("food|bar|church|museum|art_gallery",
+							+ URLEncoder.encode(
+									"food|bar|church|museum|art_gallery",
 									"UTF-8")
 							+ "&key="
 							+ URLEncoder.encode(
-									"AIzaSyDkkR-XhiW9uVPhvM_T5GFrqrC-aeXas4U", "UTF-8");
+									"AIzaSyDkkR-XhiW9uVPhvM_T5GFrqrC-aeXas4U",
+									"UTF-8");
 					new GetPlaces().execute(url);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
@@ -701,6 +711,11 @@ public class MapsFragment extends Fragment implements LocationListener {
 	}
 
 	public void onLocationChanged(Location location) {
+		
+		// remove any existing marker
+		if (userMarker != null)
+			userMarker.remove();
+		
 		Log.v("MyMapActivity", "location changed");
 		// updatePlaces();
 		LatLng position = new LatLng(location.getLatitude(),

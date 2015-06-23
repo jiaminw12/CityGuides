@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -33,9 +34,9 @@ import android.widget.RatingBar.*;
 
 public class AttractionDetails extends Activity {
 
-	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAttraction.php";
-	private static final String ADDCOM_URL = "http://192.168.1.5/City_Guide/addComment.php";
-	private static final String READCOM_URL = "http://192.168.1.5/City_Guide/getComment.php";
+	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAttraction.php";
+	private static final String ADDCOM_URL = "http://192.168.1.7/City_Guide/addComment.php";
+	private static final String READCOM_URL = "http://192.168.1.7/City_Guide/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
@@ -92,6 +93,8 @@ public class AttractionDetails extends Activity {
 	String mAttr_id, title, alertboxmsg;
 	String name_profile;
 	int success;
+	String url;
+	Bundle bundle;
 
 	ArrayList<CommentItem> commentItem = null;
 	CommentListAdapter commentListAdapter;
@@ -282,7 +285,7 @@ public class AttractionDetails extends Activity {
 									String mlong = c.getString(TAG_LONG);
 									String openHrs = c.getString(TAG_OHRS);
 									String img = c.getString(TAG_IMG);
-									String link = c.getString(TAG_LINK);
+									final String link = c.getString(TAG_LINK);
 
 									byte[] image = Base64.decode(img,
 											Base64.DEFAULT);
@@ -294,9 +297,25 @@ public class AttractionDetails extends Activity {
 									mTitle.setText(title);
 									mDetail.setText(desc);
 									mOpenHrs.setText(openHrs);
-									mLink.setText(link);
-									mLink.setMovementMethod(LinkMovementMethod
-											.getInstance());
+									if (!(link.equalsIgnoreCase("null"))) {
+										mLink.setText(link);
+										mLink.setOnClickListener(new View.OnClickListener() {
+
+											@Override
+											public void onClick(View v) {
+												Intent nextActivity = new Intent(
+														AttractionDetails.this,
+														WebViewActivity.class);
+												Bundle extras = new Bundle();
+												extras.putString("url", link);
+												extras.putString("profile_username", name_profile);
+												extras.putString("AID", mAttr_id);
+												nextActivity.putExtras(extras);
+												startActivity(nextActivity);
+											}
+
+										});
+									}
 
 									setMap(mlat, mlong, title, addr);
 								}
@@ -307,16 +326,27 @@ public class AttractionDetails extends Activity {
 							}
 						}
 
+						TableRow row = (TableRow) findViewById(R.id.tableRow6);
+
 						JSONObject json_comm = jsonParser.makeHttpRequest(
 								READCOM_URL, "POST", params);
 						if (json_comm != null) {
 							success = json_comm.getInt(TAG_SUCCESS);
 							if (success == 1) {
+								row.setVisibility(View.VISIBLE);
 								mReview.setVisibility(View.VISIBLE);
 
 								mComments = json_comm.getJSONArray(TAG_COMMENT);
 								commentItem = new ArrayList<CommentItem>();
 								ListView listview = (ListView) findViewById(R.id.list);
+
+								if (mComments.length() < 2) {
+									listview.getLayoutParams().height = 500 / 2;
+								} else {
+									listview.getLayoutParams().height = 500 * mComments
+											.length() / 2;
+								}
+
 								// looping through All Attractions
 								for (int i = 0; i < mComments.length(); i++) {
 									JSONObject c = mComments.getJSONObject(i);
@@ -368,7 +398,7 @@ public class AttractionDetails extends Activity {
 				.snippet(mAddress);
 		googleMap.addMarker(marker);
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(latitude, longitude)).zoom(20).build();
+				.target(new LatLng(latitude, longitude)).zoom(14).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
 

@@ -104,7 +104,8 @@
 
                 <TextView
                     android:id="@+id/weblink"
-                    android:autoLink="web"
+                    android:clickable="true"
+                    android:textColor="#ff0000ff"
                     android:textSize="15sp" />
             </TableRow>
 
@@ -141,7 +142,7 @@
                     android:text="Write Your Review"
                     android:textColor="#ffffff" />
             </TableRow>
-            
+
             <TextView
                 android:id="@+id/title_review"
                 android:layout_width="wrap_content"
@@ -151,14 +152,14 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:visibility="invisible" />
-            
+
             <!-- List of Comments -->
 
             <TableRow
                 android:id="@+id/tableRow6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="500px" >
+                android:visibility="invisible" >
 
                 <ListView
                     android:id="@+id/list"

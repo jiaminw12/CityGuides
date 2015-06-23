@@ -514,8 +514,11 @@ public class MapsFragment extends Fragment implements LocationListener {
 		LatLng lastLatLng = new LatLng(lat, lng);
 
 		// remove any existing marker
-		if (userMarker != null)
+		if (userMarker != null) {
+			googleMap.clear();
 			userMarker.remove();
+		}
+		
 		// create and set marker properties
 		userMarker = googleMap.addMarker(new MarkerOptions()
 				.position(lastLatLng).title("You are here")
@@ -714,6 +717,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 		
 		// remove any existing marker
 		if (userMarker != null)
+			googleMap.clear();
 			userMarker.remove();
 		
 		Log.v("MyMapActivity", "location changed");

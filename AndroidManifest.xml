@@ -81,6 +81,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.orbital.cityguide.MainActivity" />
         </activity>
+        <activity
+            android:name="com.orbital.cityguide.WebViewActivity"
+            android:label="@string/app_name"
+            android:parentActivityName="com.orbital.cityguide.MainActivity" >
+
+            <!-- The meta-data element is needed for versions lower than 4.1 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.orbital.cityguide.MainActivity" />
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"

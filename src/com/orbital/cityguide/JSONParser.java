@@ -74,7 +74,6 @@ public class JSONParser {
             is.close();
             // Convert the string builder data to an actual string.
             json = sb.toString();
-            Log.d("JSON", json);
         } catch (Exception e) {
             Log.e("Buffer Error", "Error converting result " + e.toString());
         }
@@ -141,7 +140,6 @@ public class JSONParser {
             }
             is.close();
             json = sb.toString();
-            Log.d("JSON", json);
         } catch (Exception e) {
             Log.e("Buffer Error", "Error converting result " + e.toString());
         }

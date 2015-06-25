@@ -32,7 +32,7 @@ public class SearchFragment extends ListFragment {
 
 	JSONParser jParser = new JSONParser();
 
-	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAllAttractions.php";
+	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAllAttractions.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";

@@ -49,8 +49,9 @@ public class ViewProfileFragment extends Fragment {
 	ImageView mProfilePic;
 	TextView mUsername;
 	TextView mEmail;
-	TextView mAge;
+	TextView mDate;
 	TextView mGender;
+	Button mSubmit;
 
 	private LoginButton loginFacebook;
 	CallbackManager callbackManager;
@@ -59,7 +60,11 @@ public class ViewProfileFragment extends Fragment {
 	String name_profile;
 	int success;
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
+	static int LOAD_IMAGE = 1;
+	static int LOAD_IMAGE_KITKAT = 2;
+	static int TAKE_PICTURE = 3;
+
+	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_USERNAME = "username";
@@ -88,8 +93,19 @@ public class ViewProfileFragment extends Fragment {
 
 		mProfilePic = (ImageView) rootView.findViewById(R.id.profilepic);
 		mUsername = (TextView) rootView.findViewById(R.id.userName);
-		mAge = (TextView) rootView.findViewById(R.id.userName);
-		mGender = (TextView) rootView.findViewById(R.id.userName);
+		mDate = (TextView) rootView.findViewById(R.id.date);
+		mGender = (TextView) rootView.findViewById(R.id.gender);
+		mSubmit = (Button) rootView.findViewById(R.id.submit);
+		mSubmit.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Starting new intent
+				Intent in = new Intent(getActivity(), EditProfile.class);
+				in.putExtra("profile_username", name_profile);
+				startActivity(in);
+			}
+
+		});
 
 		setRetainInstance(true);
 		return rootView;
@@ -98,6 +114,12 @@ public class ViewProfileFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		init();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 		init();
 	}
 
@@ -147,8 +169,10 @@ public class ViewProfileFragment extends Fragment {
 							}
 
 							mUsername.setText(name);
-							mAge.setText(birthDate);;
-							mGender.setText(gender);;
+							mDate.setText(birthDate);
+							;
+							mGender.setText(gender);
+							;
 						}
 					} else if (success == 0) {
 						title = "Message";

@@ -4,6 +4,13 @@ import com.orbital.cityguide.adapter.NavDrawerListAdapter;
 import com.orbital.cityguide.model.NavDrawerItem;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -11,17 +18,22 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,15 +55,30 @@ public class AfterLoginNavigationList extends Activity {
 
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
-	
+
+	String title, alertboxmsg;
+	int success;
 	String name_profile;
 	Bundle bundle;
+	
+	ImageView mImage;
+	
+	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
+	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_USER = "userprofile";
+	private static final String TAG_IMAGE = "image";
+
+	// An array of all of our attractions
+	private JSONArray mUsers = null;
+	
+	// JSON parser class
+	JSONParser jsonParser = new JSONParser();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.navigation_list);
-		
+
 		Bundle extras = getIntent().getExtras();
 		name_profile = extras.getString("profile_username");
 
@@ -71,6 +98,8 @@ public class AfterLoginNavigationList extends Activity {
 
 		View listHeaderView = inflater.inflate(R.layout.header_list, null,
 				false);
+		mImage = (ImageView) listHeaderView.findViewById(R.id.photo);
+		updateImage();
 		TextView mName = (TextView) listHeaderView.findViewById(R.id.name);
 		mName.setText(name_profile);
 
@@ -135,10 +164,53 @@ public class AfterLoginNavigationList extends Activity {
 			displayView(0);
 		}
 	}
+	
+	public void updateImage(){
+		String username = name_profile;
 
-	/**
-	 * Slide menu item click listener
-	 * */
+		if (!(username.matches(""))) {
+			try {
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("username", username));
+
+				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+						.permitAll().build();
+				StrictMode.setThreadPolicy(policy);
+
+				JSONObject json = jsonParser.makeHttpRequest(GETUSR_URL,
+						"POST", params);
+				if (json != null) {
+					success = json.getInt(TAG_SUCCESS);
+					if (success == 1) {
+
+						mUsers = json.getJSONArray(TAG_USER);
+
+						// looping through All Attractions
+						for (int i = 0; i < mUsers.length(); i++) {
+							JSONObject c = mUsers.getJSONObject(i);
+
+							// Storing each json item in variable
+							String image_pic = c.getString(TAG_IMAGE);
+
+							if (!image_pic.equalsIgnoreCase("null")) {
+								byte[] image = Base64.decode(image_pic,
+										Base64.DEFAULT);
+								Bitmap bitmap = BitmapFactory.decodeByteArray(
+										image, 0, image.length);
+								mImage.setImageBitmap(bitmap);
+							} else {
+								mImage.setVisibility(View.GONE);
+							}
+						}
+					} 
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/*Slide menu item click listener*/
 	private class SlideMenuClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -148,12 +220,14 @@ public class AfterLoginNavigationList extends Activity {
 			displayView(position);
 		}
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -169,10 +243,9 @@ public class AfterLoginNavigationList extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
 
-	/* *
-	 * Called when invalidateOptionsMenu() is triggered
-	 */
+	/*Called when invalidateOptionsMenu() is triggered*/
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// if nav drawer is opened, hide the action items
@@ -180,10 +253,9 @@ public class AfterLoginNavigationList extends Activity {
 		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
 	}
+	
 
-	/**
-	 * Diplaying fragment view for selected nav drawer list item
-	 * */
+	/*Diplaying fragment view for selected nav drawer list item*/
 	private void displayView(int position) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
@@ -244,12 +316,14 @@ public class AfterLoginNavigationList extends Activity {
 			Log.e("MainActivity", "Error in creating fragment");
 		}
 	}
+	
 
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
 	}
+	
 
 	/**
 	 * When using the ActionBarDrawerToggle, you must call it during
@@ -262,6 +336,7 @@ public class AfterLoginNavigationList extends Activity {
 		// Sync the toggle state after onRestoreInstanceState has occurred.
 		mDrawerToggle.syncState();
 	}
+	
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -269,6 +344,7 @@ public class AfterLoginNavigationList extends Activity {
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
+	
 
 	@Override
 	public void onBackPressed() {

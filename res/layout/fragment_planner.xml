@@ -1,22 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
-    <TextView
-        android:id="@+id/txtLabel"
-         android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
+
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="16dp"
-        android:text="Planner View"/>
-    
-    <ImageView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txtLabel"
-        android:src="@drawable/ic_home"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"/>
-    
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/profilepic"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:stretchColumns="*" >
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:id="@+id/TextView01"
+                android:layout_weight="1"
+                android:padding="20dip"
+                android:text="From: "
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/fromDate"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textColorHint="#B6B6B4"
+                android:textSize="15sp" />
+
+            <ImageButton
+                android:id="@+id/pickFromDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="DatePicker"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic_calendar" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:id="@+id/TextView02"
+                android:layout_weight="1"
+                android:padding="18dip"
+                android:text="To: "
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/toDate"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textColorHint="#B6B6B4"
+                android:textSize="15sp" />
+
+            <ImageButton
+                android:id="@+id/pickToDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="13dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="DatePicker"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic_calendar" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:id="@+id/TextView03"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="OR"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/numOfDays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textColorHint="#B6B6B4"
+                android:textSize="15sp" />
+        </TableRow>
+        
+         <TextView
+                android:id="@+id/TextView04"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Organize your trip: "
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        
+         <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <ListView
+                android:id="@+id/watingList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textColorHint="#B6B6B4"
+                android:textSize="15sp" />
+        </TableRow>
+        
+        
+    </TableLayout>
 
 </RelativeLayout>

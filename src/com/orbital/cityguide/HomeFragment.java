@@ -1,9 +1,14 @@
 package com.orbital.cityguide;
 
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -21,11 +26,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.devsmart.android.ui.HorizontalListView;
+import com.orbital.cityguide.adapter.WeatherForecastListAdapter;
+import com.orbital.cityguide.model.WeatherForecastItem;
 
 public class HomeFragment extends Fragment {
 
@@ -39,6 +52,10 @@ public class HomeFragment extends Fragment {
 	TextView detailsField;
 	TextView currentTemperatureField;
 	TextView weatherIcon;
+
+	HorizontalListView mlistview;
+	WeatherForecastListAdapter weatherForecastListAdapter;
+	ArrayList<WeatherForecastItem> weatherForecastItem = null;
 
 	Handler handler;
 
@@ -57,7 +74,7 @@ public class HomeFragment extends Fragment {
 		currentTemperatureField = (TextView) rootView
 				.findViewById(R.id.current_temperature_field);
 		weatherIcon = (TextView) rootView.findViewById(R.id.weather_icon);
-
+		mlistview = (HorizontalListView) rootView.findViewById(R.id.listView);
 		weatherIcon.setTypeface(weatherFont);
 		return rootView;
 	}
@@ -81,7 +98,9 @@ public class HomeFragment extends Fragment {
 			public void run() {
 				final JSONObject json = RemoteFetch
 						.getJSON(getActivity(), city);
-				if (json == null) {
+				final JSONObject jsonDaily = RemoteFetch.getDailyJSON(
+						getActivity(), city);
+				if (json == null && jsonDaily == null) {
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(
@@ -95,6 +114,7 @@ public class HomeFragment extends Fragment {
 					handler.post(new Runnable() {
 						public void run() {
 							renderWeather(json);
+							renderWeatherDaily(jsonDaily);
 						}
 					});
 				}
@@ -133,8 +153,48 @@ public class HomeFragment extends Fragment {
 					.getLong("sunset") * 1000);
 
 		} catch (Exception e) {
-			Log.e("SimpleWeather",
-					"One or more fields not found in the JSON data");
+			Log.e("Weather", "One or more fields not found in the JSON data");
+		}
+	}
+
+	private void renderWeatherDaily(JSONObject json) {
+		try {
+
+			mlistview.getLayoutParams().width = 1049;
+
+			weatherForecastItem = new ArrayList<WeatherForecastItem>();
+
+			// looping through All Attractions
+			for (int i = 0; i < 7; i++) {
+				JSONObject list = json.getJSONArray("list").getJSONObject(i);
+
+				JSONObject mWeather = list.getJSONArray("weather")
+						.getJSONObject(0);
+				JSONObject mTemp = list.getJSONObject("temp");
+
+				WeatherForecastItem weatherItem = new WeatherForecastItem();
+
+				DateFormatSymbols symbols = new DateFormatSymbols(new Locale(
+						"en"));
+				String[] dayNames = symbols.getInstance().getShortWeekdays();
+				weatherItem.setDate(dayNames[i + 1]);
+
+				weatherItem
+						.setIconString(setWeatherIcon(mWeather.getInt("id")));
+				weatherItem.setTemperature(String.format("%.1f",
+						mTemp.getDouble("day")));
+
+				weatherForecastItem.add(weatherItem);
+			}
+
+			weatherForecastListAdapter = new WeatherForecastListAdapter(
+					getActivity().getApplicationContext(),
+					R.layout.list_item_weather, weatherForecastItem);
+
+			mlistview.setAdapter(weatherForecastListAdapter);
+
+		} catch (Exception e) {
+			Log.e("Weather 2", "One or more fields not found in the JSON data");
 		}
 	}
 
@@ -171,6 +231,42 @@ public class HomeFragment extends Fragment {
 			}
 		}
 		weatherIcon.setText(icon);
+	}
+
+	private String setWeatherIcon(int actualId) {
+		int id = actualId / 100;
+		String icon = "";
+		if (actualId == 800) {
+			Calendar now = Calendar.getInstance();
+			int a = now.get(Calendar.AM_PM);
+			if (a == Calendar.AM) {
+				icon = getActivity().getString(R.string.weather_sunny);
+			} else {
+				icon = getActivity().getString(R.string.weather_clear_night);
+			}
+		} else {
+			switch (id) {
+			case 2:
+				icon = getActivity().getString(R.string.weather_thunder);
+				break;
+			case 3:
+				icon = getActivity().getString(R.string.weather_drizzle);
+				break;
+			case 7:
+				icon = getActivity().getString(R.string.weather_foggy);
+				break;
+			case 8:
+				icon = getActivity().getString(R.string.weather_cloudy);
+				break;
+			case 6:
+				icon = getActivity().getString(R.string.weather_snowy);
+				break;
+			case 5:
+				icon = getActivity().getString(R.string.weather_rainy);
+				break;
+			}
+		}
+		return icon;
 	}
 
 	public void popupMessage(String title, String msg) {

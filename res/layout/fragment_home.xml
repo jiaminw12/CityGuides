@@ -6,8 +6,7 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FF0099CC" >
+        android:layout_height="match_parent" >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,8 +22,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/counter_text_color_white" />
+                android:textColor="@color/counter_text_color_black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/updated_field"
@@ -32,29 +32,17 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/city_field"
                 android:layout_centerHorizontal="true"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/counter_text_color_white"
+                android:textColor="@color/counter_text_color_black"
                 android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/weather_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/updated_field"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/counter_text_color_white"
+                android:textColor="@color/counter_text_color_black"
                 android:textSize="70sp" />
-
-            <TextView
-                android:id="@+id/current_temperature_field"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/counter_text_color_white"
-                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/details_field"
@@ -62,8 +50,27 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/weather_icon"
                 android:layout_centerHorizontal="true"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/counter_text_color_white" />
+                android:layout_marginTop="15dp"
+                android:textColor="@color/counter_text_color_black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/current_temperature_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/details_field"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:textColor="@color/counter_text_color_black"
+                android:textSize="70sp" />
+
+            <com.devsmart.android.ui.HorizontalListView
+                android:id="@+id/listView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/current_temperature_field"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp" />
         </RelativeLayout>
     </FrameLayout>
 

@@ -120,14 +120,7 @@ public class ViewProfileFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		init();
-	}
-
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        	    
-        }
-    };   
+	} 
     
     @Override
 	public void onResume() {

@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -189,8 +190,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 							mUsername.setText(name);
 							mEmail.setText(email);
 							mDate.setText(birthDate);
-							genderAdapter = ArrayAdapter.createFromResource(this,
-									R.array.genderArray,
+							genderAdapter = ArrayAdapter.createFromResource(
+									this, R.array.genderArray,
 									android.R.layout.simple_spinner_item);
 							mGender.setAdapter(this.genderAdapter);
 							int pposition = genderAdapter.getPosition(gender);
@@ -246,8 +247,9 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 					image = Base64.encodeToString(imageArr, Base64.DEFAULT);
 				}
 
-				if (!username.matches("") && !emailAddress.matches("") && !date.matches("")
-						&& !gender.matches("") && !image.matches("")) {
+				if (!username.matches("") && !emailAddress.matches("")
+						&& !date.matches("") && !gender.matches("")
+						&& !image.matches("")) {
 
 					try {
 						List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -263,8 +265,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 								.permitAll().build();
 						StrictMode.setThreadPolicy(policy);
 
-						JSONObject json = jsonParser.makeHttpRequest(UPDATEUSR_URL,
-								"POST", params);
+						JSONObject json = jsonParser.makeHttpRequest(
+								UPDATEUSR_URL, "POST", params);
 						if (json != null) {
 							success = json.getInt(TAG_SUCCESS);
 							if (success == 1) {
@@ -275,7 +277,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 								bundle.putString("edttext", "From Activity");
 								Fragment fragment = new ViewProfileFragment();
 								bundle = new Bundle();
-								bundle.putString("profile_username", name_profile);
+								bundle.putString("profile_username",
+										name_profile);
 								fragment.setArguments(bundle);
 								finish();
 							} else if (success == 0) {
@@ -314,24 +317,31 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 		});
 
 		mTakePic = (Button) findViewById(R.id.takePicture);
-		mTakePic.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		boolean result = isDeviceSupportCamera();
+		if (result == false) {
+			mTakePic.setVisibility(View.GONE);
+		} else {
+			mTakePic.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-				File file = new File(Environment.getExternalStorageDirectory(),
-						"MyPhoto.jpg");
-				outputFileUri = Uri.fromFile(file);
-				intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+					File file = new File(Environment
+							.getExternalStorageDirectory(), "MyPhoto.jpg");
+					outputFileUri = Uri.fromFile(file);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
-				startActivityForResult(intent, TAKE_PICTURE);
-			}
-		});
+					startActivityForResult(intent, TAKE_PICTURE);
+				}
+			});
+		}
 
 	}
 
-	// PictureUpload
+	/*---------------------- IMAGE ------------------------------*/
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+
+		mProfilePic = (ImageView) findViewById(R.id.imgView);
 
 		if (resultCode == RESULT_OK) {
 			// LOAD_IMAGE
@@ -348,12 +358,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 				String picturePath = cursor.getString(columnIndex);
 				cursor.close();
 
-				Log.e("path", picturePath); // use selectedImagePath
-
-				mProfilePic = (ImageView) findViewById(R.id.imgView);
 				bmp = BitmapFactory.decodeFile(picturePath);
 				bmp = Shrink(picturePath, 100, 200);
-				mProfilePic.setImageBitmap(bmp);
 
 			} else if (requestCode == 2) {
 				// LOAD_IMAGE_KITKAT
@@ -373,20 +379,18 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 					selectedImagePath = imageCursor.getString(imageCursor
 							.getColumnIndex(MediaStore.Images.Media.DATA));
 				}
-				Log.e("path", selectedImagePath); // use selectedImagePath
 
-				mProfilePic = (ImageView) findViewById(R.id.imgView);
 				bmp = BitmapFactory.decodeFile(selectedImagePath);
 				bmp = Shrink(selectedImagePath, 100, 200);
-				mProfilePic.setImageBitmap(bmp);
 
 			} else if (requestCode == 3) {
+				Log.e("path", outputFileUri.getPath());
+
 				// TAKE_PICTURE
-				mProfilePic = (ImageView) findViewById(R.id.imgView);
-				BitmapDrawable bmpd = new BitmapDrawable(getResources(),
-						outputFileUri.getPath());
-				mProfilePic.setImageDrawable(bmpd);
+				bmp = BitmapFactory.decodeFile(outputFileUri.getPath());
+				bmp = Shrink(outputFileUri.getPath(), 100, 200);
 			}
+			mProfilePic.setImageBitmap(bmp);
 		}
 	}
 
@@ -440,6 +444,20 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 				.append(yy).append("-")
 				.append(mm < 9 ? "0" + (mm + 1) : mm + 1).append("-")
 				.append(dd < 10 ? "0" + dd : dd));
+	}
+
+	/**
+	 * Checking device has camera hardware or not
+	 * */
+	private boolean isDeviceSupportCamera() {
+		if (getApplicationContext().getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_CAMERA)) {
+			// this device has a camera
+			return true;
+		} else {
+			// no camera on this device
+			return false;
+		}
 	}
 
 	public void popupMessage(String title, String msg) {

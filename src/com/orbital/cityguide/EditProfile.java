@@ -41,6 +41,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -109,6 +110,7 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editprofile);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		Bundle bundle = getIntent().getExtras();
 		name_profile = bundle.getString("profile_username", name_profile);
@@ -458,6 +460,17 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 			// no camera on this device
 			return false;
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		// Respond to the action bar's Up/Home button
+		case android.R.id.home:
+			this.finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void popupMessage(String title, String msg) {

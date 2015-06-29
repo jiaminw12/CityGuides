@@ -57,6 +57,8 @@ public class HomeFragment extends Fragment {
 	WeatherForecastListAdapter weatherForecastListAdapter;
 	ArrayList<WeatherForecastItem> weatherForecastItem = null;
 
+	String dayNames[];
+
 	Handler handler;
 
 	public HomeFragment() {
@@ -76,6 +78,8 @@ public class HomeFragment extends Fragment {
 		weatherIcon = (TextView) rootView.findViewById(R.id.weather_icon);
 		mlistview = (HorizontalListView) rootView.findViewById(R.id.listView);
 		weatherIcon.setTypeface(weatherFont);
+
+		retrieveDay();
 		return rootView;
 	}
 
@@ -91,6 +95,42 @@ public class HomeFragment extends Fragment {
 	public void onResume() {
 		super.onResume();
 		updateWeatherData(new CityPreference(getActivity()).getCity());
+	}
+
+	public void retrieveDay() {
+		Calendar calendar = Calendar.getInstance();
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		Log.d("Day : ", String.valueOf(day));
+		switch (day) {
+		case Calendar.SUNDAY:
+			dayNames = new String[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri",
+					"Sat" };
+			break;
+		case Calendar.MONDAY:
+			dayNames = new String[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+					"Sun" };
+			break;
+		case Calendar.TUESDAY:
+			dayNames = new String[] { "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+					"Mon" };
+			break;
+		case Calendar.WEDNESDAY:
+			dayNames = new String[] { "Wed", "Thu", "Fri", "Sat", "Sun", "Mon",
+					"Tue" };
+			break;
+		case Calendar.THURSDAY:
+			dayNames = new String[] { "Thu", "Fri", "Sat", "Sun", "Mon", "Tue",
+					"Wed" };
+			break;
+		case Calendar.FRIDAY:
+			dayNames = new String[] { "Fri", "Sat", "Sun", "Mon", "Tue", "Wed",
+					"Thu" };
+			break;
+		case Calendar.SATURDAY:
+			dayNames = new String[] { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu",
+					"Fri" };
+			break;
+		}
 	}
 
 	private void updateWeatherData(final String city) {
@@ -173,15 +213,7 @@ public class HomeFragment extends Fragment {
 				JSONObject mTemp = list.getJSONObject("temp");
 
 				WeatherForecastItem weatherItem = new WeatherForecastItem();
-
-				Calendar calendar = Calendar.getInstance();
-				int day = calendar.get(Calendar.DAY_OF_WEEK);
-
-				DateFormatSymbols symbols = new DateFormatSymbols(new Locale(
-						"en"));
-				String[] dayNames = symbols.getInstance().getShortWeekdays();
-				weatherItem.setDate(dayNames[i + 1]);
-		
+				weatherItem.setDate(dayNames[i]);
 				weatherItem
 						.setIconString(setWeatherIcon(mWeather.getInt("id")));
 				weatherItem.setTemperature(String.format("%.1f",

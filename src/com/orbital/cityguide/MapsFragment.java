@@ -46,6 +46,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -65,6 +66,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 	AutoCompleteTextView autocompleteView;
 	MapView mMapView;
+	ImageView ins;
 	private GoogleMap googleMap;
 
 	String title, alertboxmsg;
@@ -136,6 +138,9 @@ public class MapsFragment extends Fragment implements LocationListener {
 		autocompleteView.setThreshold(1);
 		autocompleteView.bringToFront();
 
+		ins = (ImageView)rootView.findViewById(R.id.imageView1);
+		ins.bringToFront();
+		
 		// Adding textchange listener
 		autocompleteView.addTextChangedListener(new TextWatcher() {
 
@@ -416,7 +421,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 				// Setting the adapter
 				autocompleteView.setAdapter(adapter);
-				
+
 				break;
 			case PLACES_DETAILS:
 				HashMap<String, String> hm = result.get(0);
@@ -433,7 +438,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 				// remove any existing marker
 				if (userMarker != null)
 					googleMap.clear();
-					userMarker.remove();
+				userMarker.remove();
 
 				LatLng point = new LatLng(latitude, longitude);
 
@@ -463,13 +468,13 @@ public class MapsFragment extends Fragment implements LocationListener {
 							+ ","
 							+ URLEncoder.encode(lngVal, "UTF-8")
 							+ "&radius="
-							+ URLEncoder.encode("5000", "UTF-8")
+							+ URLEncoder.encode("500", "UTF-8")
 							+ "&sensor="
 							+ URLEncoder.encode("true", "UTF-8")
 							+ "&types="
-							+ URLEncoder.encode(
-									"food|bar|church|museum|art_gallery",
-									"UTF-8")
+							+ URLEncoder
+									.encode("food|bar|shopping_mall|museum|art_gallery",
+											"UTF-8")
 							+ "&key="
 							+ URLEncoder.encode(
 									"AIzaSyDkkR-XhiW9uVPhvM_T5GFrqrC-aeXas4U",
@@ -518,7 +523,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 			googleMap.clear();
 			userMarker.remove();
 		}
-		
+
 		// create and set marker properties
 		userMarker = googleMap.addMarker(new MarkerOptions()
 				.position(lastLatLng).title("You are here")
@@ -540,11 +545,12 @@ public class MapsFragment extends Fragment implements LocationListener {
 					+ ","
 					+ URLEncoder.encode(lngVal, "UTF-8")
 					+ "&radius="
-					+ URLEncoder.encode("5000", "UTF-8")
+					+ URLEncoder.encode("500", "UTF-8")
 					+ "&sensor="
 					+ URLEncoder.encode("true", "UTF-8")
 					+ "&types="
-					+ URLEncoder.encode("food|bar|church|museum|art_gallery",
+					+ URLEncoder.encode(
+							"food|bar|shopping_mall|museum|art_gallery",
 							"UTF-8")
 					+ "&key="
 					+ URLEncoder.encode(
@@ -714,12 +720,12 @@ public class MapsFragment extends Fragment implements LocationListener {
 	}
 
 	public void onLocationChanged(Location location) {
-		
+
 		// remove any existing marker
 		if (userMarker != null)
 			googleMap.clear();
 			userMarker.remove();
-		
+
 		Log.v("MyMapActivity", "location changed");
 		// updatePlaces();
 		LatLng position = new LatLng(location.getLatitude(),

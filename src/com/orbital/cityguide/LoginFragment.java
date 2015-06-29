@@ -124,6 +124,8 @@ public class LoginFragment extends Fragment {
 	}
 
 	public void init() {
+		
+		final boolean result = isNetworkAvailable();
 
 		register.setOnClickListener(new OnClickListener() {
 			@Override
@@ -145,7 +147,7 @@ public class LoginFragment extends Fragment {
 					title = "Error Message";
 					alertboxmsg = "Required field(s) is missing.";
 					popupMessage(title, alertboxmsg);
-				} else {
+				} else if (result == true){
 					try {
 						List<NameValuePair> params = new ArrayList<NameValuePair>();
 						params.add(new BasicNameValuePair("username", username));
@@ -179,9 +181,26 @@ public class LoginFragment extends Fragment {
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
+				} else if (result == false){
+					title = "Message";
+					alertboxmsg = "Please enable internet.";
+					popupMessage(title, alertboxmsg);
 				}
 			}
 		});
+	}
+	
+	public boolean isNetworkAvailable() {
+		ConnectivityManager connManager = (ConnectivityManager) this
+				.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// if no network is available networkInfo will be null
+		// otherwise check if we are connected
+		if (mWifi != null && mWifi.isConnected()) {
+			return true;
+		}
+		return false;
 	}
 
 	public void popupMessage(String title, String msg) {
@@ -199,4 +218,5 @@ public class LoginFragment extends Fragment {
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
+
 }

@@ -174,11 +174,14 @@ public class HomeFragment extends Fragment {
 
 				WeatherForecastItem weatherItem = new WeatherForecastItem();
 
+				Calendar calendar = Calendar.getInstance();
+				int day = calendar.get(Calendar.DAY_OF_WEEK);
+
 				DateFormatSymbols symbols = new DateFormatSymbols(new Locale(
 						"en"));
 				String[] dayNames = symbols.getInstance().getShortWeekdays();
 				weatherItem.setDate(dayNames[i + 1]);
-
+		
 				weatherItem
 						.setIconString(setWeatherIcon(mWeather.getInt("id")));
 				weatherItem.setTemperature(String.format("%.1f",

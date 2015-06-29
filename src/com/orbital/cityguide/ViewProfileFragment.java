@@ -20,9 +20,11 @@ import com.facebook.login.widget.LoginButton;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,6 +80,9 @@ public class ViewProfileFragment extends Fragment {
 
 	// JSON parser class
 	JSONParser jsonParser = new JSONParser();
+	
+	private static final String TAG = "BroadcastTest";
+	private Intent intentBroadcast;
 
 	public ViewProfileFragment() {
 	}
@@ -117,10 +122,22 @@ public class ViewProfileFragment extends Fragment {
 		init();
 	}
 
-	@Override
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        	    
+        }
+    };   
+    
+    @Override
 	public void onResume() {
 		super.onResume();
 		init();
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause(); 		
 	}
 
 	public void init() {

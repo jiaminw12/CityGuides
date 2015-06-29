@@ -9,12 +9,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
         <!-- Title -->
 
@@ -25,7 +24,18 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="35sp"
             android:textStyle="bold" />
-    </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPlanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="+"
+            android:textSize="17dip"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="fill_parent"

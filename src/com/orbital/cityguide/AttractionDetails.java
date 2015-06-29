@@ -205,6 +205,8 @@ public class AttractionDetails extends Activity {
 								if (json != null) {
 									success = json.getInt(TAG_SUCCESS);
 									if (success == 1) {
+										title = "Message";
+										alertboxmsg = "Successfully submit comment.";
 										finish();
 										startActivity(getIntent());
 									} else if (success == 0) {

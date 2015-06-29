@@ -103,36 +103,114 @@
                 android:gravity="center_vertical"
                 android:textColor="#000000"
                 android:textColorHint="#B6B6B4"
-                android:textSize="15sp" />
-        </TableRow>
-        
-         <TextView
-                android:id="@+id/TextView04"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Organize your trip: "
-                android:textColor="#000000"
                 android:textSize="15sp"
-                android:textStyle="bold" />
-        
-         <TableRow
+                android:text="3" />
+        </TableRow>
+
+        <TextView
+            android:id="@+id/TextView04"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Organize your trip: "
+            android:textColor="#000000"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TableRow
+            android:layout_marginTop="15dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal" >
 
-            <ListView
-                android:id="@+id/watingList"
+            <TextView
+                android:id="@+id/TextView05"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="I&apos;m Doing This "
                 android:textColor="#000000"
-                android:textColorHint="#B6B6B4"
-                android:textSize="15sp" />
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </TableRow>
-        
-        
+
+        <TextView
+            android:id="@+id/TextView06"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add things that you would like to include in your list here by clicking the &apos;+&apos; button."
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TableRow
+            android:layout_marginTop="15dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Day 1"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drag items from your I’m Doing This list"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+        <TableRow
+            android:layout_marginTop="15dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Day 2"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drag items from your I’m Doing This list"
+            android:textColor="#000000"
+            android:textSize="15sp"/>
+
+        <TableRow
+            android:layout_marginTop="15dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Day 3"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Drag items from your I’m Doing This list"
+            android:textColor="#000000"
+            android:textSize="15sp" />
     </TableLayout>
 
 </RelativeLayout>

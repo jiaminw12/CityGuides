@@ -20,12 +20,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SearchFragment extends ListFragment {
+public class SearchFragment extends ListFragment implements OnItemSelectedListener {
+	
+	Button mBtnPlanner;
+	Spinner searchSpinner = null;
+	
+	protected ArrayAdapter<CharSequence> searchAdapter;
 
 	// manages all of our attractions in a list.
 	private ArrayList<HashMap<String, String>> mAttractionsList;
@@ -51,6 +60,12 @@ public class SearchFragment extends ListFragment {
 
 		View rootView = inflater.inflate(R.layout.fragment_search, container,
 				false);
+		
+		searchSpinner = (Spinner) rootView.findViewById(R.id.search_spinner);
+		this.searchAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.arraySearch, android.R.layout.simple_spinner_item);
+		searchSpinner.setAdapter(this.searchAdapter);
+		searchSpinner.setOnItemSelectedListener(this);
 
 		Bundle bundle = this.getArguments();
 		name_profile = bundle.getString("profile_username", name_profile);
@@ -62,6 +77,18 @@ public class SearchFragment extends ListFragment {
 
 		setRetainInstance(true);
 		return rootView;
+	}
+	
+	@Override
+	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		// TODO Auto-generated method stub
+		String value = searchSpinner.getSelectedItem().toString();
+
+		if (value.equalsIgnoreCase("all")) {
+		} else if (value.equalsIgnoreCase("category")) {
+		} else if (value.equalsIgnoreCase("area")) {
+		} else if (value.equalsIgnoreCase("price")) {
+		} 
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -168,5 +195,12 @@ public class SearchFragment extends ListFragment {
 
 		}
 
+	}
+
+	
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
- 
-    <!-- Product id (pid) - will be HIDDEN - used to pass to other activity -->
+    android:layout_marginTop="35dp"
+    android:orientation="horizontal" >
+
+    <!-- Attraction id (aid) - will be HIDDEN - used to pass to other activity -->
+
     <TextView
         android:id="@+id/aid"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone" />
- 
+
     <!-- Name Label -->
+
     <TextView
         android:id="@+id/name"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="6dip"
         android:paddingLeft="6dip"
+        android:paddingTop="6dip"
         android:textSize="17dip"
         android:textStyle="bold" />
- 
-</LinearLayout>
+
+    <Button
+        android:id="@+id/btnPlanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="+"
+        android:textSize="17dip"
+        android:textStyle="bold" />
+
+</RelativeLayout>

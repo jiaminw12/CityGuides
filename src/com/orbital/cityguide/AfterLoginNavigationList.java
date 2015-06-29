@@ -25,7 +25,6 @@ import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,9 +59,9 @@ public class AfterLoginNavigationList extends Activity {
 	int success;
 	String name_profile;
 	Bundle bundle;
-	
+
 	ImageView mImage;
-	
+
 	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
@@ -70,7 +69,7 @@ public class AfterLoginNavigationList extends Activity {
 
 	// An array of all of our attractions
 	private JSONArray mUsers = null;
-	
+
 	// JSON parser class
 	JSONParser jsonParser = new JSONParser();
 
@@ -164,8 +163,8 @@ public class AfterLoginNavigationList extends Activity {
 			displayView(0);
 		}
 	}
-	
-	public void updateImage(){
+
+	public void updateImage() {
 		String username = name_profile;
 
 		if (!(username.matches(""))) {
@@ -202,7 +201,7 @@ public class AfterLoginNavigationList extends Activity {
 								mImage.setVisibility(View.GONE);
 							}
 						}
-					} 
+					}
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -210,7 +209,7 @@ public class AfterLoginNavigationList extends Activity {
 		}
 	}
 
-	/*Slide menu item click listener*/
+	/* Slide menu item click listener */
 	private class SlideMenuClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -220,14 +219,12 @@ public class AfterLoginNavigationList extends Activity {
 			displayView(position);
 		}
 	}
-	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -243,19 +240,18 @@ public class AfterLoginNavigationList extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
 
-	/*Called when invalidateOptionsMenu() is triggered*/
+	/* Called when invalidateOptionsMenu() is triggered */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// if nav drawer is opened, hide the action items
 		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+		updateImage();
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
 
-	/*Diplaying fragment view for selected nav drawer list item*/
+	/* Diplaying fragment view for selected nav drawer list item */
 	private void displayView(int position) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
@@ -316,14 +312,12 @@ public class AfterLoginNavigationList extends Activity {
 			Log.e("MainActivity", "Error in creating fragment");
 		}
 	}
-	
 
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
 	}
-	
 
 	/**
 	 * When using the ActionBarDrawerToggle, you must call it during
@@ -336,7 +330,6 @@ public class AfterLoginNavigationList extends Activity {
 		// Sync the toggle state after onRestoreInstanceState has occurred.
 		mDrawerToggle.syncState();
 	}
-	
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -344,7 +337,6 @@ public class AfterLoginNavigationList extends Activity {
 		// Pass any configuration change to the drawer toggls
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-	
 
 	@Override
 	public void onBackPressed() {

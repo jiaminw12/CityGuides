@@ -3,55 +3,95 @@ package com.orbital.cityguide;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Fragment;
+import com.orbital.cityguide.AlphabetListAdapter.Row;
+import com.orbital.cityguide.AlphabetListAdapter.Item;
+import com.orbital.cityguide.AlphabetListAdapter.Section;
+
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SearchFragment extends ListFragment implements OnItemSelectedListener {
-	
+public class SearchFragment extends ListFragment implements
+		OnItemSelectedListener {
+
 	Button mBtnPlanner;
 	Spinner searchSpinner = null;
-	
+	LinearLayout sideIndex;
+
 	protected ArrayAdapter<CharSequence> searchAdapter;
 
 	// manages all of our attractions in a list.
 	private ArrayList<HashMap<String, String>> mAttractionsList;
 
+	private AlphabetListAdapter adapter = new AlphabetListAdapter();
+	private GestureDetector mGestureDetector;
+	private List<Object[]> alphabet = new ArrayList<Object[]>();
+	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
+	private int sideIndexHeight;
+	private static float sideIndexX;
+	private static float sideIndexY;
+	private int indexListSize;
+
 	JSONParser jParser = new JSONParser();
 
-	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAllAttractions.php";
+	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
 	private static final String TAG_ATTRACTION = "attractions";
 	// An array of all of our attractions
 	private JSONArray mAttractions = null;
-	
+
 	String name_profile;
 
 	public SearchFragment() {
+	}
+
+	class SideIndexGestureListener extends
+			GestureDetector.SimpleOnGestureListener {
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2,
+				float distanceX, float distanceY) {
+			sideIndexX = sideIndexX - distanceX;
+			sideIndexY = sideIndexY - distanceY;
+
+			if (sideIndexX >= 0 && sideIndexY >= 0) {
+				displayListItem();
+			}
+
+			return super.onScroll(e1, e2, distanceX, distanceY);
+		}
 	}
 
 	@Override
@@ -60,10 +100,11 @@ public class SearchFragment extends ListFragment implements OnItemSelectedListen
 
 		View rootView = inflater.inflate(R.layout.fragment_search, container,
 				false);
-		
+
 		searchSpinner = (Spinner) rootView.findViewById(R.id.search_spinner);
-		this.searchAdapter = ArrayAdapter.createFromResource(this.getActivity(),
-				R.array.arraySearch, android.R.layout.simple_spinner_item);
+		this.searchAdapter = ArrayAdapter.createFromResource(
+				this.getActivity(), R.array.arraySearch,
+				android.R.layout.simple_spinner_item);
 		searchSpinner.setAdapter(this.searchAdapter);
 		searchSpinner.setOnItemSelectedListener(this);
 
@@ -72,23 +113,27 @@ public class SearchFragment extends ListFragment implements OnItemSelectedListen
 
 		// Hashmap for ListView
 		mAttractionsList = new ArrayList<HashMap<String, String>>();
-		// Loading products in Background Thread
-		new LoadAllProducts().execute();
+
+		sideIndex = (LinearLayout) rootView.findViewById(R.id.sideIndex);
+		sideIndex.bringToFront();
 
 		setRetainInstance(true);
 		return rootView;
 	}
-	
+
 	@Override
-	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+			long arg3) {
 		// TODO Auto-generated method stub
 		String value = searchSpinner.getSelectedItem().toString();
 
 		if (value.equalsIgnoreCase("all")) {
+			// Loading products in Background Thread
+			new LoadAllProducts().execute();
 		} else if (value.equalsIgnoreCase("category")) {
 		} else if (value.equalsIgnoreCase("area")) {
 		} else if (value.equalsIgnoreCase("price")) {
-		} 
+		}
 	}
 
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -103,27 +148,31 @@ public class SearchFragment extends ListFragment implements OnItemSelectedListen
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// getting values from selected ListItem
-				String aid = ((TextView) view.findViewById(R.id.aid)).getText()
-						.toString();
+				String title = ((TextView) view.findViewById(R.id.name))
+						.getText().toString();
+				for (HashMap<String, String> map : mAttractionsList) {
+					for (String str : map.keySet()) {
+						String key = str;
+						String value = map.get(key);
+						if (value.equalsIgnoreCase(title)) {
+							// Starting new intent
+							Intent in = new Intent(getActivity(),
+									AttractionDetails.class);
+							// sending aid to next activity
+							in.putExtra("AID", key);
+							in.putExtra("profile_username", name_profile);
+							startActivity(in);
+						}
+					}
+				}
 
-				// Starting new intent
-				Intent in = new Intent(getActivity(), AttractionDetails.class);
-				// sending aid to next activity
-				in.putExtra("AID", aid);
-				in.putExtra("profile_username", name_profile);
-				startActivity(in);
 			}
 		});
 	}
 
-	/**
-	 * Background Async Task to Load all product by making HTTP Request
-	 * */
 	class LoadAllProducts extends AsyncTask<String, String, String> {
 
-		/**
-		 * getting All products from url
-		 * */
+		/* getting All products from url */
 		protected String doInBackground(String... args) {
 			// Building Parameters
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -154,22 +203,11 @@ public class SearchFragment extends ListFragment implements OnItemSelectedListen
 
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
-
-						// adding each child node to HashMap key => value
-						map.put(TAG_AID, id);
-						map.put(TAG_TITLE, name);
+						map.put(id, name);
 
 						// adding HashList to ArrayList
 						mAttractionsList.add(map);
 					}
-				} else {
-					// no products found
-					// Launch Add New product Activity
-					// Intent i = new Intent(getApplicationContext(),
-					// NewProductActivity.class);
-					// Closing all previous activities
-					// i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					// startActivity(i);
 				}
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
@@ -179,28 +217,153 @@ public class SearchFragment extends ListFragment implements OnItemSelectedListen
 			return null;
 		}
 
-		/**
-		 * After completing background task Dismiss the progress dialog
-		 * **/
+		/* After completing background task Dismiss the progress dialog */
 		protected void onPostExecute(String file_url) {
-			/**
-			 * Updating parsed JSON data into ListView
-			 * */
-			ListAdapter adapter = new SimpleAdapter(getActivity(),
-					mAttractionsList, R.layout.list_item, new String[] {
-							TAG_AID, TAG_TITLE }, new int[] { R.id.aid,
-							R.id.name });
-			// updating listview
-			setListAdapter(adapter);
 
+			mGestureDetector = new GestureDetector(
+					new SideIndexGestureListener());
+			List<Row> rows = new ArrayList<Row>();
+			int start = 0;
+			int end = 0;
+			String previousLetter = null;
+			Object[] tmpIndexItem = null;
+			Pattern numberPattern = Pattern.compile("[0-9]");
+
+			for (HashMap<String, String> map : mAttractionsList) {
+				for (String str : map.keySet()) {
+					String key = str;
+					Log.d("key :", key);
+					String value = map.get(key);
+					String firstLetter = value.substring(0, 1);
+
+					// Group numbers together in the scroller
+					if (numberPattern.matcher(firstLetter).matches()) {
+						firstLetter = "#";
+					}
+
+					// If we've changed to a new letter, add the previous
+					// letter
+					// to the alphabet scroller
+					if (previousLetter != null
+							&& !firstLetter.equals(previousLetter)) {
+						end = rows.size() - 1;
+						tmpIndexItem = new Object[3];
+						tmpIndexItem[0] = previousLetter.toUpperCase(Locale.UK);
+						tmpIndexItem[1] = start;
+						tmpIndexItem[2] = end;
+						alphabet.add(tmpIndexItem);
+
+						start = end + 1;
+					}
+
+					// Check if we need to add a header row
+					if (!firstLetter.equals(previousLetter)) {
+						rows.add(new Section(firstLetter));
+						sections.put(firstLetter, start);
+					}
+
+					// Add the country to the list
+					rows.add(new Item(value));
+					previousLetter = firstLetter;
+				}
+			}
+
+			if (previousLetter != null) {
+				// Save the last letter
+				tmpIndexItem = new Object[3];
+				tmpIndexItem[0] = previousLetter.toUpperCase(Locale.UK);
+				tmpIndexItem[1] = start;
+				tmpIndexItem[2] = rows.size() - 1;
+				alphabet.add(tmpIndexItem);
+			}
+
+			updateList(alphabet.size());
+			adapter.setRows(rows);
+			setListAdapter(adapter);
 		}
 
+		private Context getActivity() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
-	
+	public void displayListItem() {
+
+		sideIndexHeight = sideIndex.getHeight();
+		// compute number of pixels for every side index item
+		double pixelPerIndexItem = (double) sideIndexHeight / indexListSize;
+
+		// compute the item index for given event position belongs to
+		int itemPosition = (int) (sideIndexY / pixelPerIndexItem);
+
+		// get the item (we can do it since we know item index)
+		if (itemPosition < alphabet.size()) {
+			Object[] indexItem = alphabet.get(itemPosition);
+			int subitemPosition = sections.get(indexItem[0]);
+
+			// ListView listView = (ListView) findViewById(android.R.id.list);
+			getListView().setSelection(subitemPosition);
+		}
+	}
+
+	public void updateList(int size) {
+		sideIndex.removeAllViews();
+		indexListSize = alphabet.size();
+		
+		if (indexListSize < 1) {
+			return;
+		}
+
+		int indexMaxSize = (int) Math.floor(sideIndex.getHeight() / 20);
+		int tmpIndexListSize = indexListSize;
+		while (tmpIndexListSize > indexMaxSize) {
+			tmpIndexListSize = tmpIndexListSize / 2;
+		}
+		double delta;
+		if (tmpIndexListSize > 0) {
+			delta = indexListSize / tmpIndexListSize;
+		} else {
+			delta = 1;
+		}
+
+		TextView tmpTV;
+		for (double i = 1; i <= indexListSize; i = i + delta) {
+			Object[] tmpIndexItem = alphabet.get((int) i - 1);
+			String tmpLetter = tmpIndexItem[0].toString();
+
+			tmpTV = new TextView(getActivity());
+			tmpTV.setText(tmpLetter);
+			tmpTV.setGravity(Gravity.CENTER);
+			tmpTV.setTextSize(15);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+					ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+			tmpTV.setLayoutParams(params);
+			sideIndex.addView(tmpTV);
+		}
+
+		sideIndexHeight = sideIndex.getHeight();
+
+		sideIndex.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// now you know coordinates of touch
+				sideIndexX = event.getX();
+				sideIndexY = event.getY();
+
+				// and can display a proper item it country list
+				displayListItem();
+
+				return false;
+			}
+		});
+	}
+
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 }

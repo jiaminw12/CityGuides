@@ -100,7 +100,6 @@ public class HomeFragment extends Fragment {
 	public void retrieveDay() {
 		Calendar calendar = Calendar.getInstance();
 		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		Log.d("Day : ", String.valueOf(day));
 		switch (day) {
 		case Calendar.SUNDAY:
 			dayNames = new String[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri",

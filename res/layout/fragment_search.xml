@@ -10,12 +10,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!--Main ListViewAlways give id value as list(@android:id/list) -->
+    <!-- Main ListViewAlways give id value as list(@android:id/list) -->
 
     <ListView
         android:id="@android:id/list"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/search_spinner" />
+        android:layout_below="@+id/search_spinner"
+        android:fastScrollEnabled="true" />
+
+    <LinearLayout
+        android:id="@+id/sideIndex"
+        android:layout_width="40dip"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/search_spinner"
+        android:background="#FFF"
+        android:textColor="@color/counter_text_color_black"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+    </LinearLayout>
 
 </RelativeLayout>

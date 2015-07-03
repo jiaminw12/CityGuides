@@ -70,10 +70,12 @@ public class SearchFragment extends ListFragment implements
 	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionByTitle.php";
 	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
 	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://192.168.1.9/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
 	private static final String TAG_CATEGORY = "category_title";
+	private static final String TAG_AREA = "location_title";
 	private static final String TAG_ATTRACTION = "attractions";
 
 	// An array of all of our attractions
@@ -148,8 +150,9 @@ public class SearchFragment extends ListFragment implements
 			sideIndex.setVisibility(View.GONE);
 			new LoadProductsCAT().execute();
 		} else if (value.equalsIgnoreCase("area")) {
-		} else if (value.equalsIgnoreCase("price")) {
-		}
+			sideIndex.setVisibility(View.GONE);
+			new LoadProductsAREA().execute();
+		} 
 	}
 	
 	@Override
@@ -353,6 +356,91 @@ public class SearchFragment extends ListFragment implements
 			List<Row> rows = new ArrayList<Row>();
 			int start = 0;
 			int end = 0;
+			String previousLetter = null;
+
+			for (HashMap<String, String> map : mAttractionsList) {
+				for (String str : map.keySet()) {
+					String key = str;
+					String value = map.get(key);
+					String firstLetter = key.toUpperCase(Locale.US);
+
+					// Check if we need to add a header row
+					if (!firstLetter.equals(previousLetter)) {
+						rows.add(new Section(firstLetter));
+						sections.put(firstLetter, start);
+					}
+
+					// Add the title to the list
+					rows.add(new Item(value));
+					previousLetter = firstLetter;
+				}
+			}
+			
+			adapter.setRows(rows);
+			setListAdapter(adapter);
+		}
+
+		private Context getActivity() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+	
+	class LoadProductsAREA extends AsyncTask<String, String, String> {
+
+		/* getting All products from url */
+		protected String doInBackground(String... args) {
+			mAttractionsList.clear();
+			// Building Parameters
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+
+			// getting JSON string from URL
+			JSONObject json;
+
+			try {
+				json = jParser.makeHttpRequest(READATTRBYAREA_URL, "GET", params);
+				int success = json.getInt(TAG_SUCCESS);
+
+				if (success == 1) {
+					// attractions found
+					// Getting Array of Products
+					mAttractions = json.getJSONArray(TAG_ATTRACTION);
+
+					// looping through All Attractions
+					for (int i = 0; i < mAttractions.length(); i++) {
+						JSONObject c = mAttractions.getJSONObject(i);
+
+						// Storing each json item in variable
+						String name = c.getString(TAG_TITLE);
+						String area = c.getString(TAG_AREA);
+						
+						// creating new HashMap
+						HashMap<String, String> map = new HashMap<String, String>();
+						map.put(area, name);
+
+						// adding HashList to ArrayList
+						mAttractionsList.add(map);
+
+					}
+				}
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			return null;
+		}
+
+		/* After completing background task Dismiss the progress dialog */
+		protected void onPostExecute(String file_url) {
+			mGestureDetector = new GestureDetector(
+					new SideIndexGestureListener());
+			List<Row> rows = new ArrayList<Row>();
+			int start = 0;
 			String previousLetter = null;
 
 			for (HashMap<String, String> map : mAttractionsList) {

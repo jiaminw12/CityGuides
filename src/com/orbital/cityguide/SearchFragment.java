@@ -19,6 +19,7 @@ import com.orbital.cityguide.AlphabetListAdapter.Section;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -42,11 +44,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SearchFragment extends ListFragment implements
 		OnItemSelectedListener {
 
-	Button mBtnPlanner;
 	Spinner searchSpinner = null;
 	ListView mListView;
 	LinearLayout sideIndex;
@@ -65,8 +67,6 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	JSONParser jParser = new JSONParser();
-
 	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionByTitle.php";
 	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
 	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
@@ -82,9 +82,8 @@ public class SearchFragment extends ListFragment implements
 	private JSONArray mAttractions = null;
 
 	private JSONArray mAttrID = null;
-
-	// JSON parser class
-	JSONParser jsonParser = new JSONParser();
+	
+	JSONParser jParser = new JSONParser();
 
 	String name_profile;
 	int success;
@@ -175,12 +174,14 @@ public class SearchFragment extends ListFragment implements
 				TextView text = (TextView) view.findViewById(R.id.name);
 				String title = text.getText().toString();
 				String key = retrieveId(title);
-				Intent in = new Intent(getActivity(),
-						AttractionDetails.class);
-				// sending aid to next activity
-				in.putExtra("AID", key);
-				in.putExtra("profile_username", name_profile);
-				startActivity(in);
+				if(key != null){
+					Intent in = new Intent(getActivity(),
+							AttractionDetails.class);
+					// sending aid to next activity
+					in.putExtra("AID", key);
+					in.putExtra("profile_username", name_profile);
+					startActivity(in);
+				}
 			}
 		});
 	}
@@ -553,7 +554,7 @@ public class SearchFragment extends ListFragment implements
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 
-			JSONObject json = jsonParser.makeHttpRequest(RETRIEVEID_URL,
+			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL,
 					"POST", params);
 			if (json != null) {
 				success = json.getInt(TAG_SUCCESS);

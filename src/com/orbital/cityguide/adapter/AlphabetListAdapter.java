@@ -1,11 +1,7 @@
 package com.orbital.cityguide.adapter;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -16,17 +12,12 @@ import org.json.JSONObject;
 import com.orbital.cityguide.DBAdapter;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
-import com.orbital.cityguide.R.id;
-import com.orbital.cityguide.R.layout;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,19 +27,15 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class AlphabetListAdapter extends BaseAdapter {
 
 	JSONParser jParser = new JSONParser();
-	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionByTitle.php";
-	private static final String RETRIEVETITLE_URL = "http://192.168.1.9/City_Guide/getAttractionByID.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
-	private static final String TAG_ATITLE = "attr_title";
 	private static final String TAG_ATTRACTION = "attractions";
 	private JSONArray mAttrID = null;
 	int success;
@@ -135,9 +122,33 @@ public class AlphabetListAdapter extends BaseAdapter {
 			TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
 
-			mID = retrieveId(mTitle.getText().toString());
+			mID = retrieveIdByTitle(mTitle.getText().toString());
 			mPlanner = (Button) view.findViewById(R.id.btnPlanner);
-			setmPlannerText();
+			try {
+				dbAdaptor.open();
+				cursor = dbAdaptor.getAttrID();
+				if (cursor != null && cursor.getCount() > 0) {
+					cursor.moveToFirst();
+					do {
+						String mAttrID = cursor.getString(0);
+						if (mID.equals(mAttrID)) {
+							mPlanner.setText("-");
+							break;
+						} else {
+							mPlanner.setText("+");
+						}
+					} while (cursor.moveToNext());
+				} else {
+				}
+			} catch (Exception e) {
+				Log.d("City Guide", e.getMessage());
+			} finally {
+				if (cursor != null)
+					cursor.close();
+
+				if (dbAdaptor != null)
+					dbAdaptor.close();
+			}
 
 			mPlanner.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
@@ -148,14 +159,15 @@ public class AlphabetListAdapter extends BaseAdapter {
 					if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
 						mPlanner.setText("-");
 						String title = item.text;
-						String key = retrieveId(title);
-
+						Log.d("TITLE ::: ", title);
+						String key = retrieveIdByTitle(title);
+						Log.d("KEY ::: ", key);
 						try {
 							dbAdaptor.open();
 							dbAdaptor.insertPlannerList(key, "1");
 							Toast.makeText(mParent.getContext(),
-									"Successfully Added!!!", Toast.LENGTH_SHORT)
-									.show();
+									"Successfully Added!!! Fragmnet",
+									Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
 							Log.e("CityGuideSingapore", e.getMessage());
 						} finally {
@@ -167,14 +179,15 @@ public class AlphabetListAdapter extends BaseAdapter {
 							.equalsIgnoreCase("-")) {
 						mPlanner.setText("+");
 						String title = item.text;
-						String key = retrieveId(title);
+						String key = retrieveIdByTitle(title);
+						Log.d("TITLE ::: ", title);
 
 						dbAdaptor = new DBAdapter(mParent.getContext());
 						try {
 							dbAdaptor.open();
 							dbAdaptor.deletePlannerItem(key);
 							Toast.makeText(mParent.getContext(),
-									"Successfully Removed!!!",
+									"Successfully Removed!!! Fragmnet",
 									Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
 							Log.d("CityGuideSingapore", e.getMessage());
@@ -212,36 +225,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 		return view;
 	}
 
-	public void setmPlannerText() {
-		try {
-			dbAdaptor.open();
-			cursor = dbAdaptor.getAttrID();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-					String mAttrID = cursor.getString(0);
-					if (mID.equals(mAttrID)) {
-						mPlanner.setText("-");
-						break;
-					} else {
-						mPlanner.setText("+");
-					}
-				} while (cursor.moveToNext());
-			} else {
-			}
-		} catch (Exception e) {
-			Log.d("City Guide", e.getMessage());
-		} finally {
-			if (cursor != null)
-				cursor.close();
-
-			if (dbAdaptor != null)
-				dbAdaptor.close();
-		}
-
-	}
-
-	public String retrieveId(String attr_title) {
+	public String retrieveIdByTitle(String attr_title) {
 		String id = null;
 		try {
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -266,33 +250,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 		}
 
 		return id;
-	}
-
-	public String retrieveTitle(String attr_id) {
-		String title = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_id", attr_id));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(RETRIEVETITLE_URL,
-					"POST", params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					title = c.getString(TAG_ATITLE);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return title;
 	}
 
 }

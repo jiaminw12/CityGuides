@@ -110,8 +110,10 @@ public class DBAdapter {
 	}
 
 	// delete a ListItem
-	public boolean deletePlannerItem(String key) {
-		return db.delete(TABLE_PLANNERLIST, KEY_ATTR_ID + "=" + key, null) > 0;
+	public void deletePlannerItem(String key) {
+		db = DBHelper.getWritableDatabase();
+		db.delete(TABLE_PLANNERLIST, KEY_ATTR_ID + "=" + key, null);
+		return;
 	}
 
 	// retrieve all the ListItem
@@ -162,7 +164,7 @@ public class DBAdapter {
 		return dateFormat.format(date);
 	}
 	
-	/*public void insertTag(){
+	public void insertTag(){
 		Tag tag1 = new Tag("Waiting List");
 		Tag tag2 = new Tag("Day 1");
 		Tag tag3 = new Tag("Day 2");
@@ -185,6 +187,6 @@ public class DBAdapter {
 		createTag(tag8);
 		createTag(tag9);
 		createTag(tag10);
-	}*/
+	}
 	
 }

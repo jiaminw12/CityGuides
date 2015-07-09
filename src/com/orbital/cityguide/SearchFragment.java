@@ -68,7 +68,7 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionByTitle.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
 	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
 	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
 	private static final String READATTRBYAREA_URL = "http://192.168.1.9/City_Guide/getAllAttractionsAREA.php";
@@ -137,9 +137,6 @@ public class SearchFragment extends ListFragment implements
 
 		setRetainInstance(true);
 		
-		/*dbAdaptor = new DBAdapter(this.getActivity());
-		dbAdaptor.insertTag();*/
-		
 		return rootView;
 	}
 
@@ -197,6 +194,7 @@ public class SearchFragment extends ListFragment implements
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
+			mAttractionsList.clear();
 			// Building Parameters
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 

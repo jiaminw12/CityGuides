@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -26,9 +27,11 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.method.LinkMovementMethod;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.*;
 import android.widget.RatingBar.*;
 
@@ -74,6 +77,7 @@ public class AttractionDetails extends Activity {
 	JSONParser jsonParser = new JSONParser();
 
 	ImageView mImageView;
+	Button mPlanner;
 	TextView mTitle;
 	TextView mDetail;
 	TextView mLink;
@@ -98,6 +102,9 @@ public class AttractionDetails extends Activity {
 
 	ArrayList<CommentItem> commentItem = null;
 	CommentListAdapter commentListAdapter;
+	
+	DBAdapter dbAdaptor;
+	Cursor cursor = null;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,6 +117,13 @@ public class AttractionDetails extends Activity {
 
 		mImageView = (ImageView) findViewById(R.id.imageViewId);
 		mTitle = (TextView) findViewById(R.id.title_Attr);
+		mPlanner = (Button) findViewById(R.id.btnPlanner);
+		setmPlannerText();
+		mPlanner.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				updatePlanner();
+			}
+		});
 		mDetail = (TextView) findViewById(R.id.details);
 		mLink = (TextView) findViewById(R.id.weblink);
 		mOpenHrs = (TextView) findViewById(R.id.open_hrs);
@@ -144,7 +158,74 @@ public class AttractionDetails extends Activity {
 
 		new GetAttrDetails().execute();
 	}
+	
+	public void setmPlannerText() {
+		dbAdaptor = new DBAdapter(getApplicationContext());
+		try {
+			dbAdaptor.open();
+			cursor = dbAdaptor.getAttrID();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
+					String mAttrID = cursor.getString(0);
+					if (mAttr_id.equals(mAttrID)) {
+						mPlanner.setText("-");
+						break;
+					} else {
+						mPlanner.setText("+");
+					}
+				} while (cursor.moveToNext());
+			} else {
+			}
+		} catch (Exception e) {
+			Log.d("City Guide", e.getMessage());
+		} finally {
+			if (cursor != null)
+				cursor.close();
 
+			if (dbAdaptor != null)
+				dbAdaptor.close();
+		}
+	}
+	
+	public void updatePlanner(){
+		dbAdaptor = new DBAdapter(getApplicationContext());
+		if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
+			mPlanner.setText("-");
+
+			try {
+				dbAdaptor.open();
+				dbAdaptor.insertPlannerList(mAttr_id, "1");
+				Toast.makeText(getApplicationContext(),
+						"Successfully Added!!! Attraction Details", Toast.LENGTH_SHORT)
+						.show();
+			} catch (Exception e) {
+				Log.e("CityGuideSingapore", e.getMessage());
+			} finally {
+				if (dbAdaptor != null) {
+					dbAdaptor.close();
+				}
+			}
+		} else if (mPlanner.getText().toString().equalsIgnoreCase("-")) {
+			mPlanner.setText("+");
+
+			dbAdaptor = new DBAdapter(getApplicationContext());
+			try {
+				dbAdaptor.open();
+				dbAdaptor.deletePlannerItem(mAttr_id);
+				Toast.makeText(getApplicationContext(),
+						"Successfully Removed!!! Attraction Details",
+						Toast.LENGTH_SHORT).show();
+			} catch (Exception e) {
+				Log.d("CityGuideSingapore", e.getMessage());
+			} finally {
+				if (dbAdaptor != null) {
+					dbAdaptor.close();
+				}
+			}
+		}
+	}
+	
 	public void commentButton() {
 
 		LayoutInflater li = LayoutInflater.from(this);

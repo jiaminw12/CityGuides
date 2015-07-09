@@ -13,9 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.orbital.cityguide.AlphabetListAdapter.Row;
-import com.orbital.cityguide.AlphabetListAdapter.Item;
-import com.orbital.cityguide.AlphabetListAdapter.Section;
+import com.orbital.cityguide.adapter.AlphabetListAdapter;
+import com.orbital.cityguide.adapter.AlphabetListAdapter.Item;
+import com.orbital.cityguide.adapter.AlphabetListAdapter.Row;
+import com.orbital.cityguide.adapter.AlphabetListAdapter.Section;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -87,6 +88,8 @@ public class SearchFragment extends ListFragment implements
 
 	String name_profile;
 	int success;
+	
+	DBAdapter dbAdaptor;
 
 	public SearchFragment() {
 	}
@@ -133,6 +136,10 @@ public class SearchFragment extends ListFragment implements
 		sideIndex.bringToFront();
 
 		setRetainInstance(true);
+		
+		/*dbAdaptor = new DBAdapter(this.getActivity());
+		dbAdaptor.insertTag();*/
+		
 		return rootView;
 	}
 

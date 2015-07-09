@@ -14,7 +14,7 @@
 
     <ListView
         android:id="@android:id/list"
-        android:layout_width="wrap_content"
+        android:layout_width="425px"
         android:layout_height="wrap_content"
         android:layout_below="@+id/search_spinner"
         android:fastScrollEnabled="true" />

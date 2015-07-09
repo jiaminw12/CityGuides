@@ -111,7 +111,7 @@ public class DBAdapter {
 
 	// delete a ListItem
 	public void deletePlannerItem(String key) {
-		db = DBHelper.getWritableDatabase();
+		Log.d("Delete key :: ", key);
 		db.delete(TABLE_PLANNERLIST, KEY_ATTR_ID + "=" + key, null);
 		return;
 	}
@@ -131,8 +131,6 @@ public class DBAdapter {
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}
-		} else {
-			Log.d("Testing", "gdhhhhhhhhhhhhhhh");
 		}
 		return mCursor;
 	}

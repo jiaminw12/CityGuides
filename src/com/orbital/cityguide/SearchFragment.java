@@ -575,6 +575,11 @@ public class SearchFragment extends ListFragment implements
 
 		return id;
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
 
 
 }

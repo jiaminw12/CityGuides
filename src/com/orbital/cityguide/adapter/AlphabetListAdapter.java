@@ -43,7 +43,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 	DBAdapter dbAdaptor;
 	Cursor cursor = null;
 
-	Button mPlanner;
 	Item item;
 	ViewGroup mParent;
 
@@ -119,11 +118,11 @@ public class AlphabetListAdapter extends BaseAdapter {
 			}
 
 			item = (Item) getItem(position);
-			TextView mTitle = (TextView) view.findViewById(R.id.name);
+			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
 
 			mID = retrieveIdByTitle(mTitle.getText().toString());
-			mPlanner = (Button) view.findViewById(R.id.btnPlanner);
+			final Button mPlanner = (Button) view.findViewById(R.id.btnPlanner);
 			try {
 				dbAdaptor.open();
 				cursor = dbAdaptor.getAttrID();
@@ -157,11 +156,11 @@ public class AlphabetListAdapter extends BaseAdapter {
 					final int position = listView.getPositionForView(parentRow);
 
 					if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
-						mPlanner.setText("-");
-						String title = item.text;
-						Log.d("TITLE ::: ", title);
+						String title = mTitle.getText().toString();
+						Log.e("Title + ::: ", title);
 						String key = retrieveIdByTitle(title);
-						Log.d("KEY ::: ", key);
+						Log.e("KEY ::: ", key);
+						mPlanner.setText("-");
 						try {
 							dbAdaptor.open();
 							dbAdaptor.insertPlannerList(key, "1");
@@ -177,11 +176,9 @@ public class AlphabetListAdapter extends BaseAdapter {
 						}
 					} else if (mPlanner.getText().toString()
 							.equalsIgnoreCase("-")) {
-						mPlanner.setText("+");
-						String title = item.text;
+						String title = mTitle.getText().toString();
 						String key = retrieveIdByTitle(title);
-						Log.d("TITLE ::: ", title);
-
+						mPlanner.setText("+");
 						dbAdaptor = new DBAdapter(mParent.getContext());
 						try {
 							dbAdaptor.open();
@@ -224,6 +221,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 
 		return view;
 	}
+	
 
 	public String retrieveIdByTitle(String attr_title) {
 		String id = null;

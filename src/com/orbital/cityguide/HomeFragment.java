@@ -1,34 +1,22 @@
 package com.orbital.cityguide;
 
 import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
-import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -139,7 +127,7 @@ public class HomeFragment extends Fragment {
 						.getJSON(getActivity(), city);
 				final JSONObject jsonDaily = RemoteFetch.getDailyJSON(
 						getActivity(), city);
-				if (json == null && jsonDaily == null) {
+				if (json == null  && jsonDaily == null) {
 					handler.post(new Runnable() {
 						public void run() {
 							Toast.makeText(

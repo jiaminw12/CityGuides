@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import com.orbital.cityguide.DBAdapter;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
+import com.terlici.dragndroplist.DragNDropAdapter;
+import com.terlici.dragndroplist.DragNDropListView;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -157,9 +159,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 
 					if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
 						String title = mTitle.getText().toString();
-						Log.e("Title + ::: ", title);
 						String key = retrieveIdByTitle(title);
-						Log.e("KEY ::: ", key);
 						mPlanner.setText("-");
 						try {
 							dbAdaptor.open();
@@ -222,7 +222,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 		return view;
 	}
 	
-
 	public String retrieveIdByTitle(String attr_title) {
 		String id = null;
 		try {

@@ -23,7 +23,7 @@ public class DBAdapter {
 
 	private static final int DATABASE_VERSION = 1;
 	private static final String TAG = "DBAdapter";
-	
+
 	// Database Name
 	private static final String DATABASE_NAME = "cityGuideSingapore";
 
@@ -44,8 +44,8 @@ public class DBAdapter {
 
 	private static final String CREATE_TABLE_PLANNERLIST = "CREATE TABLE "
 			+ TABLE_PLANNERLIST + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
-			+ KEY_ATTR_ID + " TEXT," + KEY_TAG_ID + " TEXT,"
-			+ KEY_CREATED_AT + " DATETIME" + ")";
+			+ KEY_ATTR_ID + " TEXT," + KEY_TAG_ID + " TEXT," + KEY_CREATED_AT
+			+ " DATETIME" + ")";
 
 	Context context;
 	DatabaseHelper DBHelper;
@@ -90,7 +90,7 @@ public class DBAdapter {
 		DBHelper.close();
 	}
 
-	 /* Creating tag*/
+	/* Creating tag */
 	public long createTag(Tag tag) {
 		db = DBHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -98,35 +98,45 @@ public class DBAdapter {
 
 		return db.insert(TABLE_TAG, null, values);
 	}
-	
+
 	// insert a item into the insertPlannerList
 	public long insertPlannerList(String attr_id, String tag_id) {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(KEY_ATTR_ID, attr_id);
 		initialValues.put(KEY_TAG_ID, tag_id);
 		initialValues.put(KEY_CREATED_AT, getDateTime());
-		
-		return db.insert(TABLE_PLANNERLIST, null, initialValues);	
+
+		return db.insert(TABLE_PLANNERLIST, null, initialValues);
 	}
 
 	// delete a ListItem
 	public void deletePlannerItem(String key) {
-		Log.d("Delete key :: ", key);
 		db.delete(TABLE_PLANNERLIST, KEY_ATTR_ID + "=" + key, null);
 		return;
 	}
 
 	// retrieve all the ListItem
 	public Cursor getAllPlanner() {
-		return db.query(TABLE_PLANNERLIST, new String[] { KEY_ID, KEY_ATTR_ID,
-				KEY_TAG_ID, KEY_CREATED_AT }, null, null, null, null,
-				KEY_TAG_ID + " ASC");
+		Cursor mCursor = null;
+		if (db != null) {
+			mCursor = db
+					.rawQuery(
+							"SELECT plannerList.attr_id, tags.tag_name "
+							+ "FROM plannerList INNER JOIN tags "
+							+ "ON plannerList.tag_id = tags.id "
+							+ "ORDER BY plannerList.attr_id ASC",
+							null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
+		}
+		return mCursor;
 	}
-	
+
 	// retrieve all attr_id
 	public Cursor getAttrID() {
 		Cursor mCursor = null;
-		if(db != null ){
+		if (db != null) {
 			mCursor = db.rawQuery("SELECT attr_id FROM plannerList", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
@@ -138,10 +148,23 @@ public class DBAdapter {
 	// retrieve a particular ListItem
 	public Cursor getPlannerItem(long rowId) throws SQLException {
 		Cursor mCursor = db.query(true, TABLE_PLANNERLIST, new String[] {
-				KEY_ID, KEY_ATTR_ID, KEY_TAG_ID, KEY_CREATED_AT }, KEY_ID
-				+ "=" + rowId, null, null, null, null, null);
+				KEY_ID, KEY_ATTR_ID, KEY_TAG_ID, KEY_CREATED_AT }, KEY_ID + "="
+				+ rowId, null, null, null, null, null);
 		if (mCursor != null) {
 			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+
+	// retrieve tag_title
+	public Cursor getTagTitle() {
+		Cursor mCursor = null;
+		if (db != null) {
+			mCursor = db
+					.rawQuery("SELECT tag_name FROM TABLE_TAG WHERE ", null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
 		}
 		return mCursor;
 	}
@@ -161,8 +184,8 @@ public class DBAdapter {
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
-	
-	public void insertTag(){
+
+	public void insertTag() {
 		Tag tag1 = new Tag("Waiting List");
 		Tag tag2 = new Tag("Day 1");
 		Tag tag3 = new Tag("Day 2");
@@ -173,7 +196,7 @@ public class DBAdapter {
 		Tag tag8 = new Tag("Day 7");
 		Tag tag9 = new Tag("Day 8");
 		Tag tag10 = new Tag("Day 9");
-		
+
 		// Inserting tags in db
 		createTag(tag1);
 		createTag(tag2);
@@ -186,5 +209,5 @@ public class DBAdapter {
 		createTag(tag9);
 		createTag(tag10);
 	}
-	
+
 }

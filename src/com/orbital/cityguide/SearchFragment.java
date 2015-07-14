@@ -140,6 +140,7 @@ public class SearchFragment extends ListFragment implements
 		return rootView;
 	}
 
+	// Spinner
 	@Override
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
@@ -148,13 +149,13 @@ public class SearchFragment extends ListFragment implements
 
 		if (value.equalsIgnoreCase("all")) {
 			sideIndex.setVisibility(View.VISIBLE);
-			new LoadAllProducts().execute();
+			new LoadAllAttractions().execute();
 		} else if (value.equalsIgnoreCase("category")) {
 			sideIndex.setVisibility(View.GONE);
-			new LoadProductsCAT().execute();
+			new LoadAttractionsCAT().execute();
 		} else if (value.equalsIgnoreCase("area")) {
 			sideIndex.setVisibility(View.GONE);
-			new LoadProductsAREA().execute();
+			new LoadAttractionsAREA().execute();
 		} 
 	}
 	
@@ -190,7 +191,7 @@ public class SearchFragment extends ListFragment implements
 		});
 	}
 
-	class LoadAllProducts extends AsyncTask<String, String, String> {
+	class LoadAllAttractions extends AsyncTask<String, String, String> {
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
@@ -306,7 +307,7 @@ public class SearchFragment extends ListFragment implements
 		}
 	}
 
-	class LoadProductsCAT extends AsyncTask<String, String, String> {
+	class LoadAttractionsCAT extends AsyncTask<String, String, String> {
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
@@ -392,7 +393,7 @@ public class SearchFragment extends ListFragment implements
 		}
 	}
 	
-	class LoadProductsAREA extends AsyncTask<String, String, String> {
+	class LoadAttractionsAREA extends AsyncTask<String, String, String> {
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {

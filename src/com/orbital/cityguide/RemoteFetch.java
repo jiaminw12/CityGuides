@@ -37,13 +37,13 @@ public class RemoteFetch {
 			reader.close();
 			
 			JSONObject data = new JSONObject(json.toString());
-			
 			if(data.getInt("cod") != 200){
 				return null;
 			}
 			
 			return data;
 		}catch(Exception e){
+			Log.e("Weather : ", e.toString());
 			return null;
 		}
 	}

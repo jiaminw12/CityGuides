@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import com.orbital.cityguide.adapter.CommentListAdapter;
+import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.model.CommentItem;
 
 import android.app.Activity;
@@ -37,9 +38,9 @@ import android.widget.RatingBar.*;
 
 public class AttractionDetails extends Activity {
 
-	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAttraction.php";
-	private static final String ADDCOM_URL = "http://192.168.1.9/City_Guide/addComment.php";
-	private static final String READCOM_URL = "http://192.168.1.9/City_Guide/getComment.php";
+	private static final String READATTR_URL = "http://192.168.1.6/City_Guide/getAttraction.php";
+	private static final String ADDCOM_URL = "http://192.168.1.6/City_Guide/addComment.php";
+	private static final String READCOM_URL = "http://192.168.1.6/City_Guide/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";

@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Item;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Row;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
+import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter;
 
 import android.app.Fragment;
@@ -20,6 +21,8 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -28,11 +31,14 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 
@@ -43,12 +49,13 @@ public class TripPlannerFragment extends ListFragment {
 	// manages all of our attractions in a list.
 	private ArrayList<HashMap<String, String>> mPlannerList = new ArrayList<HashMap<String, String>>();
 	private ArrayList<String> mPlannerItem = new ArrayList<String>();
+	private HashMap<String, Integer> mPlannerItem_Adapter = new HashMap<String, Integer>();
 
 	private PlannerDragNDropListAdapter adapter = new PlannerDragNDropListAdapter();
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.9/City_Guide/getAttractionByID.php";
+	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.6/City_Guide/getAttractionByID.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -67,7 +74,6 @@ public class TripPlannerFragment extends ListFragment {
 	int start = 0;
 	String previousLetter = null;
 
-	//DynamicListView mListView;
 	Spinner daySpinner = null;
 
 	public TripPlannerFragment() {
@@ -79,14 +85,14 @@ public class TripPlannerFragment extends ListFragment {
 
 		View rootView = inflater.inflate(R.layout.fragment_planner, container,
 				false);
-		
+
 		dbAdaptor = new DBAdapter(getActivity());
-		
+
 		Bundle bundle = this.getArguments();
 		name_profile = bundle.getString("profile_username", name_profile);
 
-		DynamicListView mListView = (DynamicListView) rootView.findViewById(R.id.list);
 		mPlannerItem.add("Waiting List");
+		mPlannerItem_Adapter.put("Waiting List", 0);
 
 		new LoadPlannerList().execute();
 
@@ -102,46 +108,45 @@ public class TripPlannerFragment extends ListFragment {
 				String value = daySpinner.getSelectedItem().toString();
 
 				if (value.equalsIgnoreCase("1")) {
-					//addSectionHeader(1);
+					// addSectionHeader(1);
 				} else if (value.equalsIgnoreCase("2")) {
-					//addSectionHeader(2);
+					// addSectionHeader(2);
 				} else if (value.equalsIgnoreCase("3")) {
-					//addSectionHeader(3);
+					// addSectionHeader(3);
 				} else if (value.equalsIgnoreCase("4")) {
-					//addSectionHeader(4);
+					// addSectionHeader(4);
 				} else if (value.equalsIgnoreCase("5")) {
-					//addSectionHeader(5);
+					// addSectionHeader(5);
 				} else if (value.equalsIgnoreCase("6")) {
-					//addSectionHeader(6);
+					// addSectionHeader(6);
 				} else if (value.equalsIgnoreCase("7")) {
-					//addSectionHeader(7);
+					// addSectionHeader(7);
 				} else if (value.equalsIgnoreCase("8")) {
-					//addSectionHeader(8);
+					// addSectionHeader(8);
 				} else if (value.equalsIgnoreCase("9")) {
-					//addSectionHeader(9);
+					// addSectionHeader(9);
 				}
-				
+
 			}
-			
+
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				
+
 			}
 		});
-		
-		
+
 		return rootView;
 	}
-	
+
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		// Get listview
 		final DynamicListView lv = (DynamicListView) getListView();
-		lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		lv.setList(mPlannerItem);
-		
+		lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 	}
-	
+
 	class LoadPlannerList extends AsyncTask<String, String, String> {
 
 		/* getting All Planner List Item */
@@ -151,6 +156,7 @@ public class TripPlannerFragment extends ListFragment {
 				cursor = dbAdaptor.getAllPlanner();
 				if (cursor != null && cursor.getCount() > 0) {
 					cursor.moveToFirst();
+					int i = 1;
 					do {
 						String attr_title = retrieveTitleByID(cursor
 								.getString(0));
@@ -158,8 +164,9 @@ public class TripPlannerFragment extends ListFragment {
 
 						HashMap<String, String> map = new HashMap<String, String>();
 						map.put(tag_title, attr_title);
-						mPlannerItem.add(tag_title);
-
+						mPlannerItem.add(attr_title);
+						mPlannerItem_Adapter.put(attr_title, i);
+						i++;
 						// adding HashList to ArrayList
 						mPlannerList.add(map);
 					} while (cursor.moveToNext());
@@ -173,6 +180,8 @@ public class TripPlannerFragment extends ListFragment {
 
 				if (dbAdaptor != null)
 					dbAdaptor.close();
+
+				adapter.setList(mPlannerItem_Adapter);
 			}
 
 			return null;
@@ -188,17 +197,17 @@ public class TripPlannerFragment extends ListFragment {
 				for (String str : map.keySet()) {
 					String key = str;
 					String value = map.get(key);
-					String firstLetter = key;
+					String firstTitke = key;
 
 					// Check if we need to add a header row
-					if (!firstLetter.equals(previousLetter)) {
-						rows.add(new Section(firstLetter));
-						sections.put(firstLetter, start);
+					if (!firstTitke.equals(previousLetter)) {
+						rows.add(new Section(firstTitke));
+						sections.put(firstTitke, start);
 					}
 
 					// Add the title to the list
 					rows.add(new Item(value));
-					previousLetter = firstLetter;
+					previousLetter = firstTitke;
 				}
 			}
 
@@ -212,17 +221,17 @@ public class TripPlannerFragment extends ListFragment {
 			return null;
 		}
 	}
-	
-	public void addSectionHeader(int numofDay){
+
+	public void addSectionHeader(int numofDay) {
 		int start = 0;
-		for (int i = 1; i<numofDay+1; i++){
-			String title = "Day "+ i;
+		for (int i = 1; i < numofDay + 1; i++) {
+			String title = "Day " + i;
 			rows.add(new Section(title));
 			sections.put(title, start);
 		}
-		
+
 		adapter.setRows(rows);
-	} 
+	}
 
 	public String retrieveTitleByID(String attr_id) {
 		String title = null;
@@ -250,6 +259,5 @@ public class TripPlannerFragment extends ListFragment {
 
 		return title;
 	}
-
 
 }

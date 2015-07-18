@@ -1,5 +1,6 @@
 package com.orbital.cityguide;
 
+import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.adapter.NavDrawerListAdapter;
 import com.orbital.cityguide.model.NavDrawerItem;
 

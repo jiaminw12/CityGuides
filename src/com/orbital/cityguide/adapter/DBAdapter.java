@@ -1,4 +1,4 @@
-package com.orbital.cityguide;
+package com.orbital.cityguide.adapter;
 
 import java.io.File;
 import java.io.FileInputStream;

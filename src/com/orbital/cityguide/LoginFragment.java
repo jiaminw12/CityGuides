@@ -51,9 +51,8 @@ public class LoginFragment extends Fragment {
 	String title, alertboxmsg;
 	int success;
 
-	private static final String LOGIN_URL = "http://192.168.1.9/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://192.168.1.6/City_Guide/login.php";
 	private static final String TAG_SUCCESS = "success";
-	private static final String TAG_MESSAGE = "message";
 
 	// Your Facebook APP ID
 	private static String APP_ID = "1599241106995105"; // Replace your App ID here

@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.orbital.cityguide.adapter.AlphabetListAdapter;
+import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Item;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Row;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Section;
@@ -68,10 +69,10 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://192.168.1.9/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.6/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://192.168.1.6/City_Guide/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://192.168.1.6/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://192.168.1.6/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";

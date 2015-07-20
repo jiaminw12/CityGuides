@@ -87,8 +87,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
-	private static final String UPDATEUSR_URL = "http://192.168.1.7/City_Guide/updateUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
+	private static final String UPDATEUSR_URL = "http://192.168.1.5/City_Guide/updateUser.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";

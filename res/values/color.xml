@@ -8,4 +8,10 @@
     <color name="counter_text_color">#c5c4c4</color>
     <color name="counter_text_color_white">#ffffff</color>
     <color name="counter_text_color_black">#000000</color>
+    <color name="backgroundColor">#E8E8E0</color>
+    <color name="backgroundColorPress">#DBDBD3</color>
+    <color name="red">#FF3B00</color>
+    <color name="red_press">#990000</color>
+    <color name="dark_gray">#4C535B</color>
+    <color name="dark_gray_press">#ff7e8a97</color>
 </resources>

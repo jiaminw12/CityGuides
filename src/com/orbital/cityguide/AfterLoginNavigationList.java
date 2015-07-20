@@ -62,7 +62,7 @@ public class AfterLoginNavigationList extends Activity {
 
 	ImageView mImage;
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_IMAGE = "image";

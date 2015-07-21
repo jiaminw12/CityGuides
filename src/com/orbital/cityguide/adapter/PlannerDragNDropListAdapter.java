@@ -11,6 +11,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.baoyz.swipemenulistview.SwipeMenuListView.OnMenuItemClickListener;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
 
@@ -19,9 +24,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.StrictMode;
 import android.renderscript.Sampler.Value;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -144,6 +152,46 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 		View view = convertView;
 		mParent = parent;
 
+		SwipeMenuListView mListView = (SwipeMenuListView) parent
+				.findViewById(android.R.id.list);
+
+		SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+			@Override
+			public void create(SwipeMenu menu) {
+
+				// create "edit" item
+				SwipeMenuItem openItem = new SwipeMenuItem(parent.getContext()
+						.getApplicationContext());
+				// set item background
+				openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
+						0xCE)));
+				// set item width
+				openItem.setWidth(dp2px(100));
+				// set item title
+				openItem.setTitle("Edit");
+				// set item title fontsize
+				openItem.setTitleSize(18);
+				// set item title font color
+				openItem.setTitleColor(Color.WHITE);
+				// add to menu
+				menu.addMenuItem(openItem);
+
+				// create "delete" item
+				SwipeMenuItem deleteItem = new SwipeMenuItem(parent
+						.getContext().getApplicationContext());
+				// set item background
+				deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+						0x3F, 0x25)));
+				// set item width
+				deleteItem.setWidth(dp2px(100));
+				// set a icon
+				deleteItem.setIcon(R.drawable.trash);
+				// add to menu
+				menu.addMenuItem(deleteItem);
+			}
+		};
+
 		if (getItemViewType(position) == 0) { // Item
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater) parent.getContext()
@@ -155,7 +203,32 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			item = (Item) getItem(position);
 			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
-			
+			// set creator
+			mListView.setMenuCreator(creator);
+			mListView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(int position, SwipeMenu menu,
+						int index) {
+					switch (index) {
+					case 0:
+						// open
+						Toast.makeText(parent.getContext(), "Open",
+								Toast.LENGTH_SHORT).show();
+						break;
+					case 1:
+						// delete
+						Toast.makeText(parent.getContext(), "Delete",
+								Toast.LENGTH_SHORT).show();
+						// mAppList.remove(position);
+						// mAdapter.notifyDataSetChanged();
+						break;
+					}
+					// false : close the menu; true : not close
+					// the menu
+					return false;
+				}
+			});
+
 		} else { // Section
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater) parent.getContext()
@@ -174,7 +247,11 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 
 		return view;
 
+	}
 
+	private int dp2px(int dp) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				mParent.getResources().getDisplayMetrics());
 	}
 
 }

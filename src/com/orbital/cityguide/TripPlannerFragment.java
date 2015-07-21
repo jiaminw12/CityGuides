@@ -39,7 +39,7 @@ import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
 
-public class TripPlannerFragment extends Fragment {
+public class TripPlannerFragment extends ListFragment {
 
 	protected ArrayAdapter<CharSequence> dayAdapter;
 
@@ -70,7 +70,6 @@ public class TripPlannerFragment extends Fragment {
 	String previousLetter = null;
 
 	Spinner daySpinner = null;
-	SwipeMenuListView mListView;
 
 	public TripPlannerFragment() {
 	}
@@ -86,7 +85,6 @@ public class TripPlannerFragment extends Fragment {
 		Bundle bundle = this.getArguments();
 		name_profile = bundle.getString("profile_username", name_profile);
 
-		mListView = (SwipeMenuListView) rootView.findViewById(R.id.list);
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
 				R.array.arrayDay, android.R.layout.simple_spinner_item);
@@ -130,46 +128,16 @@ public class TripPlannerFragment extends Fragment {
 
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		SwipeMenuListView mListView = (SwipeMenuListView) getView()
-				.findViewById(R.id.list);
-
-		SwipeMenuCreator creator = new SwipeMenuCreator() {
-
-			@Override
-			public void create(SwipeMenu menu) {
-
-				// create "edit" item
-				SwipeMenuItem openItem = new SwipeMenuItem(getActivity()
-						.getApplicationContext());
-				// set item background
-				openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
-						0xCE)));
-				// set item width
-				openItem.setWidth(dp2px(100));
-				// set item title
-				openItem.setTitle("Edit");
-				// set item title fontsize
-				openItem.setTitleSize(18);
-				// set item title font color
-				openItem.setTitleColor(Color.WHITE);
-				// add to menu
-				menu.addMenuItem(openItem);
-
-				// create "delete" item
-				SwipeMenuItem deleteItem = new SwipeMenuItem(getActivity()
-						.getApplicationContext());
-				// set item background
-				deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-						0x3F, 0x25)));
-				// set item width
-				deleteItem.setWidth(dp2px(100));
-				// set a icon
-				deleteItem.setIcon(R.drawable.trash);
-				// add to menu
-				menu.addMenuItem(deleteItem);
-			}
-		};
-
+		
+		for (int i = 1; i < 4 + 1; i++) {
+			String title = "Day " + i;
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put(String.valueOf(i), title);
+			// adding HashList to ArrayList
+			mPlannerList.add(map);
+		}
+		System.out.println("Testing : " + mPlannerList);
+		
 		try {
 			dbAdaptor.open();
 			cursor = dbAdaptor.getAllPlanner();
@@ -199,6 +167,8 @@ public class TripPlannerFragment extends Fragment {
 		int start = 0;
 		String previousLetter = null;
 
+		System.out.println(mPlannerList);
+
 		for (HashMap<String, String> map : mPlannerList) {
 			for (String str : map.keySet()) {
 				String key = str;
@@ -209,54 +179,19 @@ public class TripPlannerFragment extends Fragment {
 				if (!firstTitle.equals(previousLetter)) {
 					rows.add(new Section(firstTitle));
 					sections.put(firstTitle, start);
-				} else {
-					// set creator
-					mListView.setMenuCreator(creator);
-					mListView
-							.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-								@Override
-								public boolean onMenuItemClick(int position,
-										SwipeMenu menu, int index) {
-									switch (index) {
-									case 0:
-										// open
-										Toast.makeText(getActivity(), "Open",
-												Toast.LENGTH_SHORT).show();
-										break;
-									case 1:
-										// delete
-										Toast.makeText(getActivity(), "Delete",
-												Toast.LENGTH_SHORT).show();
-										// mAppList.remove(position);
-										// mAdapter.notifyDataSetChanged();
-										break;
-									}
-									// false : close the menu; true : not close
-									// the menu
-									return false;
-								}
-							});
 				}
+
 				// Add the title to the list
 				rows.add(new Item(value));
 				previousLetter = firstTitle;
 			}
 		}
-
 		adapter.setRows(rows);
-		mListView.setAdapter(adapter);
+		setListAdapter(adapter);
 	}
 
 	public void addSectionHeader(int numofDay) {
-		int start = 0;
-		for (int i = 1; i < numofDay + 1; i++) {
-			String title = "Day " + i;
-			rows.add(new Section(title));
-			sections.put(title, start);
-		}
-
-		adapter.setRows(rows);
-		mListView.setAdapter(adapter);
+		
 	}
 
 	public String retrieveTitleByID(String attr_id) {
@@ -284,11 +219,6 @@ public class TripPlannerFragment extends Fragment {
 		}
 
 		return title;
-	}
-
-	private int dp2px(int dp) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				getResources().getDisplayMetrics());
 	}
 
 }

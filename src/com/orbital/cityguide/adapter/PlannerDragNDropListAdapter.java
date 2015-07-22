@@ -148,49 +148,13 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, final ViewGroup parent) {
-		dbAdaptor = new DBAdapter(parent.getContext());
-		View view = convertView;
-		mParent = parent;
 
 		SwipeMenuListView mListView = (SwipeMenuListView) parent
 				.findViewById(android.R.id.list);
-
-		SwipeMenuCreator creator = new SwipeMenuCreator() {
-
-			@Override
-			public void create(SwipeMenu menu) {
-
-				// create "edit" item
-				SwipeMenuItem openItem = new SwipeMenuItem(parent.getContext()
-						.getApplicationContext());
-				// set item background
-				openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
-						0xCE)));
-				// set item width
-				openItem.setWidth(dp2px(100));
-				// set item title
-				openItem.setTitle("Edit");
-				// set item title fontsize
-				openItem.setTitleSize(18);
-				// set item title font color
-				openItem.setTitleColor(Color.WHITE);
-				// add to menu
-				menu.addMenuItem(openItem);
-
-				// create "delete" item
-				SwipeMenuItem deleteItem = new SwipeMenuItem(parent
-						.getContext().getApplicationContext());
-				// set item background
-				deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-						0x3F, 0x25)));
-				// set item width
-				deleteItem.setWidth(dp2px(100));
-				// set a icon
-				deleteItem.setIcon(R.drawable.trash);
-				// add to menu
-				menu.addMenuItem(deleteItem);
-			}
-		};
+		
+		dbAdaptor = new DBAdapter(parent.getContext());
+		View view = convertView;
+		mParent = parent;
 
 		if (getItemViewType(position) == 0) { // Item
 			if (view == null) {
@@ -203,6 +167,52 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			item = (Item) getItem(position);
 			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
+
+			SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+				@Override
+				public void create(SwipeMenu menu) {
+					switch (menu.getViewType()) {
+					case 0:
+						// create menu of type 0
+						// create "edit" item
+						SwipeMenuItem openItem = new SwipeMenuItem(parent.getContext()
+								.getApplicationContext());
+						// set item background
+						openItem.setBackground(new ColorDrawable(Color.rgb(0xC9,
+								0xC9, 0xCE)));
+						// set item width
+						openItem.setWidth(dp2px(100));
+						// set item title
+						openItem.setTitle("Edit");
+						// set item title fontsize
+						openItem.setTitleSize(18);
+						// set item title font color
+						openItem.setTitleColor(Color.WHITE);
+						// add to menu
+						menu.addMenuItem(openItem);
+
+						// create "delete" item
+						SwipeMenuItem deleteItem = new SwipeMenuItem(parent.getContext()
+								.getApplicationContext());
+						// set item background
+						deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+								0x3F, 0x25)));
+						// set item width
+						deleteItem.setWidth(dp2px(100));
+						// set a icon
+						deleteItem.setIcon(R.drawable.trash);
+						// add to menu
+						menu.addMenuItem(deleteItem);
+						break;
+					case 1:
+						// section
+						// create menu of type 1
+						break;
+					}
+				}
+			};
+			
 			// set creator
 			mListView.setMenuCreator(creator);
 			mListView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -212,13 +222,13 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 					switch (index) {
 					case 0:
 						// open
-						Toast.makeText(parent.getContext(), "Open",
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(parent.getContext(), "Open", Toast.LENGTH_SHORT)
+								.show();
 						break;
 					case 1:
 						// delete
-						Toast.makeText(parent.getContext(), "Delete",
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(parent.getContext(), "Delete", Toast.LENGTH_SHORT)
+								.show();
 						// mAppList.remove(position);
 						// mAdapter.notifyDataSetChanged();
 						break;

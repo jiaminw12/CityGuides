@@ -123,13 +123,7 @@ public class TripPlannerFragment extends ListFragment {
 			}
 		});
 
-		return rootView;
-	}
-
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		
-		for (int i = 1; i < 4 + 1; i++) {
+		for (int i = 1; i < 3 + 1; i++) {
 			String title = "Day " + i;
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put(String.valueOf(i), title);
@@ -137,7 +131,7 @@ public class TripPlannerFragment extends ListFragment {
 			mPlannerList.add(map);
 		}
 		System.out.println("Testing : " + mPlannerList);
-		
+
 		try {
 			dbAdaptor.open();
 			cursor = dbAdaptor.getAllPlanner();
@@ -188,10 +182,94 @@ public class TripPlannerFragment extends ListFragment {
 		}
 		adapter.setRows(rows);
 		setListAdapter(adapter);
+
+		return rootView;
+	}
+
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		SwipeMenuListView mListView = (SwipeMenuListView) getView()
+				.findViewById(android.R.id.list);
+
+		SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+			@Override
+			public void create(SwipeMenu menu) {
+				switch (menu.getViewType()) {
+				case 0:
+					// create menu of type 0
+					// create "edit" item
+					SwipeMenuItem openItem = new SwipeMenuItem(getActivity()
+							.getApplicationContext());
+					// set item background
+					openItem.setBackground(new ColorDrawable(Color.rgb(0xC9,
+							0xC9, 0xCE)));
+					// set item width
+					openItem.setWidth(dp2px(100));
+					// set item title
+					openItem.setTitle("Edit");
+					// set item title fontsize
+					openItem.setTitleSize(18);
+					// set item title font color
+					openItem.setTitleColor(Color.WHITE);
+					// add to menu
+					menu.addMenuItem(openItem);
+
+					// create "delete" item
+					SwipeMenuItem deleteItem = new SwipeMenuItem(getActivity()
+							.getApplicationContext());
+					// set item background
+					deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+							0x3F, 0x25)));
+					// set item width
+					deleteItem.setWidth(dp2px(100));
+					// set a icon
+					deleteItem.setIcon(R.drawable.trash);
+					// add to menu
+					menu.addMenuItem(deleteItem);
+					break;
+				case 1:
+					// section
+					// create menu of type 1
+					break;
+				}
+			}
+		};
+		
+		// set creator
+		mListView.setMenuCreator(creator);
+		mListView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(int position, SwipeMenu menu,
+					int index) {
+				switch (index) {
+				case 0:
+					// open
+					Toast.makeText(getActivity(), "Open", Toast.LENGTH_SHORT)
+							.show();
+					break;
+				case 1:
+					// delete
+					Toast.makeText(getActivity(), "Delete", Toast.LENGTH_SHORT)
+							.show();
+					// mAppList.remove(position);
+					// mAdapter.notifyDataSetChanged();
+					break;
+				}
+				// false : close the menu; true : not close
+				// the menu
+				return false;
+			}
+		});
 	}
 
 	public void addSectionHeader(int numofDay) {
-		
+
+	}
+
+	private int dp2px(int dp) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				getResources().getDisplayMetrics());
 	}
 
 	public String retrieveTitleByID(String attr_id) {

@@ -21,13 +21,18 @@ import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Item;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -50,7 +55,8 @@ public class TripPlannerFragment extends ListFragment {
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.5/City_Guide/getAttractionByID.php";
+	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.9/City_Guide/getAttractionByID.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -77,6 +83,8 @@ public class TripPlannerFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		getActivity().setRequestedOrientation(
+				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		View rootView = inflater.inflate(R.layout.fragment_planner, container,
 				false);
@@ -235,7 +243,7 @@ public class TripPlannerFragment extends ListFragment {
 				}
 			}
 		};
-		
+
 		// set creator
 		mListView.setMenuCreator(creator);
 		mListView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
@@ -250,8 +258,11 @@ public class TripPlannerFragment extends ListFragment {
 					break;
 				case 1:
 					// delete
-					Toast.makeText(getActivity(), "Delete", Toast.LENGTH_SHORT)
-							.show();
+					Item item = (Item) adapter.getItem(position);
+					AlertDialog diaBox = AskOption(item.text);
+					diaBox.show();
+					adapter.notifyDataSetChanged();
+
 					// mAppList.remove(position);
 					// mAdapter.notifyDataSetChanged();
 					break;
@@ -267,9 +278,52 @@ public class TripPlannerFragment extends ListFragment {
 
 	}
 
-	private int dp2px(int dp) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				getResources().getDisplayMetrics());
+	// delete planner item
+	private AlertDialog AskOption(String attr_title) {
+		final String key = retrieveIdByTitle(attr_title);
+		AlertDialog myQuittingDialogBox = new AlertDialog.Builder(getActivity())
+				// set message, title
+				.setTitle("Delete")
+				.setMessage("Are you sure want to Delete?")
+
+				.setPositiveButton("Delete",
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								// your deleting code
+								dialog.dismiss();
+
+								dbAdaptor = new DBAdapter(getActivity()
+										.getApplicationContext());
+								Cursor cursor = null;
+
+								try {
+									dbAdaptor.open();
+
+									dbAdaptor.deletePlannerItem(key);
+
+								} catch (Exception e) {
+									Log.d("MyExpense", e.getMessage());
+								} finally {
+									if (dbAdaptor != null) {
+										dbAdaptor.close();
+									}
+								}
+							}
+
+						})
+
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+
+								dialog.dismiss();
+
+							}
+						}).create();
+		return myQuittingDialogBox;
 	}
 
 	public String retrieveTitleByID(String attr_id) {
@@ -297,6 +351,38 @@ public class TripPlannerFragment extends ListFragment {
 		}
 
 		return title;
+	}
+
+	public String retrieveIdByTitle(String attr_title) {
+		String id = null;
+		try {
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("attr_title", attr_title));
+
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+
+			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
+					params);
+			if (json != null) {
+				success = json.getInt(TAG_SUCCESS);
+				if (success == 1) {
+					mAttrID = json.getJSONArray(TAG_ATTRACTION);
+					JSONObject c = mAttrID.getJSONObject(0);
+					id = c.getString(TAG_AID);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return id;
+	}
+
+	private int dp2px(int dp) {
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				getResources().getDisplayMetrics());
 	}
 
 }

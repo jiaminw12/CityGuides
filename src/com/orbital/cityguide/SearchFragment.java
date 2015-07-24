@@ -23,6 +23,7 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -69,10 +70,10 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.5/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://192.168.1.5/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://192.168.1.5/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://192.168.1.5/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://192.168.1.9/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -114,7 +115,8 @@ public class SearchFragment extends ListFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
+		getActivity().setRequestedOrientation(
+				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		View rootView = inflater.inflate(R.layout.fragment_search, container,
 				false);
 

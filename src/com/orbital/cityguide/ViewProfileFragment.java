@@ -26,6 +26,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -66,7 +67,7 @@ public class ViewProfileFragment extends Fragment {
 	static int LOAD_IMAGE_KITKAT = 2;
 	static int TAKE_PICTURE = 3;
 
-	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.9/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_USERNAME = "username";
@@ -89,7 +90,9 @@ public class ViewProfileFragment extends Fragment {
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
+		getActivity().setRequestedOrientation(
+				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
 		View rootView = inflater.inflate(R.layout.fragment_profile, container,
 				false);
 

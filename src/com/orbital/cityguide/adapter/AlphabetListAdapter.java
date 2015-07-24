@@ -32,7 +32,7 @@ import android.widget.Toast;
 public class AlphabetListAdapter extends BaseAdapter {
 
 	JSONParser jParser = new JSONParser();
-	private static final String RETRIEVEID_URL = "http://192.168.1.5/City_Guide/getAttractionIDByTitle.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_ATTRACTION = "attractions";

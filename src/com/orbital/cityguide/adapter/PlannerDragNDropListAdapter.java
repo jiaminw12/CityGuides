@@ -1,9 +1,7 @@
 package com.orbital.cityguide.adapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -18,27 +16,25 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.baoyz.swipemenulistview.SwipeMenuListView.OnMenuItemClickListener;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
+import com.orbital.cityguide.TripPlannerFragment;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.StrictMode;
-import android.renderscript.Sampler.Value;
+import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +42,7 @@ import android.widget.Toast;
 public class PlannerDragNDropListAdapter extends BaseAdapter {
 
 	JSONParser jParser = new JSONParser();
-	private static final String RETRIEVEID_URL = "http://192.168.1.5/City_Guide/getAttractionIDByTitle.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_ATTRACTION = "attractions";
@@ -148,9 +144,6 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, final ViewGroup parent) {
-
-		SwipeMenuListView mListView = (SwipeMenuListView) parent
-				.findViewById(android.R.id.list);
 		
 		dbAdaptor = new DBAdapter(parent.getContext());
 		View view = convertView;
@@ -168,76 +161,6 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
 
-			SwipeMenuCreator creator = new SwipeMenuCreator() {
-
-				@Override
-				public void create(SwipeMenu menu) {
-					switch (menu.getViewType()) {
-					case 0:
-						// create menu of type 0
-						// create "edit" item
-						SwipeMenuItem openItem = new SwipeMenuItem(parent.getContext()
-								.getApplicationContext());
-						// set item background
-						openItem.setBackground(new ColorDrawable(Color.rgb(0xC9,
-								0xC9, 0xCE)));
-						// set item width
-						openItem.setWidth(dp2px(100));
-						// set item title
-						openItem.setTitle("Edit");
-						// set item title fontsize
-						openItem.setTitleSize(18);
-						// set item title font color
-						openItem.setTitleColor(Color.WHITE);
-						// add to menu
-						menu.addMenuItem(openItem);
-
-						// create "delete" item
-						SwipeMenuItem deleteItem = new SwipeMenuItem(parent.getContext()
-								.getApplicationContext());
-						// set item background
-						deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-								0x3F, 0x25)));
-						// set item width
-						deleteItem.setWidth(dp2px(100));
-						// set a icon
-						deleteItem.setIcon(R.drawable.trash);
-						// add to menu
-						menu.addMenuItem(deleteItem);
-						break;
-					case 1:
-						// section
-						// create menu of type 1
-						break;
-					}
-				}
-			};
-			
-			// set creator
-			mListView.setMenuCreator(creator);
-			mListView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(int position, SwipeMenu menu,
-						int index) {
-					switch (index) {
-					case 0:
-						// open
-						Toast.makeText(parent.getContext(), "Open", Toast.LENGTH_SHORT)
-								.show();
-						break;
-					case 1:
-						// delete
-						Toast.makeText(parent.getContext(), "Delete", Toast.LENGTH_SHORT)
-								.show();
-						// mAppList.remove(position);
-						// mAdapter.notifyDataSetChanged();
-						break;
-					}
-					// false : close the menu; true : not close
-					// the menu
-					return false;
-				}
-			});
 
 		} else { // Section
 			if (view == null) {

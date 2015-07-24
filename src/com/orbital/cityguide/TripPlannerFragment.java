@@ -90,8 +90,8 @@ public class TripPlannerFragment extends ListFragment {
 				false);
 
 		dbAdaptor = new DBAdapter(getActivity());
-		Bundle bundle = this.getArguments();
-		name_profile = bundle.getString("profile_username", name_profile);
+		// Bundle bundle = this.getArguments();
+		// name_profile = bundle.getString("profile_username", name_profile);
 
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
@@ -138,7 +138,6 @@ public class TripPlannerFragment extends ListFragment {
 			// adding HashList to ArrayList
 			mPlannerList.add(map);
 		}
-		System.out.println("Testing : " + mPlannerList);
 
 		try {
 			dbAdaptor.open();
@@ -168,8 +167,6 @@ public class TripPlannerFragment extends ListFragment {
 
 		int start = 0;
 		String previousLetter = null;
-
-		System.out.println(mPlannerList);
 
 		for (HashMap<String, String> map : mPlannerList) {
 			for (String str : map.keySet()) {
@@ -261,10 +258,6 @@ public class TripPlannerFragment extends ListFragment {
 					Item item = (Item) adapter.getItem(position);
 					AlertDialog diaBox = AskOption(item.text);
 					diaBox.show();
-					adapter.notifyDataSetChanged();
-
-					// mAppList.remove(position);
-					// mAdapter.notifyDataSetChanged();
 					break;
 				}
 				// false : close the menu; true : not close
@@ -309,6 +302,13 @@ public class TripPlannerFragment extends ListFragment {
 									if (dbAdaptor != null) {
 										dbAdaptor.close();
 									}
+									Fragment fragment = new TripPlannerFragment();
+									getFragmentManager()
+											.beginTransaction()
+											.replace(R.id.frame_container,
+													fragment).detach(fragment)
+											.attach(fragment)
+											.commitAllowingStateLoss();
 								}
 							}
 

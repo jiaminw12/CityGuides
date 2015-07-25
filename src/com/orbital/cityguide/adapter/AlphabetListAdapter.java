@@ -162,7 +162,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 							dbAdaptor.open();
 							dbAdaptor.insertPlannerList(key, "1");
 							Toast.makeText(mParent.getContext(),
-									"Successfully Added!!! Fragmnet",
+									"Successfully Added!",
 									Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
 							Log.e("CityGuideSingapore", e.getMessage());
@@ -181,7 +181,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 							dbAdaptor.open();
 							dbAdaptor.deletePlannerItem(key);
 							Toast.makeText(mParent.getContext(),
-									"Successfully Removed!!! Fragmnet",
+									"Successfully Removed!",
 									Toast.LENGTH_SHORT).show();
 						} catch (Exception e) {
 							Log.d("CityGuideSingapore", e.getMessage());

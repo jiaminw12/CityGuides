@@ -22,6 +22,7 @@ import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Item;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
@@ -76,6 +77,7 @@ public class TripPlannerFragment extends ListFragment {
 	String previousLetter = null;
 
 	Spinner daySpinner = null;
+	CharSequence[] planner_list;
 
 	public TripPlannerFragment() {
 	}
@@ -90,8 +92,8 @@ public class TripPlannerFragment extends ListFragment {
 				false);
 
 		dbAdaptor = new DBAdapter(getActivity());
-		// Bundle bundle = this.getArguments();
-		// name_profile = bundle.getString("profile_username", name_profile);
+		//Bundle bundle = this.getArguments();
+		//name_profile = bundle.getString("profile_username", name_profile);
 
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
@@ -131,14 +133,6 @@ public class TripPlannerFragment extends ListFragment {
 			}
 		});
 
-		for (int i = 1; i < 3 + 1; i++) {
-			String title = "Day " + i;
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put(String.valueOf(i), title);
-			// adding HashList to ArrayList
-			mPlannerList.add(map);
-		}
-
 		try {
 			dbAdaptor.open();
 			cursor = dbAdaptor.getAllPlanner();
@@ -153,7 +147,6 @@ public class TripPlannerFragment extends ListFragment {
 					// adding HashList to ArrayList
 					mPlannerList.add(map);
 				} while (cursor.moveToNext());
-			} else {
 			}
 		} catch (Exception e) {
 			Log.e("City Guide", e.getMessage());
@@ -247,16 +240,19 @@ public class TripPlannerFragment extends ListFragment {
 			@Override
 			public boolean onMenuItemClick(int position, SwipeMenu menu,
 					int index) {
+				Item item;
+				AlertDialog diaBox;
 				switch (index) {
 				case 0:
-					// open
-					Toast.makeText(getActivity(), "Open", Toast.LENGTH_SHORT)
-							.show();
+					// edit
+					item = (Item) adapter.getItem(position);
+					diaBox = AskOption_Update(item.text);
+					diaBox.show();
 					break;
 				case 1:
 					// delete
-					Item item = (Item) adapter.getItem(position);
-					AlertDialog diaBox = AskOption(item.text);
+					item = (Item) adapter.getItem(position);
+					diaBox = AskOption_Delete(item.text);
 					diaBox.show();
 					break;
 				}
@@ -268,11 +264,81 @@ public class TripPlannerFragment extends ListFragment {
 	}
 
 	public void addSectionHeader(int numofDay) {
+		List<String> listItems = new ArrayList<String>();
+		for (int i = 1; i < numofDay + 1; i++) {
+			planner_list = new String[numofDay];
+			String title = "Day " + i;
+			listItems.add(title);
+		}
+		planner_list = listItems.toArray(new CharSequence[listItems.size()]);
+	}
 
+	// update planner item
+	private AlertDialog AskOption_Update(String attr_title) {
+		final String key = retrieveIdByTitle(attr_title);
+		Builder updateDialogBox = new AlertDialog.Builder(getActivity());
+		// set message, title
+		updateDialogBox.setTitle("Choose a day");
+
+		// select the item
+		DialogInterface.OnClickListener ListClick = new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				// your deleting code
+				dialog.dismiss();
+				String tag_id = null;
+				String row_id = null;
+				dbAdaptor = new DBAdapter(getActivity().getApplicationContext());
+				Cursor cursor = null;
+				Cursor cursor2 = null;
+				try {
+					dbAdaptor.open();
+					cursor = dbAdaptor.getTagID(String
+							.valueOf(planner_list[which]));
+					cursor2 = dbAdaptor.getPlannerRowId(key);
+					if (cursor != null && cursor.getCount() > 0
+							&& cursor2 != null && cursor2.getCount() > 0) {
+						cursor.moveToFirst();
+						cursor2.moveToFirst();
+						do {
+							tag_id = cursor.getString(0);
+							row_id = cursor2.getString(0);
+						} while (cursor.moveToNext() && cursor2.moveToNext());
+					}
+					
+					dbAdaptor.updatePlannerItem(Integer.valueOf(row_id), key, tag_id);
+				} catch (Exception e) {
+					Log.d("City Guide Singapore", e.getMessage());
+				} finally {
+					if (dbAdaptor != null) {
+						dbAdaptor.close();
+					}
+					
+					Fragment fragment = new TripPlannerFragment();
+					getFragmentManager()
+							.beginTransaction()
+							.replace(R.id.frame_container,
+									fragment).detach(fragment)
+							.attach(fragment)
+							.commitAllowingStateLoss();
+				}
+			}
+		};
+
+		// cancel button
+		DialogInterface.OnClickListener OkClick = new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		};
+
+		updateDialogBox.setItems(planner_list, ListClick);
+		updateDialogBox.setNeutralButton("Cancel", OkClick);
+		AlertDialog alertdialog = updateDialogBox.create();
+		return alertdialog;
 	}
 
 	// delete planner item
-	private AlertDialog AskOption(String attr_title) {
+	private AlertDialog AskOption_Delete(String attr_title) {
 		final String key = retrieveIdByTitle(attr_title);
 		AlertDialog myQuittingDialogBox = new AlertDialog.Builder(getActivity())
 				// set message, title
@@ -289,7 +355,6 @@ public class TripPlannerFragment extends ListFragment {
 
 								dbAdaptor = new DBAdapter(getActivity()
 										.getApplicationContext());
-								Cursor cursor = null;
 
 								try {
 									dbAdaptor.open();
@@ -297,7 +362,8 @@ public class TripPlannerFragment extends ListFragment {
 									dbAdaptor.deletePlannerItem(key);
 
 								} catch (Exception e) {
-									Log.d("MyExpense", e.getMessage());
+									Log.d("City Guide Singapore",
+											e.getMessage());
 								} finally {
 									if (dbAdaptor != null) {
 										dbAdaptor.close();

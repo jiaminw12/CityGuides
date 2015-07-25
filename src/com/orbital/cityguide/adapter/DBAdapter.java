@@ -79,7 +79,7 @@ public class DBAdapter {
 		}
 	}
 
-	// opens the database
+	// open the database
 	public DBAdapter open() throws SQLException {
 		db = DBHelper.getWritableDatabase();
 		return this;
@@ -90,7 +90,7 @@ public class DBAdapter {
 		DBHelper.close();
 	}
 
-	/* Creating tag */
+	// create tag
 	public long createTag(Tag tag) {
 		db = DBHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -119,13 +119,10 @@ public class DBAdapter {
 	public Cursor getAllPlanner() {
 		Cursor mCursor = null;
 		if (db != null) {
-			mCursor = db
-					.rawQuery(
-							"SELECT plannerList.attr_id, tags.tag_name "
-							+ "FROM plannerList INNER JOIN tags "
-							+ "ON plannerList.tag_id = tags.id "
-							+ "ORDER BY plannerList.attr_id ASC",
-							null);
+			mCursor = db.rawQuery("SELECT plannerList.attr_id, tags.tag_name "
+					+ "FROM plannerList INNER JOIN tags "
+					+ "ON plannerList.tag_id = tags.id "
+					+ "ORDER BY tags.id ASC", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}
@@ -156,12 +153,25 @@ public class DBAdapter {
 		return mCursor;
 	}
 
-	// retrieve tag_title
-	public Cursor getTagTitle() {
+	// retrieve tag_id
+	public Cursor getTagID(String title) {
 		Cursor mCursor = null;
 		if (db != null) {
-			mCursor = db
-					.rawQuery("SELECT tag_name FROM TABLE_TAG WHERE ", null);
+			mCursor = db.rawQuery("SELECT id FROM tags WHERE tag_name = '"
+					+ title + "'", null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
+		}
+		return mCursor;
+	}
+
+	// retrieve id from plannerList
+	public Cursor getPlannerRowId(String attr_id) {
+		Cursor mCursor = null;
+		if (db != null) {
+			mCursor = db.rawQuery("SELECT id FROM plannerList WHERE attr_id = '"
+					+ attr_id + "'", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}
@@ -170,7 +180,7 @@ public class DBAdapter {
 	}
 
 	// update ListItem
-	public boolean updatePlannerItem(long rowId, long attr_id, long tag_id) {
+	public boolean updatePlannerItem(long rowId, String attr_id, String tag_id) {
 		ContentValues args = new ContentValues();
 		args.put(KEY_ATTR_ID, attr_id);
 		args.put(KEY_TAG_ID, tag_id);

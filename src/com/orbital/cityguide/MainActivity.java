@@ -4,11 +4,13 @@ import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.adapter.NavDrawerListAdapter;
 import com.orbital.cityguide.model.NavDrawerItem;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -51,17 +53,19 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.navigation_list);
-
-		SharedPreferences prefs = getSharedPreferences("PREFERENCE",
-				MODE_PRIVATE);
-		boolean firstRun = prefs.getBoolean("firstRun", true);
-		if (firstRun) {
-			// set your flag to false
-			prefs.edit().putBoolean("firstRun", false).commit(); 
-			dbAdaptor = new DBAdapter(this);
-			dbAdaptor.insertTag();
+		
+		if (!doesDatabaseExist(this, "cityGuideSingapore")){
+			SharedPreferences prefs = getSharedPreferences("PREFERENCE",
+					MODE_PRIVATE);
+			boolean firstRun = prefs.getBoolean("firstRun", true);
+			if (firstRun) {
+				// set your flag to false
+				prefs.edit().putBoolean("firstRun", false).commit(); 
+				dbAdaptor = new DBAdapter(this);
+				dbAdaptor.insertTag();
+			}
 		}
-
+		
 		name_profile = "NULL";
 
 		mTitle = mDrawerTitle = getTitle();
@@ -264,6 +268,11 @@ public class MainActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		moveTaskToBack(true);
+	}
+	
+	private static boolean doesDatabaseExist(ContextWrapper context, String dbName) {
+	    File dbFile = context.getDatabasePath(dbName);
+	    return dbFile.exists();
 	}
 
 }

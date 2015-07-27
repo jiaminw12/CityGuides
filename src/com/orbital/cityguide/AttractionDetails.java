@@ -38,9 +38,9 @@ import android.widget.RatingBar.*;
 
 public class AttractionDetails extends Activity {
 
-	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAttraction.php";
-	private static final String ADDCOM_URL = "http://192.168.1.9/City_Guide/addComment.php";
-	private static final String READCOM_URL = "http://192.168.1.9/City_Guide/getComment.php";
+	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAttraction.php";
+	private static final String ADDCOM_URL = "http://192.168.1.7/City_Guide/addComment.php";
+	private static final String READCOM_URL = "http://192.168.1.7/City_Guide/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";

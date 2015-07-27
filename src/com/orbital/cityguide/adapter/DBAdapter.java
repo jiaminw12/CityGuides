@@ -130,6 +130,20 @@ public class DBAdapter {
 		return mCursor;
 	}
 
+	// retrieve all the ListItem (For UPLOAD TO SERVER)
+	public Cursor getAllPlannerList() {
+		Cursor mCursor = null;
+		if (db != null) {
+			mCursor = db.rawQuery("SELECT attr_id, tag_id, created_at "
+					+ "FROM plannerList "
+					+ "ORDER BY tag_id ASC", null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+			}
+		}
+		return mCursor;
+	}
+
 	// retrieve all attr_id
 	public Cursor getAttrID() {
 		Cursor mCursor = null;
@@ -170,8 +184,9 @@ public class DBAdapter {
 	public Cursor getPlannerRowId(String attr_id) {
 		Cursor mCursor = null;
 		if (db != null) {
-			mCursor = db.rawQuery("SELECT id FROM plannerList WHERE attr_id = '"
-					+ attr_id + "'", null);
+			mCursor = db.rawQuery(
+					"SELECT id FROM plannerList WHERE attr_id = '" + attr_id
+							+ "'", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
@@ -21,33 +20,26 @@ import com.orbital.cityguide.adapter.AlphabetListAdapter.Section;
 
 import android.app.ListFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SearchFragment extends ListFragment implements
 		OnItemSelectedListener {
@@ -70,10 +62,10 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://192.168.1.9/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://192.168.1.9/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://192.168.1.9/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.7/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://192.168.1.7/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://192.168.1.7/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -85,12 +77,12 @@ public class SearchFragment extends ListFragment implements
 	private JSONArray mAttractions = null;
 
 	private JSONArray mAttrID = null;
-	
+
 	JSONParser jParser = new JSONParser();
 
 	String name_profile;
 	int success;
-	
+
 	DBAdapter dbAdaptor;
 
 	public SearchFragment() {
@@ -126,11 +118,13 @@ public class SearchFragment extends ListFragment implements
 				android.R.layout.simple_spinner_item);
 		searchSpinner.setAdapter(this.searchAdapter);
 		searchSpinner.setOnItemSelectedListener(this);
-		
-		mListView = (ListView)rootView.findViewById(R.id.list);
+
+		mListView = (ListView) rootView.findViewById(R.id.list);
 
 		Bundle bundle = this.getArguments();
-		name_profile = bundle.getString("profile_username", name_profile);
+		if (name_profile != null){
+			name_profile = bundle.getString("profile_username", name_profile);
+		}
 
 		// Hashmap for ListView
 		mAttractionsList = new ArrayList<HashMap<String, String>>();
@@ -139,7 +133,7 @@ public class SearchFragment extends ListFragment implements
 		sideIndex.bringToFront();
 
 		setRetainInstance(true);
-		
+
 		return rootView;
 	}
 
@@ -159,9 +153,9 @@ public class SearchFragment extends ListFragment implements
 		} else if (value.equalsIgnoreCase("area")) {
 			sideIndex.setVisibility(View.GONE);
 			new LoadAttractionsAREA().execute();
-		} 
+		}
 	}
-	
+
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
 		// TODO Auto-generated method stub
@@ -182,7 +176,7 @@ public class SearchFragment extends ListFragment implements
 				TextView text = (TextView) view.findViewById(R.id.name);
 				String title = text.getText().toString();
 				String key = retrieveId(title);
-				if(key != null){
+				if (key != null) {
 					Intent in = new Intent(getActivity(),
 							AttractionDetails.class);
 					// sending aid to next activity
@@ -326,7 +320,8 @@ public class SearchFragment extends ListFragment implements
 			JSONObject json;
 
 			try {
-				json = jParser.makeHttpRequest(READATTRBYCATS_URL, "GET", params);
+				json = jParser.makeHttpRequest(READATTRBYCATS_URL, "GET",
+						params);
 				int success = json.getInt(TAG_SUCCESS);
 
 				if (success == 1) {
@@ -341,7 +336,7 @@ public class SearchFragment extends ListFragment implements
 						// Storing each json item in variable
 						String name = c.getString(TAG_TITLE);
 						String category = c.getString(TAG_CATEGORY);
-						
+
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
 						map.put(category, name);
@@ -385,7 +380,7 @@ public class SearchFragment extends ListFragment implements
 					previousLetter = firstLetter;
 				}
 			}
-			
+
 			adapter.setRows(rows);
 			setListAdapter(adapter);
 		}
@@ -395,7 +390,7 @@ public class SearchFragment extends ListFragment implements
 			return null;
 		}
 	}
-	
+
 	class LoadAttractionsAREA extends AsyncTask<String, String, String> {
 
 		/* getting All products from url */
@@ -412,7 +407,8 @@ public class SearchFragment extends ListFragment implements
 			JSONObject json;
 
 			try {
-				json = jParser.makeHttpRequest(READATTRBYAREA_URL, "GET", params);
+				json = jParser.makeHttpRequest(READATTRBYAREA_URL, "GET",
+						params);
 				int success = json.getInt(TAG_SUCCESS);
 
 				if (success == 1) {
@@ -427,7 +423,7 @@ public class SearchFragment extends ListFragment implements
 						// Storing each json item in variable
 						String name = c.getString(TAG_TITLE);
 						String area = c.getString(TAG_AREA);
-						
+
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
 						map.put(area, name);
@@ -470,7 +466,7 @@ public class SearchFragment extends ListFragment implements
 					previousLetter = firstLetter;
 				}
 			}
-			
+
 			adapter.setRows(rows);
 			setListAdapter(adapter);
 		}
@@ -563,8 +559,8 @@ public class SearchFragment extends ListFragment implements
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 
-			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL,
-					"POST", params);
+			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
+					params);
 			if (json != null) {
 				success = json.getInt(TAG_SUCCESS);
 				if (success == 1) {
@@ -579,11 +575,10 @@ public class SearchFragment extends ListFragment implements
 
 		return id;
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 	}
-
 
 }

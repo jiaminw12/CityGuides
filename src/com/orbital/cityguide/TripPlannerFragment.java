@@ -24,16 +24,17 @@ import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -43,7 +44,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Toast;
 
 public class TripPlannerFragment extends ListFragment {
 
@@ -56,8 +56,9 @@ public class TripPlannerFragment extends ListFragment {
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.9/City_Guide/getAttractionByID.php";
-	private static final String RETRIEVEID_URL = "http://192.168.1.9/City_Guide/getAttractionIDByTitle.php";
+	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.7/City_Guide/getAttractionByID.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.7/City_Guide/getAttractionIDByTitle.php";
+	private static final String UPDATELIST_URL = "http://192.168.1.7/City_Guide/updatePlannerList.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -72,6 +73,7 @@ public class TripPlannerFragment extends ListFragment {
 	Cursor cursor = null;
 
 	String name_profile;
+	String username;
 	int success;
 	int start = 0;
 	String previousLetter = null;
@@ -92,8 +94,16 @@ public class TripPlannerFragment extends ListFragment {
 				false);
 
 		dbAdaptor = new DBAdapter(getActivity());
-		//Bundle bundle = this.getArguments();
-		//name_profile = bundle.getString("profile_username", name_profile);
+		Bundle bundle = this.getArguments();
+		if (name_profile != null && isNetworkAvailable()) {
+			name_profile = bundle.getString("profile_username", name_profile);
+			username = name_profile;
+			LoadPlannerList();
+			UploadPlannerList();
+		} else {
+			name_profile = null;
+			LoadPlannerList();
+		}
 
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
@@ -132,54 +142,6 @@ public class TripPlannerFragment extends ListFragment {
 
 			}
 		});
-
-		try {
-			dbAdaptor.open();
-			cursor = dbAdaptor.getAllPlanner();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-					String attr_title = retrieveTitleByID(cursor.getString(0));
-					String tag_title = cursor.getString(1);
-
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put(tag_title, attr_title);
-					// adding HashList to ArrayList
-					mPlannerList.add(map);
-				} while (cursor.moveToNext());
-			}
-		} catch (Exception e) {
-			Log.e("City Guide", e.getMessage());
-		} finally {
-			if (cursor != null)
-				cursor.close();
-
-			if (dbAdaptor != null)
-				dbAdaptor.close();
-		}
-
-		int start = 0;
-		String previousLetter = null;
-
-		for (HashMap<String, String> map : mPlannerList) {
-			for (String str : map.keySet()) {
-				String key = str;
-				String value = map.get(key);
-				String firstTitle = key;
-
-				// Check if we need to add a header row
-				if (!firstTitle.equals(previousLetter)) {
-					rows.add(new Section(firstTitle));
-					sections.put(firstTitle, start);
-				}
-
-				// Add the title to the list
-				rows.add(new Item(value));
-				previousLetter = firstTitle;
-			}
-		}
-		adapter.setRows(rows);
-		setListAdapter(adapter);
 
 		return rootView;
 	}
@@ -263,6 +225,106 @@ public class TripPlannerFragment extends ListFragment {
 		});
 	}
 
+	public void LoadPlannerList() {
+		try {
+			dbAdaptor.open();
+			cursor = dbAdaptor.getAllPlanner();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
+					String attr_title = retrieveTitleByID(cursor.getString(0));
+					String tag_title = cursor.getString(1);
+
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(tag_title, attr_title);
+					// adding HashList to ArrayList
+					mPlannerList.add(map);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			Log.e("City Guide", e.getMessage());
+		} finally {
+			if (cursor != null)
+				cursor.close();
+
+			if (dbAdaptor != null)
+				dbAdaptor.close();
+		}
+
+		int start = 0;
+		String previousLetter = null;
+
+		for (HashMap<String, String> map : mPlannerList) {
+			for (String str : map.keySet()) {
+				String key = str;
+				String value = map.get(key);
+				String firstTitle = key;
+
+				// Check if we need to add a header row
+				if (!firstTitle.equals(previousLetter)) {
+					rows.add(new Section(firstTitle));
+					sections.put(firstTitle, start);
+				}
+
+				// Add the title to the list
+				rows.add(new Item(value));
+				previousLetter = firstTitle;
+			}
+		}
+		adapter.setRows(rows);
+		setListAdapter(adapter);
+	}
+
+	public void UploadPlannerList() {
+
+		// Building Parameters
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+
+		// getting JSON string from URL
+		JSONObject json;
+
+		try {
+			dbAdaptor.open();
+			cursor = dbAdaptor.getAllPlannerList();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
+					String attr_id = retrieveTitleByID(cursor.getString(0));
+					String tag_id = cursor.getString(1);
+					String created_date = cursor.getString(3);
+
+					params.add(new BasicNameValuePair("attr_id", attr_id));
+					params.add(new BasicNameValuePair("tag_id", tag_id));
+					params.add(new BasicNameValuePair("created_date",
+							created_date));
+					params.add(new BasicNameValuePair("username", username));
+
+					json = jParser.makeHttpRequest(UPDATELIST_URL, "POST",
+							params);
+					if (json != null) {
+						success = json.getInt(TAG_SUCCESS);
+						if (success == 1) {
+							Log.d("Successful!!!", "jshdjjshdj");
+						}
+					}
+				} while (cursor.moveToNext());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null)
+				cursor.close();
+
+			if (dbAdaptor != null)
+				dbAdaptor.close();
+		}
+
+	}
+
 	public void addSectionHeader(int numofDay) {
 		List<String> listItems = new ArrayList<String>();
 		for (int i = 1; i < numofDay + 1; i++) {
@@ -304,21 +366,23 @@ public class TripPlannerFragment extends ListFragment {
 							row_id = cursor2.getString(0);
 						} while (cursor.moveToNext() && cursor2.moveToNext());
 					}
-					
-					dbAdaptor.updatePlannerItem(Integer.valueOf(row_id), key, tag_id);
+
+					dbAdaptor.updatePlannerItem(Integer.valueOf(row_id), key,
+							tag_id);
 				} catch (Exception e) {
 					Log.d("City Guide Singapore", e.getMessage());
 				} finally {
 					if (dbAdaptor != null) {
 						dbAdaptor.close();
 					}
-					
+
 					Fragment fragment = new TripPlannerFragment();
-					getFragmentManager()
-							.beginTransaction()
-							.replace(R.id.frame_container,
-									fragment).detach(fragment)
-							.attach(fragment)
+					Bundle bundle = new Bundle();
+					bundle.putString("profile_username", name_profile);
+					fragment.setArguments(bundle);
+					getFragmentManager().beginTransaction()
+							.replace(R.id.frame_container, fragment)
+							.detach(fragment).attach(fragment)
 							.commitAllowingStateLoss();
 				}
 			}
@@ -369,6 +433,10 @@ public class TripPlannerFragment extends ListFragment {
 										dbAdaptor.close();
 									}
 									Fragment fragment = new TripPlannerFragment();
+									Bundle bundle = new Bundle();
+									bundle.putString("profile_username",
+											name_profile);
+									fragment.setArguments(bundle);
 									getFragmentManager()
 											.beginTransaction()
 											.replace(R.id.frame_container,
@@ -449,6 +517,19 @@ public class TripPlannerFragment extends ListFragment {
 	private int dp2px(int dp) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
 				getResources().getDisplayMetrics());
+	}
+
+	public boolean isNetworkAvailable() {
+		ConnectivityManager connManager = (ConnectivityManager) this
+				.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// if no network is available networkInfo will be null
+		// otherwise check if we are connected
+		if (mWifi != null && mWifi.isConnected()) {
+			return true;
+		}
+		return false;
 	}
 
 }

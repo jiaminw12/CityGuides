@@ -65,5 +65,9 @@
         <item>8</item>
         <item>9</item>
     </string-array>
+    
+    <string name="title_section1">Recommendation</string>
+    <string name="title_section2">Weather</string>
+    
 
 </resources>

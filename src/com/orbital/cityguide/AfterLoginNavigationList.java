@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Base64;
@@ -36,7 +37,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class AfterLoginNavigationList extends Activity {
+public class AfterLoginNavigationList extends FragmentActivity {
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -62,7 +63,7 @@ public class AfterLoginNavigationList extends Activity {
 
 	ImageView mImage;
 
-	private static final String GETUSR_URL = "http://192.168.1.9/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_IMAGE = "image";
@@ -263,10 +264,9 @@ public class AfterLoginNavigationList extends Activity {
 			fragment.setArguments(bundle);
 			break;
 		case 1:
-			fragment = new HomeFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, HomeFragment.newInstance(), HomeFragment.TAG).commit();
 			break;
 		case 2:
 			fragment = new SearchFragment();
@@ -292,11 +292,10 @@ public class AfterLoginNavigationList extends Activity {
 			startActivity(logout);
 			finish();
 			break;
-
 		default:
 			break;
 		}
-
+		
 		if (fragment != null) {
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction()

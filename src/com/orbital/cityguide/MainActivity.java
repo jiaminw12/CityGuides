@@ -17,6 +17,7 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -25,7 +26,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
+	
+	private static final String TAG = MainActivity.class.getSimpleName();
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -53,19 +56,19 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.navigation_list);
-		
-		if (!doesDatabaseExist(this, "cityGuideSingapore")){
+
+		if (!doesDatabaseExist(this, "cityGuideSingapore")) {
 			SharedPreferences prefs = getSharedPreferences("PREFERENCE",
 					MODE_PRIVATE);
 			boolean firstRun = prefs.getBoolean("firstRun", true);
 			if (firstRun) {
 				// set your flag to false
-				prefs.edit().putBoolean("firstRun", false).commit(); 
+				prefs.edit().putBoolean("firstRun", false).commit();
 				dbAdaptor = new DBAdapter(this);
 				dbAdaptor.insertTag();
 			}
 		}
-		
+
 		name_profile = "NULL";
 
 		mTitle = mDrawerTitle = getTitle();
@@ -174,9 +177,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	/* *
-	 * Called when invalidateOptionsMenu() is triggered
-	 */
+	/* Called when invalidateOptionsMenu() is triggered  */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// if nav drawer is opened, hide the action items
@@ -193,33 +194,22 @@ public class MainActivity extends Activity {
 		Fragment fragment = null;
 		switch (position) {
 		case 0:
-			fragment = new HomeFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, HomeFragment.newInstance(), HomeFragment.TAG).commit();
 			break;
 		case 1:
 			fragment = new SearchFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
 			break;
 		case 2:
 			fragment = new MapsFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
 			break;
 		case 3:
 			fragment = new TripPlannerFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
 			break;
 		case 4:
 			fragment = new LoginFragment();
 			break;
-
 		default:
 			break;
 		}
@@ -269,10 +259,11 @@ public class MainActivity extends Activity {
 	public void onBackPressed() {
 		moveTaskToBack(true);
 	}
-	
-	private static boolean doesDatabaseExist(ContextWrapper context, String dbName) {
-	    File dbFile = context.getDatabasePath(dbName);
-	    return dbFile.exists();
+
+	private static boolean doesDatabaseExist(ContextWrapper context,
+			String dbName) {
+		File dbFile = context.getDatabasePath(dbName);
+		return dbFile.exists();
 	}
 
 }

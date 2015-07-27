@@ -22,20 +22,16 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class LoginFragment extends Fragment {
 
@@ -51,7 +47,7 @@ public class LoginFragment extends Fragment {
 	String title, alertboxmsg;
 	int success;
 
-	private static final String LOGIN_URL = "http://192.168.1.9/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://192.168.1.7/City_Guide/login.php";
 	private static final String TAG_SUCCESS = "success";
 
 	// Your Facebook APP ID

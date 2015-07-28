@@ -56,7 +56,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
-	private static final String REGISTER_URL = "http://192.168.1.7/City_Guide/registration.php";
+	private static final String REGISTER_URL = "http://192.168.1.4/City_Guide/registration.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
 

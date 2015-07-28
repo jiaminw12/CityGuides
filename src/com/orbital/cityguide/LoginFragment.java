@@ -18,7 +18,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +25,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class LoginFragment extends Fragment {
+	
+	public static final String TAG = LoginFragment.class.getSimpleName();
 
 	Button register;
 	Button clickHere;
@@ -47,7 +50,7 @@ public class LoginFragment extends Fragment {
 	String title, alertboxmsg;
 	int success;
 
-	private static final String LOGIN_URL = "http://192.168.1.7/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://192.168.1.4/City_Guide/login.php";
 	private static final String TAG_SUCCESS = "success";
 
 	// Your Facebook APP ID
@@ -57,6 +60,10 @@ public class LoginFragment extends Fragment {
 	JSONParser jsonParser = new JSONParser();
 
 	public LoginFragment() {
+	}
+	
+	public static LoginFragment newInstance() {
+		return new LoginFragment();
 	}
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -165,6 +172,7 @@ public class LoginFragment extends Fragment {
 										AfterLoginNavigationList.class);
 								Bundle extras = new Bundle();
 								extras.putString("profile_username", username);
+								Log.d("username",username);
 								nextActivity.putExtras(extras);
 								startActivity(nextActivity);
 							} else if (success == 0) {

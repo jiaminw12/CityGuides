@@ -63,7 +63,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 	ImageView mImage;
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.4/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_IMAGE = "image";
@@ -81,6 +81,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 		Bundle extras = getIntent().getExtras();
 		name_profile = extras.getString("profile_username");
+		Log.d("name",name_profile );
 
 		mTitle = mDrawerTitle = getTitle();
 
@@ -102,7 +103,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 		updateImage();
 		TextView mName = (TextView) listHeaderView.findViewById(R.id.name);
 		mName.setText(name_profile);
-
+		
 		mDrawerList.addHeaderView(listHeaderView);
 
 		navDrawerItems = new ArrayList<NavDrawerItem>();
@@ -258,33 +259,37 @@ public class AfterLoginNavigationList extends FragmentActivity {
 		Fragment fragment = null;
 		switch (position) {
 		case 0:
-			fragment = new ViewProfileFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.frame_container,
+							ViewProfileFragment.newInstance(name_profile),
+							ViewProfileFragment.TAG_Name).commit();
 			break;
 		case 1:
 			getSupportFragmentManager()
-			.beginTransaction()
-			.replace(R.id.frame_container, HomeFragment.newInstance(), HomeFragment.TAG).commit();
+					.beginTransaction()
+					.replace(R.id.frame_container, HomeFragment.newInstance(name_profile),
+							HomeFragment.TAG).commit();
 			break;
 		case 2:
-			fragment = new SearchFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.frame_container,
+							SearchFragment.newInstance(name_profile), SearchFragment.TAG)
+					.commit();
 			break;
 		case 3:
-			fragment = new MapsFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.frame_container, MapsFragment.newInstance(name_profile),
+							MapsFragment.TAG).commit();
 			break;
 		case 4:
-			fragment = new TripPlannerFragment();
-			bundle = new Bundle();
-			bundle.putString("profile_username", name_profile);
-			fragment.setArguments(bundle);
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(R.id.frame_container,
+							TripPlannerFragment.newInstance(name_profile),
+							TripPlannerFragment.TAG).commit();
 			break;
 		case 5:
 			Intent logout = new Intent();
@@ -295,21 +300,11 @@ public class AfterLoginNavigationList extends FragmentActivity {
 		default:
 			break;
 		}
-		
-		if (fragment != null) {
-			FragmentManager fragmentManager = getFragmentManager();
-			fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, fragment).commit();
 
-			// update selected item and title, then close the drawer
-			mDrawerList.setItemChecked(position, true);
-			mDrawerList.setSelection(position);
-			setTitle(navMenuTitles[position]);
-			mDrawerLayout.closeDrawer(mDrawerList);
-		} else {
-			// error in creating fragment
-			Log.e("MainActivity", "Error in creating fragment");
-		}
+		mDrawerList.setItemChecked(position, true);
+		mDrawerList.setSelection(position);
+		setTitle(navMenuTitles[position]);
+		mDrawerLayout.closeDrawer(mDrawerList);
 	}
 
 	@Override

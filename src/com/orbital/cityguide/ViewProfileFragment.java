@@ -19,7 +19,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,6 +32,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.method.LinkMovementMethod;
 import android.util.Base64;
@@ -48,6 +48,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ViewProfileFragment extends Fragment {
+
+	public static final String TAG_Name = ViewProfileFragment.class
+			.getSimpleName();
 
 	ImageView mProfilePic;
 	TextView mUsername;
@@ -67,7 +70,7 @@ public class ViewProfileFragment extends Fragment {
 	static int LOAD_IMAGE_KITKAT = 2;
 	static int TAKE_PICTURE = 3;
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.4/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_USERNAME = "username";
@@ -81,18 +84,26 @@ public class ViewProfileFragment extends Fragment {
 
 	// JSON parser class
 	JSONParser jsonParser = new JSONParser();
-	
+
 	private static final String TAG = "BroadcastTest";
 	private Intent intentBroadcast;
 
 	public ViewProfileFragment() {
 	}
 
+	public static ViewProfileFragment newInstance(String name_profile) {
+		ViewProfileFragment myFragment = new ViewProfileFragment();
+		Bundle args = new Bundle();
+		args.putString("profile_username", name_profile);
+		myFragment.setArguments(args);
+		return myFragment;
+	}
+
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		getActivity().setRequestedOrientation(
 				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
 		View rootView = inflater.inflate(R.layout.fragment_profile, container,
 				false);
 
@@ -123,17 +134,17 @@ public class ViewProfileFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		init();
-	} 
-    
-    @Override
+	}
+
+	@Override
 	public void onResume() {
 		super.onResume();
 		init();
 	}
-	
+
 	@Override
 	public void onPause() {
-		super.onPause(); 		
+		super.onPause();
 	}
 
 	public void init() {

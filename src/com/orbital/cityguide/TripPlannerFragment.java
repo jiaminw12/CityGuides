@@ -24,7 +24,6 @@ import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
@@ -35,6 +34,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -47,6 +47,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 public class TripPlannerFragment extends ListFragment {
 
+	public static final String TAG = TripPlannerFragment.class.getSimpleName();
+
 	protected ArrayAdapter<CharSequence> dayAdapter;
 
 	// manages all of our attractions in a list.
@@ -56,9 +58,9 @@ public class TripPlannerFragment extends ListFragment {
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.7/City_Guide/getAttractionByID.php";
-	private static final String RETRIEVEID_URL = "http://192.168.1.7/City_Guide/getAttractionIDByTitle.php";
-	private static final String UPDATELIST_URL = "http://192.168.1.7/City_Guide/updatePlannerList.php";
+	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.4/City_Guide/getAttractionByID.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
+	private static final String UPDATELIST_URL = "http://192.168.1.4/City_Guide/updatePlannerList.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -82,6 +84,14 @@ public class TripPlannerFragment extends ListFragment {
 	CharSequence[] planner_list;
 
 	public TripPlannerFragment() {
+	}
+
+	public static TripPlannerFragment newInstance(String name_profile) {
+		TripPlannerFragment myFragment = new TripPlannerFragment();
+		Bundle args = new Bundle();
+		args.putString("profile_username", name_profile);
+		myFragment.setArguments(args);
+		return myFragment;
 	}
 
 	@Override
@@ -375,14 +385,14 @@ public class TripPlannerFragment extends ListFragment {
 					if (dbAdaptor != null) {
 						dbAdaptor.close();
 					}
-
-					Fragment fragment = new TripPlannerFragment();
-					Bundle bundle = new Bundle();
-					bundle.putString("profile_username", name_profile);
-					fragment.setArguments(bundle);
-					getFragmentManager().beginTransaction()
-							.replace(R.id.frame_container, fragment)
-							.detach(fragment).attach(fragment)
+					getActivity()
+							.getSupportFragmentManager()
+							.beginTransaction()
+							.replace(
+									R.id.frame_container,
+									TripPlannerFragment
+											.newInstance(name_profile),
+									TripPlannerFragment.TAG)
 							.commitAllowingStateLoss();
 				}
 			}
@@ -432,16 +442,14 @@ public class TripPlannerFragment extends ListFragment {
 									if (dbAdaptor != null) {
 										dbAdaptor.close();
 									}
-									Fragment fragment = new TripPlannerFragment();
-									Bundle bundle = new Bundle();
-									bundle.putString("profile_username",
-											name_profile);
-									fragment.setArguments(bundle);
-									getFragmentManager()
+									getActivity()
+											.getSupportFragmentManager()
 											.beginTransaction()
-											.replace(R.id.frame_container,
-													fragment).detach(fragment)
-											.attach(fragment)
+											.replace(
+													R.id.frame_container,
+													TripPlannerFragment
+															.newInstance(name_profile),
+													TripPlannerFragment.TAG)
 											.commitAllowingStateLoss();
 								}
 							}

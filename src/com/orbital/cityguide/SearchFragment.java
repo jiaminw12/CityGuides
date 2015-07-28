@@ -18,13 +18,13 @@ import com.orbital.cityguide.adapter.AlphabetListAdapter.Item;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Row;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Section;
 
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.ListFragment;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,6 +43,8 @@ import android.widget.TextView;
 
 public class SearchFragment extends ListFragment implements
 		OnItemSelectedListener {
+	
+	public static final String TAG = SearchFragment.class.getSimpleName();
 
 	Spinner searchSpinner = null;
 	ListView mListView;
@@ -62,10 +64,10 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexY;
 	private int indexListSize;
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.7/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://192.168.1.7/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://192.168.1.7/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://192.168.1.7/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://192.168.1.4/City_Guide/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://192.168.1.4/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://192.168.1.4/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -87,7 +89,7 @@ public class SearchFragment extends ListFragment implements
 
 	public SearchFragment() {
 	}
-
+	
 	class SideIndexGestureListener extends
 			GestureDetector.SimpleOnGestureListener {
 		@Override
@@ -102,6 +104,20 @@ public class SearchFragment extends ListFragment implements
 
 			return super.onScroll(e1, e2, distanceX, distanceY);
 		}
+	}
+	
+	public static SearchFragment newInstance(String name_profile) {
+		SearchFragment myFragment = new SearchFragment();
+		Bundle args = new Bundle();
+		args.putString("profile_username", name_profile);
+		myFragment.setArguments(args);
+		return myFragment;
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 	}
 
 	@Override

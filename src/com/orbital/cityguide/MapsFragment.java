@@ -22,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,6 +33,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -63,6 +63,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsFragment extends Fragment implements LocationListener {
+	
+	public static final String TAG = MapsFragment.class.getSimpleName();
 
 	AutoCompleteTextView autocompleteView;
 	MapView mMapView;
@@ -104,6 +106,14 @@ public class MapsFragment extends Fragment implements LocationListener {
 	final int PLACES_DETAILS = 1;
 
 	public MapsFragment() {
+	}
+	
+	public static MapsFragment newInstance(String name_profile) {
+		MapsFragment myFragment = new MapsFragment();
+		Bundle args = new Bundle();
+		args.putString("profile_username", name_profile);
+		myFragment.setArguments(args);
+		return myFragment;
 	}
 
 	@Override

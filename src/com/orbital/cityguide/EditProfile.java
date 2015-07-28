@@ -87,8 +87,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
-	private static final String GETUSR_URL = "http://192.168.1.7/City_Guide/getUser.php";
-	private static final String UPDATEUSR_URL = "http://192.168.1.7/City_Guide/updateUser.php";
+	private static final String GETUSR_URL = "http://192.168.1.4/City_Guide/getUser.php";
+	private static final String UPDATEUSR_URL = "http://192.168.1.4/City_Guide/updateUser.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
@@ -275,13 +275,11 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 								title = "Message";
 								alertboxmsg = "User's credentials updated!";
 								popupMessage(title, alertboxmsg);
-								Bundle bundle = new Bundle();
-								bundle.putString("edttext", "From Activity");
-								Fragment fragment = new ViewProfileFragment();
-								bundle = new Bundle();
-								bundle.putString("profile_username",
-										name_profile);
-								fragment.setArguments(bundle);
+								getSupportFragmentManager()
+								.beginTransaction()
+								.replace(R.id.frame_container,
+										ViewProfileFragment.newInstance(name_profile),
+										ViewProfileFragment.TAG_Name).commit();
 								finish();
 							} else if (success == 0) {
 								title = "Message";

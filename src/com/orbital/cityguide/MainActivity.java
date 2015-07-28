@@ -27,7 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class MainActivity extends FragmentActivity {
-	
+
 	private static final String TAG = MainActivity.class.getSimpleName();
 
 	private DrawerLayout mDrawerLayout;
@@ -36,10 +36,8 @@ public class MainActivity extends FragmentActivity {
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
-
 	// used to store app title
 	private CharSequence mTitle;
-
 	// slide menu items
 	private String[] navMenuTitles;
 	private TypedArray navMenuIcons;
@@ -68,8 +66,6 @@ public class MainActivity extends FragmentActivity {
 				dbAdaptor.insertTag();
 			}
 		}
-
-		name_profile = "NULL";
 
 		mTitle = mDrawerTitle = getTitle();
 
@@ -177,7 +173,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	/* Called when invalidateOptionsMenu() is triggered  */
+	/* Called when invalidateOptionsMenu() is triggered */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// if nav drawer is opened, hide the action items
@@ -195,39 +191,43 @@ public class MainActivity extends FragmentActivity {
 		switch (position) {
 		case 0:
 			getSupportFragmentManager()
-			.beginTransaction()
-			.replace(R.id.frame_container, HomeFragment.newInstance(), HomeFragment.TAG).commit();
+					.beginTransaction()
+					.replace(R.id.frame_container, HomeFragment.newInstance(null),
+							HomeFragment.TAG).commit();
 			break;
 		case 1:
-			fragment = new SearchFragment();
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, SearchFragment.newInstance(null),
+					SearchFragment.TAG).commit();
 			break;
 		case 2:
-			fragment = new MapsFragment();
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, MapsFragment.newInstance(null),
+					MapsFragment.TAG).commit();
 			break;
 		case 3:
-			fragment = new TripPlannerFragment();
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, TripPlannerFragment.newInstance(null),
+					TripPlannerFragment.TAG).commit();
 			break;
 		case 4:
-			fragment = new LoginFragment();
+			getSupportFragmentManager()
+			.beginTransaction()
+			.replace(R.id.frame_container, LoginFragment.newInstance(),
+					LoginFragment.TAG).commit();
 			break;
 		default:
 			break;
 		}
-
-		if (fragment != null) {
-			FragmentManager fragmentManager = getFragmentManager();
-			fragmentManager.beginTransaction()
-					.replace(R.id.frame_container, fragment).commit();
-
-			// update selected item and title, then close the drawer
-			mDrawerList.setItemChecked(position, true);
-			mDrawerList.setSelection(position);
-			setTitle(navMenuTitles[position]);
-			mDrawerLayout.closeDrawer(mDrawerList);
-		} else {
-			// error in creating fragment
-			Log.e("MainActivity", "Error in creating fragment");
-		}
+		
+		mDrawerList.setItemChecked(position, true);
+		mDrawerList.setSelection(position);
+		setTitle(navMenuTitles[position]);
+		mDrawerLayout.closeDrawer(mDrawerList);
+		
 	}
 
 	@Override

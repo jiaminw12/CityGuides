@@ -1,5 +1,6 @@
 package com.orbital.cityguide;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,8 @@ import android.app.AlertDialog.Builder;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -43,13 +46,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class TripPlannerFragment extends ListFragment {
 
 	public static final String TAG = TripPlannerFragment.class.getSimpleName();
 
-	protected ArrayAdapter<CharSequence> dayAdapter;
+	protected ArrayAdapter<CharSequence> dayAdapter, adultAdapter,
+			childAdapter;
 
 	// manages all of our attractions in a list.
 	private ArrayList<HashMap<String, String>> mPlannerList = new ArrayList<HashMap<String, String>>();
@@ -58,12 +63,22 @@ public class TripPlannerFragment extends ListFragment {
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	private static final String GET_ATRR_TITLE_URL = "http://192.168.1.4/City_Guide/getAttractionByID.php";
-	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
-	private static final String UPDATELIST_URL = "http://192.168.1.4/City_Guide/updatePlannerList.php";
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
+
+	private static final String GET_ATRR_TITLE_URL = "http://" + ipadress
+			+ "/City_Guide/getAttractionByID.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress
+			+ "/City_Guide/getAttractionIDByTitle.php";
+	private static final String UPDATELIST_URL = "http://" + ipadress
+			+ "/City_Guide/updatePlannerList.php";
+	private static final String READATTR_URL = "http://" + ipadress
+			+ "/City_Guide/getAttraction.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
+	private static final String TAG_PADULT = "price_adult";
+	private static final String TAG_PCHILD = "price_child";
 	private static final String TAG_ATTRACTION = "attractions";
 
 	// An array of all of our attractions
@@ -74,14 +89,19 @@ public class TripPlannerFragment extends ListFragment {
 	DBAdapter dbAdaptor;
 	Cursor cursor = null;
 
-	String name_profile;
-	String username;
-	int success;
-	int start = 0;
+	String name_profile, username;
+	int success, start = 0;
 	String previousLetter = null;
 
 	Spinner daySpinner = null;
+	Spinner adultSpinner = null;
+	Spinner childSpinner = null;
 	CharSequence[] planner_list;
+	TextView mFinalPrice;
+	float mPriceAdult, mPriceChild, totalSinglePrice, totalPrice = 0;
+	int num_Adult, num_Child;
+
+	SharedPreferences pref;
 
 	public TripPlannerFragment() {
 	}
@@ -100,31 +120,36 @@ public class TripPlannerFragment extends ListFragment {
 		getActivity().setRequestedOrientation(
 				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		View rootView = inflater.inflate(R.layout.fragment_planner, container,
-				false);
+		pref = this.getActivity().getSharedPreferences("PREFERENCE",
+				Context.MODE_PRIVATE);
 
-		dbAdaptor = new DBAdapter(getActivity());
 		Bundle bundle = this.getArguments();
 		if (name_profile != null && isNetworkAvailable()) {
 			name_profile = bundle.getString("profile_username", name_profile);
 			username = name_profile;
-			LoadPlannerList();
 			UploadPlannerList();
 		} else {
 			name_profile = null;
-			LoadPlannerList();
 		}
+
+		View rootView = inflater.inflate(R.layout.fragment_planner, container,
+				false);
+
+		dbAdaptor = new DBAdapter(getActivity());
 
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
 				R.array.arrayDay, android.R.layout.simple_spinner_item);
 		daySpinner.setAdapter(this.dayAdapter);
-		daySpinner.setSelection(2);
+		final int num = pref.getInt("NumOfDays", 0);
+		daySpinner.setSelection(num);
 		daySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
 				String value = daySpinner.getSelectedItem().toString();
+				pref.edit().putInt("NumOfDays", (Integer.parseInt(value)) - 1)
+						.commit();
 
 				if (value.equalsIgnoreCase("1")) {
 					addSectionHeader(1);
@@ -145,6 +170,7 @@ public class TripPlannerFragment extends ListFragment {
 				} else if (value.equalsIgnoreCase("9")) {
 					addSectionHeader(9);
 				}
+
 			}
 
 			@Override
@@ -153,6 +179,56 @@ public class TripPlannerFragment extends ListFragment {
 			}
 		});
 
+		adultSpinner = (Spinner) rootView.findViewById(R.id.adult_spinner);
+		this.adultAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.arrayPrice, android.R.layout.simple_spinner_item);
+		adultSpinner.setAdapter(this.adultAdapter);
+		final int numA = pref.getInt("NumOfAdult", 0);
+		adultSpinner.setSelection(numA);
+		num_Adult = Integer.parseInt(adultSpinner.getSelectedItem().toString());
+		adultSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				num_Adult = Integer.parseInt(adultSpinner.getSelectedItem()
+						.toString());
+				pref.edit().putInt("NumOfAdult", num_Adult).commit();
+				adapter.notifyDataSetChanged();
+				updateTotalPrice();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+
+		});
+
+		childSpinner = (Spinner) rootView.findViewById(R.id.child_spinner);
+		this.childAdapter = ArrayAdapter.createFromResource(this.getActivity(),
+				R.array.arrayPrice, android.R.layout.simple_spinner_item);
+		childSpinner.setAdapter(this.childAdapter);
+		final int numC = pref.getInt("NumOfChild", 0);
+		childSpinner.setSelection(numC);
+		num_Child = Integer.parseInt(childSpinner.getSelectedItem().toString());
+		childSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				num_Child = Integer.parseInt(childSpinner.getSelectedItem()
+						.toString());
+				pref.edit().putInt("NumOfChild", num_Child).commit();
+				adapter.notifyDataSetChanged();
+				updateTotalPrice();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
+		});
+
+		mFinalPrice = (TextView) rootView.findViewById(R.id.totalPrice);
+		LoadPlannerList();
 		return rootView;
 	}
 
@@ -177,7 +253,7 @@ public class TripPlannerFragment extends ListFragment {
 					// set item width
 					openItem.setWidth(dp2px(100));
 					// set item title
-					openItem.setTitle("Edit");
+					openItem.setTitle("Move");
 					// set item title fontsize
 					openItem.setTitleSize(18);
 					// set item title font color
@@ -233,9 +309,11 @@ public class TripPlannerFragment extends ListFragment {
 				return false;
 			}
 		});
+
 	}
 
 	public void LoadPlannerList() {
+		mPlannerList.clear();
 		try {
 			dbAdaptor.open();
 			cursor = dbAdaptor.getAllPlanner();
@@ -269,6 +347,8 @@ public class TripPlannerFragment extends ListFragment {
 				String key = str;
 				String value = map.get(key);
 				String firstTitle = key;
+				totalPrice = totalPrice
+						+ retrievePrice(retrieveIdByTitle(value));
 
 				// Check if we need to add a header row
 				if (!firstTitle.equals(previousLetter)) {
@@ -283,6 +363,10 @@ public class TripPlannerFragment extends ListFragment {
 		}
 		adapter.setRows(rows);
 		setListAdapter(adapter);
+
+		DecimalFormat df = new DecimalFormat("#0.00");
+		df.setMaximumFractionDigits(2);
+		mFinalPrice.setText("Total Price : $" + df.format(totalPrice));
 	}
 
 	public void UploadPlannerList() {
@@ -520,6 +604,80 @@ public class TripPlannerFragment extends ListFragment {
 		}
 
 		return id;
+	}
+
+	public float retrievePrice(String attr_id) {
+		float totalSinglePrice = 0;
+		String id = null;
+		try {
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("attr_id", attr_id));
+
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+
+			JSONObject json = jParser.makeHttpRequest(READATTR_URL, "POST",
+					params);
+			if (json != null) {
+				success = json.getInt(TAG_SUCCESS);
+				if (success == 1) {
+					mAttrID = json.getJSONArray(TAG_ATTRACTION);
+					JSONObject c = mAttrID.getJSONObject(0);
+					mPriceAdult = Float.valueOf(c.getString(TAG_PADULT));
+					mPriceChild = Float.valueOf(c.getString(TAG_PCHILD));
+					Log.v("mPriceAdult", String.valueOf(mPriceAdult));
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		totalSinglePrice = (mPriceAdult * num_Adult)
+				+ (mPriceChild * num_Child);
+		return totalSinglePrice;
+	}
+
+	public void updateTotalPrice(){
+		mPlannerList.clear();
+		totalPrice = 0;
+		try {
+			dbAdaptor.open();
+			cursor = dbAdaptor.getAllPlanner();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
+					String attr_title = retrieveTitleByID(cursor.getString(0));
+					String tag_title = cursor.getString(1);
+
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(tag_title, attr_title);
+					// adding HashList to ArrayList
+					mPlannerList.add(map);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			Log.e("City Guide", e.getMessage());
+		} finally {
+			if (cursor != null)
+				cursor.close();
+
+			if (dbAdaptor != null)
+				dbAdaptor.close();
+		}
+
+		for (HashMap<String, String> map : mPlannerList) {
+			for (String str : map.keySet()) {
+				String key = str;
+				String value = map.get(key);
+				String firstTitle = key;
+				totalPrice = totalPrice
+						+ retrievePrice(retrieveIdByTitle(value));
+			}
+		}
+		DecimalFormat df = new DecimalFormat("#0.00");
+		df.setMaximumFractionDigits(2);
+		mFinalPrice.setText("Total Price : $" + df.format(totalPrice));
 	}
 
 	private int dp2px(int dp) {

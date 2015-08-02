@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.orbital.cityguide.ConnectToWebServices;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
 
@@ -32,7 +33,11 @@ import android.widget.Toast;
 public class AlphabetListAdapter extends BaseAdapter {
 
 	JSONParser jParser = new JSONParser();
-	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
+	
+	private static final String RETRIEVEID_URL = "http://" + ipadress +"/City_Guide/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_ATTRACTION = "attractions";
@@ -152,7 +157,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					View parentRow = (View) v.getParent();
 					ListView listView = (ListView) parentRow.getParent();
-					final int position = listView.getPositionForView(parentRow);
 
 					if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
 						String title = mTitle.getText().toString();

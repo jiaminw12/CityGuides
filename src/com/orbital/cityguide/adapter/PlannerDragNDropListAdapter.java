@@ -1,6 +1,8 @@
 package com.orbital.cityguide.adapter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -14,6 +16,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.baoyz.swipemenulistview.SwipeMenuListView.OnMenuItemClickListener;
+import com.orbital.cityguide.ConnectToWebServices;
 import com.orbital.cityguide.JSONParser;
 import com.orbital.cityguide.R;
 import com.orbital.cityguide.TripPlannerFragment;
@@ -34,17 +37,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlannerDragNDropListAdapter extends BaseAdapter {
 
 	JSONParser jParser = new JSONParser();
-	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
+	
+	private static final String RETRIEVEID_URL = "http://" + ipadress + "/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://" + ipadress +"/City_Guide/getAttraction.php";
+	
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
+	private static final String TAG_PADULT = "price_adult";
+	private static final String TAG_PCHILD = "price_child";
 	private static final String TAG_ATTRACTION = "attractions";
 	private JSONArray mAttrID = null;
 	int success;
@@ -54,7 +67,13 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 	Item item;
 	ViewGroup mParent;
 	String mID;
+	float mPriceAdult, mPriceChild, totalSinglePrice, totalPrice=0;
+	int num_Adult, num_Child;
 	final int INVALID_ID = -1;
+	RelativeLayout rl;
+	TextView mSinglePrice;
+	
+	DecimalFormat df;
 
 	public static abstract class Row {
 	}
@@ -137,6 +156,35 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 		return id;
 	}
 
+	public float retrievePrice(String attr_id) {
+		String id = null;
+		try {
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("attr_id", attr_id));
+
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+					.permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+
+			JSONObject json = jParser.makeHttpRequest(READATTR_URL, "POST",
+					params);
+			if (json != null) {
+				success = json.getInt(TAG_SUCCESS);
+				if (success == 1) {
+					mAttrID = json.getJSONArray(TAG_ATTRACTION);
+					JSONObject c = mAttrID.getJSONObject(0);
+					mPriceAdult = Float.valueOf(c.getString(TAG_PADULT)); 
+					mPriceChild =Float.valueOf(c.getString(TAG_PCHILD));
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		totalSinglePrice = (mPriceAdult * num_Adult)+(mPriceChild * num_Child);
+
+		return totalSinglePrice;
+	}
+		
 	@Override
 	public void notifyDataSetChanged() {
 		super.notifyDataSetChanged();
@@ -147,8 +195,10 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 		
 		dbAdaptor = new DBAdapter(parent.getContext());
 		View view = convertView;
-		mParent = parent;
-
+		rl = (RelativeLayout) parent.getParent();
+		df = new DecimalFormat("#0.00");
+		df.setMaximumFractionDigits(2);
+		
 		if (getItemViewType(position) == 0) { // Item
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater) parent.getContext()
@@ -160,8 +210,15 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			item = (Item) getItem(position);
 			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
-
-
+			
+			Spinner childSpinner = (Spinner) rl.findViewById(R.id.child_spinner);
+			num_Child = Integer.parseInt(childSpinner.getSelectedItem().toString());
+			Spinner adultSpinner = (Spinner) rl.findViewById(R.id.adult_spinner);
+			num_Adult = Integer.parseInt(adultSpinner.getSelectedItem().toString());
+			
+			mSinglePrice = (TextView) view.findViewById(R.id.singlePrice);
+			mSinglePrice.setText("$" + df.format(retrievePrice(retrieveIdByTitle(item.text))));
+			
 		} else { // Section
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater) parent.getContext()
@@ -177,14 +234,10 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			view.setEnabled(false);
 			view.setOnClickListener(null);
 		}
-
+		
 		return view;
 
 	}
 
-	private int dp2px(int dp) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-				mParent.getResources().getDisplayMetrics());
-	}
-
+	
 }

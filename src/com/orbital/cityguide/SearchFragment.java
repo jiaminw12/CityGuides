@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -63,11 +64,14 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexX;
 	private static float sideIndexY;
 	private int indexListSize;
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
 
-	private static final String RETRIEVEID_URL = "http://192.168.1.4/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://192.168.1.4/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://192.168.1.4/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://192.168.1.4/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress + "/City_Guide/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://" + ipadress + "/City_Guide/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://" + ipadress + "/City_Guide/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://" + ipadress + "/City_Guide/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";

@@ -69,8 +69,11 @@ public class ViewProfileFragment extends Fragment {
 	static int LOAD_IMAGE = 1;
 	static int LOAD_IMAGE_KITKAT = 2;
 	static int TAKE_PICTURE = 3;
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
 
-	private static final String GETUSR_URL = "http://192.168.1.4/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://" + ipadress + "/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_USERNAME = "username";

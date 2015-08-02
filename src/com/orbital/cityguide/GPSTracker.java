@@ -31,7 +31,8 @@ public class GPSTracker extends Service implements LocationListener {
 	double longitude; // longitude
 
 	// The minimum distance to change Updates in meters
-	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+	private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 30000; // 30000
+																		// meters
 
 	// The minimum time between updates in milliseconds
 	private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
@@ -57,7 +58,7 @@ public class GPSTracker extends Service implements LocationListener {
 			isNetworkEnabled = locationManager
 					.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-			if (!isGPSEnabled && !isNetworkEnabled) {
+			if (!isNetworkEnabled && !isGPSEnabled) {
 				// no network provider is enabled
 			} else {
 				this.canGetLocation = true;
@@ -181,9 +182,10 @@ public class GPSTracker extends Service implements LocationListener {
 		// Showing Alert Message
 		alertDialog.show();
 	}
-
+	
 	@Override
 	public void onLocationChanged(Location location) {
+		this.location = location;
 	}
 
 	@Override
@@ -202,4 +204,5 @@ public class GPSTracker extends Service implements LocationListener {
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
+
 }

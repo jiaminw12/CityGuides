@@ -103,6 +103,28 @@
                 <TextView android:id="@+id/open_hrs" >
                 </TextView>
             </TableRow>
+            
+            <!-- Adult Price -->
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" >
+
+                <TextView android:id="@+id/adult_price" >
+                </TextView>
+            </TableRow>
+            
+            <!-- Child Price -->
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" >
+
+                <TextView android:id="@+id/child_price" >
+                </TextView>
+            </TableRow>
 
             <!-- Link -->
 

@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.location.LocationListener;
@@ -43,12 +44,14 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -61,39 +64,40 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.orbital.cityguide.adapter.DBAdapter;
 
-public class MapsFragment extends Fragment implements LocationListener {
-	
+public class MapsFragment extends Fragment implements LocationListener,
+		OnItemSelectedListener {
+
 	public static final String TAG = MapsFragment.class.getSimpleName();
 
 	AutoCompleteTextView autocompleteView;
+	Spinner mSprPlaceType;
 	MapView mMapView;
 	ImageView ins;
 	private GoogleMap googleMap;
+
+	protected ArrayAdapter<CharSequence> mapPlaceAdapter;
 
 	String title, alertboxmsg;
 
 	// GPS Location
 	GPSTracker gps;
-
 	// Progress Dialog
 	private ProgressDialog pDialog;
-
 	// instance variables for Marker icon drawable resources
 	private int userIcon, foodIcon, drinkIcon, shopIcon, otherIcon;
-
 	// location manager
 	private LocationManager locMan;
-
+	
+	private Location loc;
 	// user marker
 	private Marker userMarker;
-
 	// places of interest
 	private Marker[] placeMarkers;
 
 	// max
-	private final int MAX_PLACES = 20;// most returned from google
-
+	private final int MAX_PLACES = 20;// most returned fom google
 	// marker options
 	private MarkerOptions[] places;
 
@@ -105,9 +109,12 @@ public class MapsFragment extends Fragment implements LocationListener {
 	final int PLACES = 0;
 	final int PLACES_DETAILS = 1;
 
+	String[] mPlaceType = null;
+	String[] mPlaceTypeName = null;
+
 	public MapsFragment() {
 	}
-	
+
 	public static MapsFragment newInstance(String name_profile) {
 		MapsFragment myFragment = new MapsFragment();
 		Bundle args = new Bundle();
@@ -121,7 +128,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 			Bundle savedInstanceState) {
 		getActivity().setRequestedOrientation(
 				ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+		gps = new GPSTracker(this.getActivity());
 		// get drawable IDs
 		userIcon = R.drawable.yellow_point;
 		foodIcon = R.drawable.red_point;
@@ -129,30 +136,25 @@ public class MapsFragment extends Fragment implements LocationListener {
 		shopIcon = R.drawable.green_point;
 		otherIcon = R.drawable.purple_point;
 
-		boolean result = isNetworkAvailable();
-		gps = new GPSTracker(this.getActivity());
-
-		if (result == false) {
-			title = "Internet Connection Status";
-			alertboxmsg = "Please enable internet.";
-			popupMessage(title, alertboxmsg);
-		} else if (result == true) {
-			if (!(gps.canGetLocation())) {
-				title = "GPS Status";
-				alertboxmsg = "Couldn't get location information. Please enable GPS.";
-				popupMessage(title, alertboxmsg);
-			}
-		}
 		View rootView = inflater.inflate(R.layout.fragment_maps, container,
 				false);
+
 		autocompleteView = (AutoCompleteTextView) rootView
-				.findViewById(R.id.autocomplete);
+				.findViewById(R.id.search_autocomplete);
 		autocompleteView.setThreshold(1);
 		autocompleteView.bringToFront();
 
-		ins = (ImageView)rootView.findViewById(R.id.imageView1);
+		mSprPlaceType = (Spinner) rootView
+				.findViewById(R.id.map_search_spinner);
+		this.mapPlaceAdapter = ArrayAdapter.createFromResource(
+				this.getActivity(), R.array.place_type_name,
+				android.R.layout.simple_spinner_item);
+		mSprPlaceType.setAdapter(this.mapPlaceAdapter);
+		mSprPlaceType.setOnItemSelectedListener(this);
+
+		ins = (ImageView) rootView.findViewById(R.id.imageView1);
 		ins.bringToFront();
-		
+
 		// Adding textchange listener
 		autocompleteView.addTextChangedListener(new TextWatcher() {
 
@@ -227,15 +229,33 @@ public class MapsFragment extends Fragment implements LocationListener {
 		}
 
 		googleMap = mMapView.getMap();
-		// Enable GPS
-		googleMap.setMyLocationEnabled(true);
 
 		// create marker array
 		placeMarkers = new Marker[MAX_PLACES];
+
+		// check if GPS enabled
+		if (!gps.canGetLocation()) {
+			gps.showSettingsAlert();
+		}
+
+		googleMap.setMyLocationEnabled(true);
 		// update location
 		updatePlaces();
 
 		return rootView;
+
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// TODO Auto-generated method stub
 
 	}
 
@@ -247,14 +267,13 @@ public class MapsFragment extends Fragment implements LocationListener {
 		// place to be be searched
 		String input = "input=" + place;
 
-		// place type to be searched
-		String types = "types=geocode";
-
 		// Sensor enabled
 		String sensor = "sensor=false";
 
+		String country = "components=country:SG";
+
 		// Building the parameters to the web service
-		String parameters = input + "&" + types + "&" + sensor + "&" + key;
+		String parameters = input + "&" + sensor + "&" + key + "&" + country;
 
 		// Output format
 		String output = "json";
@@ -506,43 +525,49 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 		double lat = 0;
 		double lng = 0;
-		// get location manager
-		locMan = (LocationManager) getActivity().getSystemService(
-				Context.LOCATION_SERVICE);
-
-		// get last location
-		Location lastLoc = locMan
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
 		gps = new GPSTracker(this.getActivity());
-
-		// check if GPS location can get
-		if (gps.canGetLocation()) {
-			Log.d("Your Location", "latitude:" + gps.getLatitude()
-					+ ", longitude: " + gps.getLongitude());
-			lat = gps.getLatitude();
-			lng = gps.getLongitude();
-		} else if (lastLoc != null) {
-			lat = lastLoc.getLatitude();
-			lng = lastLoc.getLongitude();
-		}
-
-		// create LatLng
-		LatLng lastLatLng = new LatLng(lat, lng);
-
+		loc = getLocation();
+		if (loc == null){
+			// get location manager
+			locMan = (LocationManager) getActivity().getSystemService(
+					Context.LOCATION_SERVICE);
+		} 
+		
 		// remove any existing marker
 		if (userMarker != null) {
 			googleMap.clear();
 			userMarker.remove();
 		}
 
+		// check if GPS location can get
+		if (gps.canGetLocation()) {
+			lat = gps.getLatitude();
+			lng = gps.getLongitude();
+
+			SharedPreferences prefs = this.getActivity().getSharedPreferences(
+					"PREFERENCE", Context.MODE_PRIVATE);
+			prefs.edit().putFloat("latitude", (float) lat).commit();
+			prefs.edit().putFloat("longtitude", (float) lng).commit();
+
+		} else {
+			SharedPreferences pref = this.getActivity().getSharedPreferences(
+					"PREFERENCE", Context.MODE_PRIVATE);
+			float prev_lat = pref.getFloat("latitude", 0);
+			float prev_lng = pref.getFloat("longtitude", 0);
+			lat = prev_lat;
+			lng = prev_lng;
+		}
+
+		// create LatLng
+		LatLng lastLatLng = new LatLng(lat, lng);
+
 		// create and set marker properties
-		userMarker = googleMap.addMarker(new MarkerOptions()
-				.position(lastLatLng).title("You are here")
-				.snippet("Your last recorded location"));
+		userMarker = googleMap.addMarker(new MarkerOptions().position(
+				lastLatLng).title("You are here"));
 		// move to location
 		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(lat, lng)).zoom(10).build();
+				.target(new LatLng(lat, lng)).zoom(14).build();
 		googleMap.animateCamera(CameraUpdateFactory
 				.newCameraPosition(cameraPosition));
 
@@ -561,9 +586,7 @@ public class MapsFragment extends Fragment implements LocationListener {
 					+ "&sensor="
 					+ URLEncoder.encode("true", "UTF-8")
 					+ "&types="
-					+ URLEncoder.encode(
-							"food|bar|shopping_mall|museum|art_gallery",
-							"UTF-8")
+					+ URLEncoder.encode("food|bar|bus_station", "UTF-8")
 					+ "&key="
 					+ URLEncoder.encode(
 							"AIzaSyDkkR-XhiW9uVPhvM_T5GFrqrC-aeXas4U", "UTF-8");
@@ -572,9 +595,9 @@ public class MapsFragment extends Fragment implements LocationListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000,
-				100, this);
+		
+		//locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,30000, 1000, this);
+		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 1000, this);
 	}
 
 	class GetPlaces extends AsyncTask<String, String, String> {
@@ -734,21 +757,24 @@ public class MapsFragment extends Fragment implements LocationListener {
 	public void onLocationChanged(Location location) {
 
 		// remove any existing marker
-		if (userMarker != null)
+		if (userMarker != null) {
 			googleMap.clear();
 			userMarker.remove();
+		}
 
 		Log.v("MyMapActivity", "location changed");
-		// updatePlaces();
 		LatLng position = new LatLng(location.getLatitude(),
 				location.getLongitude());
-
+		// create and set marker properties
+		userMarker = googleMap.addMarker(new MarkerOptions().position(position)
+				.title("You are here"));
+		updatePlaces();
 		// Zoom parameter is set to 14
-		CameraUpdate update = CameraUpdateFactory.newLatLngZoom(position, 14);
+		CameraUpdate update = CameraUpdateFactory.newLatLng(position);
 
 		// Use map.animateCamera(update) if you want moving effect
 		googleMap.moveCamera(update);
-		mMapView.onResume();
+		//mMapView.onResume();
 	}
 
 	public void onProviderDisabled(String provider) {
@@ -763,25 +789,12 @@ public class MapsFragment extends Fragment implements LocationListener {
 		Log.v("MyMapActivity", "status changed");
 	}
 
-	public boolean isNetworkAvailable() {
-		ConnectivityManager connManager = (ConnectivityManager) this
-				.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo mWifi = connManager
-				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		// if no network is available networkInfo will be null
-		// otherwise check if we are connected
-		if (mWifi != null && mWifi.isConnected()) {
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
 		mMapView.onResume();
-		locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000,
-				100, this);
+		//locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000, 1000, this);
+		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 1000, this);
 	}
 
 	@Override
@@ -817,5 +830,55 @@ public class MapsFragment extends Fragment implements LocationListener {
 
 		AlertDialog alert = builder.create();
 		alert.show();
+	}
+
+	public Location getLocation() {
+		boolean gps_enabled = false;
+		boolean network_enabled = false;
+
+		LocationManager lm = (LocationManager) this.getActivity()
+				.getSystemService(Context.LOCATION_SERVICE);
+
+		gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		network_enabled = lm
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+		Location net_loc = null, gps_loc = null, finalLoc = null;
+		
+		if (gps_enabled)
+			gps_loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (network_enabled)
+			net_loc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+		if (gps_loc != null && net_loc != null) {
+
+			if (gps_loc.getAccuracy() >= net_loc.getAccuracy())
+				finalLoc = gps_loc;
+			else
+				finalLoc = net_loc;
+
+		} else {
+
+			if (gps_loc != null) {
+				finalLoc = net_loc;
+			} else if (net_loc != null) {
+				finalLoc = gps_loc;
+			}
+		}
+
+		return finalLoc;
+	}
+
+	public boolean isNetworkAvailable() {
+		ConnectivityManager connManager = (ConnectivityManager) this
+				.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager
+				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// if no network is available networkInfo will be null
+		// otherwise check if we are connected
+		if (mWifi != null && mWifi.isConnected()) {
+			return true;
+		}
+		return false;
 	}
 }

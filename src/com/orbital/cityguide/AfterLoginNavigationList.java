@@ -55,7 +55,10 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 	private ArrayList<NavDrawerItem> navDrawerItems;
 	private NavDrawerListAdapter adapter;
-
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
+	
 	String title, alertboxmsg;
 	int success;
 	String name_profile;
@@ -63,7 +66,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 	ImageView mImage;
 
-	private static final String GETUSR_URL = "http://192.168.1.4/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://" + ipadress +"/City_Guide/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_IMAGE = "image";

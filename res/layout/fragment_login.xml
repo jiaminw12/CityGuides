@@ -40,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/logo" />-->
+                android:src="@drawable/logo" />
+            -->
         </LinearLayout>
 
         <LinearLayout
@@ -89,20 +90,19 @@
 
             <Button
                 android:id="@+id/login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
+                android:layout_width="0.0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="1.0"
                 android:background="@android:drawable/btn_default"
                 android:text="Log In" />
 
             <Button
                 android:id="@+id/register"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
+                android:layout_width="0.0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="1.0"
                 android:background="@android:drawable/btn_default"
                 android:text="Register" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -113,13 +113,15 @@
             android:layout_below="@+id/linearLayout3"
             android:orientation="vertical" >
 
-            <!-- <com.facebook.login.widget.LoginButton
+            <!--
+                 <com.facebook.login.widget.LoginButton
                 android:id="@+id/FBlogin_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="30dp"
-                android:layout_marginTop="30dp" /> -->
+                android:layout_marginTop="30dp" />
+            -->
         </LinearLayout>
     </RelativeLayout>
 

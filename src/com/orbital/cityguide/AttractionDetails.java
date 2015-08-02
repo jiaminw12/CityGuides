@@ -37,10 +37,13 @@ import android.widget.*;
 import android.widget.RatingBar.*;
 
 public class AttractionDetails extends Activity {
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
 
-	private static final String READATTR_URL = "http://192.168.1.4/City_Guide/getAttraction.php";
-	private static final String ADDCOM_URL = "http://192.168.1.4/City_Guide/addComment.php";
-	private static final String READCOM_URL = "http://192.168.1.4/City_Guide/getComment.php";
+	private static final String READATTR_URL = "http://" + ipadress +"/City_Guide/getAttraction.php";
+	private static final String ADDCOM_URL = "http://" + ipadress +"/City_Guide/addComment.php";
+	private static final String READCOM_URL = "http://" + ipadress +"/City_Guide/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
@@ -49,13 +52,13 @@ public class AttractionDetails extends Activity {
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
 	private static final String TAG_DESC = "attr_description";
-	private static final String TAG_PADULT = "price_adult";
-	private static final String TAG_PCHILD = "price_child";
 	private static final String TAG_ADDR = "address";
 	private static final String TAG_LAT = "latitude";
 	private static final String TAG_LONG = "longitude";
 	private static final String TAG_OHRS = "opening_hrs";
 	private static final String TAG_CID = "category_id";
+	private static final String TAG_PADULT = "price_adult";
+	private static final String TAG_PCHILD = "price_child";
 	private static final String TAG_IMG = "attr_image";
 	private static final String TAG_LINK = "attr_link";
 	private static final String TAG_APOI = "attr_POI";
@@ -83,6 +86,8 @@ public class AttractionDetails extends Activity {
 	TextView mDetail;
 	TextView mLink;
 	TextView mOpenHrs;
+	TextView mAdultPrice;
+	TextView mChildPrice;
 	MapView mMapView;
 	TextView mReview;
 	ListView mList;
@@ -128,7 +133,8 @@ public class AttractionDetails extends Activity {
 		mDetail = (TextView) findViewById(R.id.details);
 		mLink = (TextView) findViewById(R.id.weblink);
 		mOpenHrs = (TextView) findViewById(R.id.open_hrs);
-
+		mAdultPrice = (TextView) findViewById(R.id.adult_price);
+		mChildPrice = (TextView) findViewById(R.id.child_price);
 		mMapView = (MapView) findViewById(R.id.mapView);
 		mMapView.onCreate(savedInstanceState);
 		mMapView.onResume();
@@ -368,6 +374,8 @@ public class AttractionDetails extends Activity {
 									String mlat = c.getString(TAG_LAT);
 									String mlong = c.getString(TAG_LONG);
 									String openHrs = c.getString(TAG_OHRS);
+									String adultP = c.getString(TAG_PADULT); 
+									String childP = c.getString(TAG_PCHILD);
 									String img = c.getString(TAG_IMG);
 									final String link = c.getString(TAG_LINK);
 
@@ -381,6 +389,8 @@ public class AttractionDetails extends Activity {
 									mTitle.setText(title);
 									mDetail.setText(desc);
 									mOpenHrs.setText(openHrs);
+									mAdultPrice.setText("Price of Adult : " + adultP);
+									mChildPrice.setText("Price of Children : " + childP);
 									if (!(link.equalsIgnoreCase("null"))) {
 										mLink.setText(link);
 										mLink.setOnClickListener(new View.OnClickListener() {

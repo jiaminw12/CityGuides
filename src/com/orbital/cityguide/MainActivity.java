@@ -7,11 +7,8 @@ import com.orbital.cityguide.model.NavDrawerItem;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -19,7 +16,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,6 +58,12 @@ public class MainActivity extends FragmentActivity {
 			if (firstRun) {
 				// set your flag to false
 				prefs.edit().putBoolean("firstRun", false).commit();
+				prefs.edit().putString("currentLocation", "Singapore").commit();
+				prefs.edit().putFloat("latitude", (float) 1.29324).commit();
+				prefs.edit().putFloat("longtitude", (float) 103.852219).commit();
+				prefs.edit().putInt("NumOfDays", 2).commit();
+				prefs.edit().putInt("NumOfAdult", 2).commit();
+				prefs.edit().putInt("NumOfChild", 0).commit();
 				dbAdaptor = new DBAdapter(this);
 				dbAdaptor.insertTag();
 			}

@@ -49,8 +49,11 @@ public class LoginFragment extends Fragment {
 
 	String title, alertboxmsg;
 	int success;
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
 
-	private static final String LOGIN_URL = "http://192.168.1.4/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://" + ipadress +"/City_Guide/login.php";
 	private static final String TAG_SUCCESS = "success";
 
 	// Your Facebook APP ID

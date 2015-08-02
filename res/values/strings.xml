@@ -32,6 +32,52 @@
         <item>Female</item>
     </string-array>
     
+    <string-array name="place_type">
+        <item>art_gallery</item>
+        <item>atm</item>
+        <item>bank</item>
+        <item>bar</item>
+        <item>bus_station</item>
+        <item>cafe</item>
+        <item>car_rental</item>
+        <item>clothing_store</item>
+        <item>convenience_store</item>
+        <item>church</item>
+        <item>department_store</item>
+        <item>food</item>
+        <item>grocery_or_supermarket</item>
+        <item>hindu_temple</item>
+        <item>mosque</item>
+        <item>museum</item>
+        <item>night_club</item>
+        <item>restaurant</item>
+        <item>shopping_mall</item>
+        <item>taxi_stand</item>
+    </string-array>
+ 
+    <string-array name="place_type_name">
+        <item>Art Gallery</item>
+        <item>Atm</item>
+        <item>Bank</item>
+        <item>Bar</item>
+        <item>Bus Station</item>
+        <item>Cafe</item>
+        <item>Car Rental</item>
+        <item>Clothing Store</item>
+        <item>Convenience Store</item>
+        <item>Church</item>
+        <item>Department Store</item>
+        <item>Food</item>
+        <item>Grocery Or Supermarket</item>
+        <item>Hindu Temple</item>
+        <item>Mosque</item>
+        <item>Museum</item>
+        <item>Night Club</item>
+        <item>Restaurant</item>
+        <item>Shopping Mall</item>
+        <item>Taxi Stand</item>
+    </string-array>
+    
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
     
@@ -55,6 +101,19 @@
     </string-array>
     
     <string-array name="arrayDay">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+    
+     <string-array name="arrayPrice">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>

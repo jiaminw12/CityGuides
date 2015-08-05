@@ -143,7 +143,7 @@ public class SearchFragment extends ListFragment implements
 
 		Bundle bundle = this.getArguments();
 		if (name_profile != null){
-			name_profile = bundle.getString("profile_username", name_profile);
+			name_profile = bundle.getString("profile_username");
 		}
 
 		// Hashmap for ListView

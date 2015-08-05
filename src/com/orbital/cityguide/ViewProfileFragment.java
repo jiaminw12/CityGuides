@@ -111,7 +111,7 @@ public class ViewProfileFragment extends Fragment {
 				false);
 
 		Bundle bundle = this.getArguments();
-		name_profile = bundle.getString("profile_username", name_profile);
+		name_profile = bundle.getString("profile_username");
 
 		mProfilePic = (ImageView) rootView.findViewById(R.id.profilepic);
 		mUsername = (TextView) rootView.findViewById(R.id.userName);

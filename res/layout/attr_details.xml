@@ -25,6 +25,9 @@
             android:textSize="35sp"
             android:textStyle="bold" />
 
+        <requestFocus>
+        </requestFocus>
+
         <Button
             android:id="@+id/btnPlanner"
             android:layout_width="wrap_content"
@@ -103,7 +106,7 @@
                 <TextView android:id="@+id/open_hrs" >
                 </TextView>
             </TableRow>
-            
+
             <!-- Adult Price -->
 
             <TableRow
@@ -114,7 +117,7 @@
                 <TextView android:id="@+id/adult_price" >
                 </TextView>
             </TableRow>
-            
+
             <!-- Child Price -->
 
             <TableRow

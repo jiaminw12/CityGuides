@@ -7,13 +7,22 @@
     <string name="drawer_open">Slider Menu Opened</string>
     <string name="drawer_close">Slider Menu Closed</string>
     
-    <!-- Nav Drawer Menu Items -->
+    <!-- Nav Drawer Menu Items before Login -->
     <string-array name="nav_drawer_items">
         <item >Home</item>
         <item >Search</item>
         <item >Maps</item>
         <item >Trip Planner</item>
         <item >Login</item>
+    </string-array>
+    
+     <!-- Nav Drawer Menu Items After Login -->
+    <string-array name="nav_drawer_items_after_login">
+        <item >Profile</item>
+        <item >Home</item>
+        <item >Search</item>
+        <item >Maps</item>
+        <item >Trip Planner</item>
         <item >Logout</item>
     </string-array>
     
@@ -125,8 +134,8 @@
         <item>9</item>
     </string-array>
     
-    <string name="title_section1">Recommendation</string>
+    <string name="title_section1">History</string>
     <string name="title_section2">Weather</string>
-    
+    <string name="title_section3">Recommendation</string>
 
 </resources>

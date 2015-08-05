@@ -89,7 +89,9 @@ public class TripPlannerFragment extends ListFragment {
 	DBAdapter dbAdaptor;
 	Cursor cursor = null;
 
-	String name_profile, username;
+	static String name_profile;
+
+	String username;
 	int success, start = 0;
 	String previousLetter = null;
 
@@ -106,11 +108,12 @@ public class TripPlannerFragment extends ListFragment {
 	public TripPlannerFragment() {
 	}
 
-	public static TripPlannerFragment newInstance(String name_profile) {
+	public static TripPlannerFragment newInstance(String nameProfile) {
 		TripPlannerFragment myFragment = new TripPlannerFragment();
 		Bundle args = new Bundle();
-		args.putString("profile_username", name_profile);
+		args.putString("profile_username", nameProfile);
 		myFragment.setArguments(args);
+		name_profile = nameProfile;
 		return myFragment;
 	}
 
@@ -125,7 +128,7 @@ public class TripPlannerFragment extends ListFragment {
 
 		Bundle bundle = this.getArguments();
 		if (name_profile != null && isNetworkAvailable()) {
-			name_profile = bundle.getString("profile_username", name_profile);
+			name_profile = bundle.getString("profile_username");
 			username = name_profile;
 			UploadPlannerList();
 		} else {
@@ -638,7 +641,7 @@ public class TripPlannerFragment extends ListFragment {
 		return totalSinglePrice;
 	}
 
-	public void updateTotalPrice(){
+	public void updateTotalPrice() {
 		mPlannerList.clear();
 		totalPrice = 0;
 		try {

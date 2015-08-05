@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="10dp"
         android:shrinkColumns="*"
         android:stretchColumns="*" >
 
@@ -71,21 +71,21 @@
         </TableRow>
     </TableLayout>
 
-    <com.baoyz.swipemenulistview.SwipeMenuListView
-        android:id="@android:id/list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tableLayout1" />
-
     <TextView
         android:id="@+id/totalPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@android:id/list"
-        android:layout_marginTop="10dp"
+        android:layout_below="@+id/tableLayout1"
         android:textColor="@color/red"
         android:textSize="20dip"
         android:textStyle="bold" />
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@android:id/list"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/totalPrice" />
 
 </RelativeLayout>

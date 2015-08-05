@@ -89,7 +89,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
-		navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+		navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items_after_login);
 
 		// nav drawer icons from resources
 		navMenuIcons = getResources()
@@ -113,16 +113,16 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 		// adding nav drawer items to array
 		// Home
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons
 				.getResourceId(0, -1)));
 		// Search
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons
 				.getResourceId(1, -1)));
 		// Maps
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons
 				.getResourceId(2, -1)));
 		// Planer
-		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons
 				.getResourceId(3, -1)));
 		// Logout
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons
@@ -165,7 +165,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
-			displayView(0);
+			displayView(1);
 		}
 	}
 
@@ -259,7 +259,6 @@ public class AfterLoginNavigationList extends FragmentActivity {
 	/* Diplaying fragment view for selected nav drawer list item */
 	private void displayView(int position) {
 		// update the main content by replacing fragments
-		Fragment fragment = null;
 		switch (position) {
 		case 0:
 			getSupportFragmentManager()
@@ -271,8 +270,8 @@ public class AfterLoginNavigationList extends FragmentActivity {
 		case 1:
 			getSupportFragmentManager()
 					.beginTransaction()
-					.replace(R.id.frame_container, HomeFragment.newInstance(name_profile),
-							HomeFragment.TAG).commit();
+					.replace(R.id.frame_container, HomeFragment_AfterLogin.newInstance(name_profile),
+							HomeFragment_AfterLogin.TAG).commit();
 			break;
 		case 2:
 			getSupportFragmentManager()

@@ -27,7 +27,7 @@ public class CommentListAdapter extends ArrayAdapter<CommentItem> {
 	private ArrayList<CommentItem> commentItem;
 	int resource;
 	int count;
-	
+
 	CommentItem cm = new CommentItem();
 
 	public CommentListAdapter(Context context, int resource,
@@ -38,12 +38,12 @@ public class CommentListAdapter extends ArrayAdapter<CommentItem> {
 		this.commentItem = commentItem;
 		this.count = commentItem.size();
 	}
-	
+
 	public void updateResults(ArrayList<CommentItem> commentItem) {
 		this.commentItem = commentItem;
-        //Triggers the list update
-        notifyDataSetChanged();
-    }
+		// Triggers the list update
+		notifyDataSetChanged();
+	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -70,7 +70,7 @@ public class CommentListAdapter extends ArrayAdapter<CommentItem> {
 		mName.setText(commentItem.get(position).getUsername());
 		mDesc.setText(commentItem.get(position).getDescription());
 		mDate.setText(commentItem.get(position).getDate());
-		
+
 		return convertView;
 	}
 
@@ -80,11 +80,11 @@ public class CommentListAdapter extends ArrayAdapter<CommentItem> {
 		return count;
 	}
 
-/*	@Override
-	public Object getItem(int position) {
+	@Override
+	public CommentItem getItem(int position) {
 		// TODO Auto-generated method stub
 		return commentItem.get(position);
-	}*/
+	}
 
 	@Override
 	public long getItemId(int position) {

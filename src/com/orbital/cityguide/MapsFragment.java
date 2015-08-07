@@ -144,14 +144,14 @@ public class MapsFragment extends Fragment implements LocationListener,
 		autocompleteView.setThreshold(1);
 		autocompleteView.bringToFront();
 
-		mSprPlaceType = (Spinner) rootView
+		/*mSprPlaceType = (Spinner) rootView
 				.findViewById(R.id.map_search_spinner);
 		this.mapPlaceAdapter = ArrayAdapter.createFromResource(
 				this.getActivity(), R.array.place_type_name,
 				android.R.layout.simple_spinner_item);
 		mSprPlaceType.setAdapter(this.mapPlaceAdapter);
 		mSprPlaceType.setOnItemSelectedListener(this);
-
+*/
 		ins = (ImageView) rootView.findViewById(R.id.imageView1);
 		ins.bringToFront();
 

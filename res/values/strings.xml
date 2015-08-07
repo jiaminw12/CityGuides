@@ -6,26 +6,26 @@
     <string name="action_settings">Settings</string>
     <string name="drawer_open">Slider Menu Opened</string>
     <string name="drawer_close">Slider Menu Closed</string>
-    
+
     <!-- Nav Drawer Menu Items before Login -->
     <string-array name="nav_drawer_items">
-        <item >Home</item>
-        <item >Search</item>
-        <item >Maps</item>
-        <item >Trip Planner</item>
-        <item >Login</item>
+        <item>Home</item>
+        <item>Search</item>
+        <item>Maps</item>
+        <item>Trip Planner</item>
+        <item>Login</item>
     </string-array>
-    
-     <!-- Nav Drawer Menu Items After Login -->
+
+    <!-- Nav Drawer Menu Items After Login -->
     <string-array name="nav_drawer_items_after_login">
-        <item >Profile</item>
-        <item >Home</item>
-        <item >Search</item>
-        <item >Maps</item>
-        <item >Trip Planner</item>
-        <item >Logout</item>
+        <item>Profile</item>
+        <item>Home</item>
+        <item>Search</item>
+        <item>Maps</item>
+        <item>Trip Planner</item>
+        <item>Logout</item>
     </string-array>
-    
+
     <!-- Nav Drawer List Item Icons -->
     <!-- Keep them in order as the titles are in -->
     <array name="nav_drawer_icons">
@@ -35,12 +35,11 @@
         <item>@drawable/ic_planner</item>
         <item>@drawable/ic_login</item>
     </array>
-    
+
     <string-array name="genderArray">
         <item>Male</item>
         <item>Female</item>
     </string-array>
-    
     <string-array name="place_type">
         <item>art_gallery</item>
         <item>atm</item>
@@ -63,7 +62,6 @@
         <item>shopping_mall</item>
         <item>taxi_stand</item>
     </string-array>
- 
     <string-array name="place_type_name">
         <item>Art Gallery</item>
         <item>Atm</item>
@@ -86,12 +84,10 @@
         <item>Shopping Mall</item>
         <item>Taxi Stand</item>
     </string-array>
-    
+
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
-    
     <string name="open_weather_maps_app_id">61ceb4888f1d9539e7a4931cc2dbc402</string>
-    
     <string name="weather_sunny">&#xf00d;</string>
     <string name="weather_clear_night">&#xf02e;</string>
     <string name="weather_foggy">&#xf014;</string>
@@ -100,15 +96,13 @@
     <string name="weather_snowy">&#xf01b;</string>
     <string name="weather_thunder">&#xf01e;</string>
     <string name="weather_drizzle">&#xf01c;</string>
-    
     <string name="place_not_found">Sorry, no weather data found.</string>
-    
+
     <string-array name="arraySearch">
         <item>All</item>
         <item>Area</item>
         <item>Category</item>
     </string-array>
-    
     <string-array name="arrayDay">
         <item>1</item>
         <item>2</item>
@@ -120,8 +114,7 @@
         <item>8</item>
         <item>9</item>
     </string-array>
-    
-     <string-array name="arrayPrice">
+    <string-array name="arrayPrice">
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -133,7 +126,12 @@
         <item>8</item>
         <item>9</item>
     </string-array>
-    
+    <string-array name="arrayTypeOfTraveller">
+        <item>Luxury</item>
+        <item>Budget</item>
+        <item>Mid-range</item>
+    </string-array>
+
     <string name="title_section1">History</string>
     <string name="title_section2">Weather</string>
     <string name="title_section3">Recommendation</string>

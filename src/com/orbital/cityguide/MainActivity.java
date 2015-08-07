@@ -59,6 +59,7 @@ public class MainActivity extends FragmentActivity {
 				// set your flag to false
 				prefs.edit().putBoolean("firstRun", false).commit();
 				prefs.edit().putString("currentLocation", "Singapore").commit();
+				prefs.edit().putString("typeOfTraveller", "Budget").commit();
 				prefs.edit().putFloat("latitude", (float) 1.29324).commit();
 				prefs.edit().putFloat("longtitude", (float) 103.852219).commit();
 				prefs.edit().putInt("NumOfDays", 2).commit();

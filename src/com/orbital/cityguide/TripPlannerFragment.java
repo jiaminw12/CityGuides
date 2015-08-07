@@ -130,7 +130,7 @@ public class TripPlannerFragment extends ListFragment {
 		if (name_profile != null && isNetworkAvailable()) {
 			name_profile = bundle.getString("profile_username");
 			username = name_profile;
-			UploadPlannerList();
+			//UploadPlannerList();
 		} else {
 			name_profile = null;
 		}

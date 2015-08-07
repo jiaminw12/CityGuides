@@ -87,6 +87,8 @@ public class SearchFragment extends ListFragment implements
 	JSONParser jParser = new JSONParser();
 
 	String name_profile;
+
+	static String username;
 	int success;
 
 	DBAdapter dbAdaptor;
@@ -114,6 +116,7 @@ public class SearchFragment extends ListFragment implements
 		SearchFragment myFragment = new SearchFragment();
 		Bundle args = new Bundle();
 		args.putString("profile_username", name_profile);
+		username = name_profile;
 		myFragment.setArguments(args);
 		return myFragment;
 	}
@@ -141,10 +144,10 @@ public class SearchFragment extends ListFragment implements
 
 		mListView = (ListView) rootView.findViewById(R.id.list);
 
-		Bundle bundle = this.getArguments();
+		/*Bundle bundle = this.getArguments();
 		if (name_profile != null){
 			name_profile = bundle.getString("profile_username");
-		}
+		}*/
 
 		// Hashmap for ListView
 		mAttractionsList = new ArrayList<HashMap<String, String>>();
@@ -201,7 +204,7 @@ public class SearchFragment extends ListFragment implements
 							AttractionDetails.class);
 					// sending aid to next activity
 					in.putExtra("AID", key);
-					in.putExtra("profile_username", name_profile);
+					in.putExtra("profile_username", username);
 					startActivity(in);
 				}
 			}
@@ -599,6 +602,7 @@ public class SearchFragment extends ListFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		adapter.notifyDataSetChanged();
 	}
 
 }

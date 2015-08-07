@@ -151,7 +151,7 @@ public class AttractionDetails extends Activity {
 		mComment.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (name_profile.equalsIgnoreCase("NULL")) {
+				if (name_profile.equalsIgnoreCase("null")) {
 					title = "Error Message";
 					alertboxmsg = "Please login!";
 					popupMessage(title, alertboxmsg);
@@ -295,6 +295,7 @@ public class AttractionDetails extends Activity {
 									if (success == 1) {
 										title = "Message";
 										alertboxmsg = "Successfully submit comment.";
+										popupMessage(title, alertboxmsg);
 										finish();
 										startActivity(getIntent());
 									} else if (success == 0) {

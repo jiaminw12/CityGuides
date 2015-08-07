@@ -18,11 +18,11 @@
             android:hint="Type in your Location"
             android:singleLine="true" />
 
-        <Spinner
+      <!--   <Spinner
             android:id="@+id/map_search_spinner"
             android:layout_width="0.0dip"
             android:layout_height="fill_parent"
-            android:layout_weight="1.0" />
+            android:layout_weight="1.0" /> -->
     </LinearLayout>
 
     <com.google.android.gms.maps.MapView

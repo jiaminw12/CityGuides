@@ -195,25 +195,25 @@ public class MainActivity extends FragmentActivity {
 		case 0:
 			getSupportFragmentManager()
 					.beginTransaction()
-					.replace(R.id.frame_container, HomeFragment.newInstance(null),
+					.replace(R.id.frame_container, HomeFragment.newInstance("null"),
 							HomeFragment.TAG).commit();
 			break;
 		case 1:
 			getSupportFragmentManager()
 			.beginTransaction()
-			.replace(R.id.frame_container, SearchFragment.newInstance(null),
+			.replace(R.id.frame_container, SearchFragment.newInstance("null"),
 					SearchFragment.TAG).commit();
 			break;
 		case 2:
 			getSupportFragmentManager()
 			.beginTransaction()
-			.replace(R.id.frame_container, MapsFragment.newInstance(null),
+			.replace(R.id.frame_container, MapsFragment.newInstance("null"),
 					MapsFragment.TAG).commit();
 			break;
 		case 3:
 			getSupportFragmentManager()
 			.beginTransaction()
-			.replace(R.id.frame_container, TripPlannerFragment.newInstance(null),
+			.replace(R.id.frame_container, TripPlannerFragment.newInstance("null"),
 					TripPlannerFragment.TAG).commit();
 			break;
 		case 4:

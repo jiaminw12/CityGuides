@@ -51,8 +51,9 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 	
-	private static final String RETRIEVEID_URL = "http://" + ipadress + "/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://" + ipadress +"/City_Guide/getAttraction.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress + "/getAttractionIDByTitle.php";
+	private static final String GETPRICE_URL = "http://" + ipadress
+			+ "/getPrice.php";
 	
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
@@ -166,7 +167,7 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 
-			JSONObject json = jParser.makeHttpRequest(READATTR_URL, "POST",
+			JSONObject json = jParser.makeHttpRequest(GETPRICE_URL, "POST",
 					params);
 			if (json != null) {
 				success = json.getInt(TAG_SUCCESS);

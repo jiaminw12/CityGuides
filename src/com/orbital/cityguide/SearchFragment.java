@@ -18,6 +18,7 @@ import com.orbital.cityguide.adapter.AlphabetListAdapter.Item;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Row;
 import com.orbital.cityguide.adapter.AlphabetListAdapter.Section;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -25,6 +26,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ListFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -37,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -44,12 +48,14 @@ import android.widget.TextView;
 
 public class SearchFragment extends ListFragment implements
 		OnItemSelectedListener {
-	
+
 	public static final String TAG = SearchFragment.class.getSimpleName();
 
+	EditText inputSearch;
 	Spinner searchSpinner = null;
 	ListView mListView;
 	LinearLayout sideIndex;
+	private ProgressDialog pDialog;
 
 	protected ArrayAdapter<CharSequence> searchAdapter;
 
@@ -64,14 +70,18 @@ public class SearchFragment extends ListFragment implements
 	private static float sideIndexX;
 	private static float sideIndexY;
 	private int indexListSize;
-	
+
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String RETRIEVEID_URL = "http://" + ipadress + "/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://" + ipadress + "/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://" + ipadress + "/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://" + ipadress + "/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress
+			+ "/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://" + ipadress
+			+ "/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://" + ipadress
+			+ "/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://" + ipadress
+			+ "/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -81,7 +91,6 @@ public class SearchFragment extends ListFragment implements
 
 	// An array of all of our attractions
 	private JSONArray mAttractions = null;
-
 	private JSONArray mAttrID = null;
 
 	JSONParser jParser = new JSONParser();
@@ -92,10 +101,14 @@ public class SearchFragment extends ListFragment implements
 	int success;
 
 	DBAdapter dbAdaptor;
+	Context mContext;
+
+	// ArrayList thats going to hold the search results
+	ArrayList<HashMap<String, String>> searchResults;
 
 	public SearchFragment() {
 	}
-	
+
 	class SideIndexGestureListener extends
 			GestureDetector.SimpleOnGestureListener {
 		@Override
@@ -111,7 +124,7 @@ public class SearchFragment extends ListFragment implements
 			return super.onScroll(e1, e2, distanceX, distanceY);
 		}
 	}
-	
+
 	public static SearchFragment newInstance(String name_profile) {
 		SearchFragment myFragment = new SearchFragment();
 		Bundle args = new Bundle();
@@ -120,11 +133,12 @@ public class SearchFragment extends ListFragment implements
 		myFragment.setArguments(args);
 		return myFragment;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+		mContext = getActivity();
 	}
 
 	@Override
@@ -143,11 +157,6 @@ public class SearchFragment extends ListFragment implements
 		searchSpinner.setOnItemSelectedListener(this);
 
 		mListView = (ListView) rootView.findViewById(R.id.list);
-
-		/*Bundle bundle = this.getArguments();
-		if (name_profile != null){
-			name_profile = bundle.getString("profile_username");
-		}*/
 
 		// Hashmap for ListView
 		mAttractionsList = new ArrayList<HashMap<String, String>>();
@@ -209,58 +218,69 @@ public class SearchFragment extends ListFragment implements
 				}
 			}
 		});
+		
+		
+		
+		
 	}
-
+	
 	class LoadAllAttractions extends AsyncTask<String, String, String> {
+
+		/* Before starting background thread Show Progress Dialog */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(mContext);
+			pDialog.setMessage("Loading the list. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
 			mAttractionsList.clear();
-			// Building Parameters
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			// getting JSON string from URL
-			JSONObject json;
-
 			try {
-				json = jParser.makeHttpRequest(READATTR_URL, "GET", params);
-				int success = json.getInt(TAG_SUCCESS);
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+						.permitAll().build();
+				StrictMode.setThreadPolicy(policy);
 
-				if (success == 1) {
-					// attractions found
-					// Getting Array of Products
-					mAttractions = json.getJSONArray(TAG_ATTRACTION);
+				JSONObject json = jParser.makeHttpRequest(READATTR_URL, "GET",
+						params);
+				if (json != null) {
+					success = json.getInt(TAG_SUCCESS);
+					if (success == 1) {
+						// attractions found
+						// Getting Array of Products
+						mAttractions = json.getJSONArray(TAG_ATTRACTION);
 
-					// looping through All Attractions
-					for (int i = 0; i < mAttractions.length(); i++) {
-						JSONObject c = mAttractions.getJSONObject(i);
+						// looping through All Attractions
+						for (int i = 0; i < mAttractions.length(); i++) {
+							JSONObject c = mAttractions.getJSONObject(i);
 
-						// Storing each json item in variable
-						String id = c.getString(TAG_AID);
-						String name = c.getString(TAG_TITLE);
+							// Storing each json item in variable
+							String id = c.getString(TAG_AID);
+							String name = c.getString(TAG_TITLE);
 
-						// creating new HashMap
-						HashMap<String, String> map = new HashMap<String, String>();
-						map.put(id, name);
+							// creating new HashMap
+							HashMap<String, String> map = new HashMap<String, String>();
+							map.put(id, name);
 
-						// adding HashList to ArrayList
-						mAttractionsList.add(map);
+							// adding HashList to ArrayList
+							mAttractionsList.add(map);
+						}
 					}
 				}
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-
 			return null;
 		}
 
 		/* After completing background task Dismiss the progress dialog */
 		protected void onPostExecute(String file_url) {
+
 			mGestureDetector = new GestureDetector(
 					new SideIndexGestureListener());
 			List<Row> rows = new ArrayList<Row>();
@@ -319,6 +339,8 @@ public class SearchFragment extends ListFragment implements
 			updateList(alphabet.size());
 			adapter.setRows(rows);
 			setListAdapter(adapter);
+
+			pDialog.dismiss();
 		}
 
 		private Context getActivity() {
@@ -328,6 +350,17 @@ public class SearchFragment extends ListFragment implements
 	}
 
 	class LoadAttractionsCAT extends AsyncTask<String, String, String> {
+
+		/* Before starting background thread Show Progress Dialog */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(mContext);
+			pDialog.setMessage("Loading the list. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
@@ -406,6 +439,8 @@ public class SearchFragment extends ListFragment implements
 
 			adapter.setRows(rows);
 			setListAdapter(adapter);
+
+			pDialog.dismiss();
 		}
 
 		private Context getActivity() {
@@ -415,6 +450,18 @@ public class SearchFragment extends ListFragment implements
 	}
 
 	class LoadAttractionsAREA extends AsyncTask<String, String, String> {
+
+		/* Before starting background thread Show Progress Dialog */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			super.onPreExecute();
+			pDialog = new ProgressDialog(mContext);
+			pDialog.setMessage("Loading the list. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
 
 		/* getting All products from url */
 		protected String doInBackground(String... args) {
@@ -492,6 +539,8 @@ public class SearchFragment extends ListFragment implements
 
 			adapter.setRows(rows);
 			setListAdapter(adapter);
+
+			pDialog.dismiss();
 		}
 
 		private Context getActivity() {

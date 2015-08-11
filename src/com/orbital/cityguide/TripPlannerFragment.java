@@ -23,6 +23,7 @@ import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Item;
 import com.orbital.cityguide.adapter.PlannerDragNDropListAdapter.Section;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
 import android.content.Context;
@@ -72,8 +73,8 @@ public class TripPlannerFragment extends ListFragment {
 			+ "/getAttractionIDByTitle.php";
 	private static final String UPDATELIST_URL = "http://" + ipadress
 			+ "/updatePlannerList.php";
-	private static final String READATTR_URL = "http://" + ipadress
-			+ "/getAttraction.php";
+	private static final String GETPRICE_URL = "http://" + ipadress
+			+ "/getPrice.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";
@@ -104,8 +105,15 @@ public class TripPlannerFragment extends ListFragment {
 	int num_Adult, num_Child;
 
 	SharedPreferences pref;
+	Context mContext;
 
 	public TripPlannerFragment() {
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);;
+		mContext = getActivity();
 	}
 
 	public static TripPlannerFragment newInstance(String nameProfile) {
@@ -316,6 +324,12 @@ public class TripPlannerFragment extends ListFragment {
 	}
 
 	public void LoadPlannerList() {
+		ProgressDialog pDialog = new ProgressDialog(mContext);
+		pDialog.setMessage("Loading the list. Please wait...");
+		pDialog.setIndeterminate(false);
+		pDialog.setCancelable(true);
+		pDialog.show();
+		
 		mPlannerList.clear();
 		try {
 			dbAdaptor.open();
@@ -370,6 +384,8 @@ public class TripPlannerFragment extends ListFragment {
 		DecimalFormat df = new DecimalFormat("#0.00");
 		df.setMaximumFractionDigits(2);
 		mFinalPrice.setText("Total Price : $" + df.format(totalPrice));
+		
+		pDialog.dismiss();
 	}
 
 	public void UploadPlannerList() {
@@ -620,7 +636,7 @@ public class TripPlannerFragment extends ListFragment {
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
 
-			JSONObject json = jParser.makeHttpRequest(READATTR_URL, "POST",
+			JSONObject json = jParser.makeHttpRequest(GETPRICE_URL, "POST",
 					params);
 			if (json != null) {
 				success = json.getInt(TAG_SUCCESS);

@@ -151,7 +151,7 @@ public class AttractionDetails extends Activity {
 		mComment.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (name_profile.equalsIgnoreCase("null")) {
+				if (name_profile.equals("null")) {
 					title = "Error Message";
 					alertboxmsg = "Please login!";
 					popupMessage(title, alertboxmsg);

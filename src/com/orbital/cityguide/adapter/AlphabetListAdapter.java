@@ -37,7 +37,7 @@ public class AlphabetListAdapter extends BaseAdapter {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 	
-	private static final String RETRIEVEID_URL = "http://" + ipadress +"/City_Guide/getAttractionIDByTitle.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress +"/getAttractionIDByTitle.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_ATTRACTION = "attractions";
@@ -232,7 +232,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 					.permitAll().build();
 			StrictMode.setThreadPolicy(policy);
-
 			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
 					params);
 			if (json != null) {

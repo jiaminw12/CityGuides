@@ -8,7 +8,9 @@
     <Spinner
         android:id="@+id/search_spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
+
+    <requestFocus />
 
     <!-- Main ListViewAlways give id value as list(@android:id/list) -->
 
@@ -26,9 +28,9 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/search_spinner"
         android:background="#FFF"
-        android:textColor="@color/counter_text_color_black"
         android:gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:textColor="@color/counter_text_color_black" >
     </LinearLayout>
 
 </RelativeLayout>

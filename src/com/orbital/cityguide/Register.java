@@ -59,7 +59,7 @@ public class Register extends FragmentActivity implements OnDateSetListener {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String REGISTER_URL = "http://" + ipadress + "/City_Guide/registration.php";
+	private static final String REGISTER_URL = "http://" + ipadress + "/registration.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";
 

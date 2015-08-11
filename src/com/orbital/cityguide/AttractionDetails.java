@@ -41,9 +41,9 @@ public class AttractionDetails extends Activity {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String READATTR_URL = "http://" + ipadress +"/City_Guide/getAttraction.php";
-	private static final String ADDCOM_URL = "http://" + ipadress +"/City_Guide/addComment.php";
-	private static final String READCOM_URL = "http://" + ipadress +"/City_Guide/getComment.php";
+	private static final String READATTR_URL = "http://" + ipadress +"/getAttraction.php";
+	private static final String ADDCOM_URL = "http://" + ipadress +"/addComment.php";
+	private static final String READCOM_URL = "http://" + ipadress +"/getComment.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";

@@ -73,7 +73,7 @@ public class ViewProfileFragment extends Fragment {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String GETUSR_URL = "http://" + ipadress + "/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://" + ipadress + "/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_USERNAME = "username";

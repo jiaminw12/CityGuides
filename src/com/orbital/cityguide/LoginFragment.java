@@ -53,7 +53,7 @@ public class LoginFragment extends Fragment {
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String LOGIN_URL = "http://" + ipadress +"/City_Guide/login.php";
+	private static final String LOGIN_URL = "http://" + ipadress +"/login.php";
 	private static final String TAG_SUCCESS = "success";
 
 	// Your Facebook APP ID

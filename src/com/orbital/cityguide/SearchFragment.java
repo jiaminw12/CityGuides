@@ -68,10 +68,10 @@ public class SearchFragment extends ListFragment implements
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String RETRIEVEID_URL = "http://" + ipadress + "/City_Guide/getAttractionIDByTitle.php";
-	private static final String READATTR_URL = "http://" + ipadress + "/City_Guide/getAllAttractions.php";
-	private static final String READATTRBYCATS_URL = "http://" + ipadress + "/City_Guide/getAllAttractionsCAT.php";
-	private static final String READATTRBYAREA_URL = "http://" + ipadress + "/City_Guide/getAllAttractionsAREA.php";
+	private static final String RETRIEVEID_URL = "http://" + ipadress + "/getAttractionIDByTitle.php";
+	private static final String READATTR_URL = "http://" + ipadress + "/getAllAttractions.php";
+	private static final String READATTRBYCATS_URL = "http://" + ipadress + "/getAllAttractionsCAT.php";
+	private static final String READATTRBYAREA_URL = "http://" + ipadress + "/getAllAttractionsAREA.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";

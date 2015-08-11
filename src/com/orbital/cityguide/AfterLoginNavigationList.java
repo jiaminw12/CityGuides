@@ -66,7 +66,7 @@ public class AfterLoginNavigationList extends FragmentActivity {
 
 	ImageView mImage;
 
-	private static final String GETUSR_URL = "http://" + ipadress +"/City_Guide/getUser.php";
+	private static final String GETUSR_URL = "http://" + ipadress +"/getUser.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_USER = "userprofile";
 	private static final String TAG_IMAGE = "image";

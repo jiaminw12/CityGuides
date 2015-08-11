@@ -68,6 +68,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 	Button mCancel;
 
 	String title, alertboxmsg, name_profile, id;
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
 	int success;
 
 	Bitmap bmp;
@@ -87,8 +89,8 @@ public class EditProfile extends FragmentActivity implements OnDateSetListener {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
 			appDirectoryName);
 
-	private static final String GETUSR_URL = "http://192.168.1.5/City_Guide/getUser.php";
-	private static final String UPDATEUSR_URL = "http://192.168.1.5/City_Guide/updateUser.php";
+	private static final String GETUSR_URL = "http://" + ipadress +"/getUser.php";
+	private static final String UPDATEUSR_URL = "http://" + ipadress +"/updateUser.php";
 
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_MESSAGE = "message";

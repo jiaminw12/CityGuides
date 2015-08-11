@@ -755,7 +755,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 	}
 
 	public void onLocationChanged(Location location) {
-
 		// remove any existing marker
 		if (userMarker != null) {
 			googleMap.clear();

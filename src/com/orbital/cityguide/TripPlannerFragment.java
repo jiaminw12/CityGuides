@@ -67,13 +67,13 @@ public class TripPlannerFragment extends ListFragment {
 	static String ipadress = mConnect.GetIPadress();
 
 	private static final String GET_ATRR_TITLE_URL = "http://" + ipadress
-			+ "/City_Guide/getAttractionByID.php";
+			+ "/getAttractionByID.php";
 	private static final String RETRIEVEID_URL = "http://" + ipadress
-			+ "/City_Guide/getAttractionIDByTitle.php";
+			+ "/getAttractionIDByTitle.php";
 	private static final String UPDATELIST_URL = "http://" + ipadress
-			+ "/City_Guide/updatePlannerList.php";
+			+ "/updatePlannerList.php";
 	private static final String READATTR_URL = "http://" + ipadress
-			+ "/City_Guide/getAttraction.php";
+			+ "/getAttraction.php";
 	private static final String TAG_SUCCESS = "success";
 	private static final String TAG_AID = "attr_id";
 	private static final String TAG_TITLE = "attr_title";

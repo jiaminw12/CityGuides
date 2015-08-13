@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 public class DBAdapter {
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	private static final String TAG = "DBAdapter";
 
 	// Database Name
@@ -38,6 +38,11 @@ public class DBAdapter {
 	public static final String KEY_TAG_ID = "tag_id";
 	private static final String KEY_CREATED_AT = "created_at";
 
+	private static final String TABLE_ATTRLIST = "attrList";
+	private static final String KEY_ATTR_TITLE = "attr_title";
+	private static final String KEY_PRICE_ADULT = "price_adult";
+	private static final String KEY_PRICE_CHILD = "price_child";
+
 	private static final String CREATE_TABLE_TAG = "CREATE TABLE " + TABLE_TAG
 			+ "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TAG_NAME + " TEXT"
 			+ ")";
@@ -46,6 +51,11 @@ public class DBAdapter {
 			+ TABLE_PLANNERLIST + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_ATTR_ID + " TEXT," + KEY_TAG_ID + " TEXT," + KEY_CREATED_AT
 			+ " DATETIME" + ")";
+
+	private static final String CREATE_TABLE_ATTRLIST = "CREATE TABLE "
+			+ TABLE_ATTRLIST + "(" + KEY_ATTR_ID + " INTEGER PRIMARY KEY,"
+			+ KEY_ATTR_TITLE + " TEXT," + KEY_PRICE_ADULT + " REAL,"
+			+ KEY_PRICE_CHILD + " REAL" + ")";
 
 	Context context;
 	DatabaseHelper DBHelper;
@@ -66,6 +76,7 @@ public class DBAdapter {
 			try {
 				db.execSQL(CREATE_TABLE_TAG);
 				db.execSQL(CREATE_TABLE_PLANNERLIST);
+				db.execSQL(CREATE_TABLE_ATTRLIST);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -75,6 +86,7 @@ public class DBAdapter {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TAG);
 			db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_PLANNERLIST);
+			db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_ATTRLIST);
 			onCreate(db);
 		}
 	}
@@ -109,6 +121,18 @@ public class DBAdapter {
 		return db.insert(TABLE_PLANNERLIST, null, initialValues);
 	}
 
+	// insert a item into the insertPlannerList
+	public long insertAttrList(String attr_id, String attr_title,
+			double price_adult, double price_child) {
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(KEY_ATTR_ID, attr_id);
+		initialValues.put(KEY_ATTR_TITLE, attr_title);
+		initialValues.put(KEY_PRICE_ADULT, price_adult);
+		initialValues.put(KEY_PRICE_CHILD, price_child);
+
+		return db.insert(TABLE_ATTRLIST, null, initialValues);
+	}
+
 	// delete a ListItem
 	public void deletePlannerItem(String key) {
 		db.delete(TABLE_PLANNERLIST, KEY_ATTR_ID + "=" + key, null);
@@ -119,10 +143,14 @@ public class DBAdapter {
 	public Cursor getAllPlanner() {
 		Cursor mCursor = null;
 		if (db != null) {
-			mCursor = db.rawQuery("SELECT plannerList.attr_id, tags.tag_name "
-					+ "FROM plannerList INNER JOIN tags "
-					+ "ON plannerList.tag_id = tags.id "
-					+ "ORDER BY tags.id ASC", null);
+			mCursor = db
+					.rawQuery(
+							"SELECT plannerList.attr_id, tags.tag_name, attrList.attr_title, "
+									+ "attrList.price_adult, attrList.price_child, plannerList.tag_id "
+									+ "FROM plannerList INNER JOIN tags "
+									+ "ON plannerList.tag_id = tags.id "
+									+ "INNER JOIN attrList ON attrList.attr_id = plannerList.attr_id "
+									+ "ORDER BY tags.id ASC", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}
@@ -135,8 +163,7 @@ public class DBAdapter {
 		Cursor mCursor = null;
 		if (db != null) {
 			mCursor = db.rawQuery("SELECT attr_id, tag_id, created_at "
-					+ "FROM plannerList "
-					+ "ORDER BY tag_id ASC", null);
+					+ "FROM plannerList " + "ORDER BY tag_id ASC", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}

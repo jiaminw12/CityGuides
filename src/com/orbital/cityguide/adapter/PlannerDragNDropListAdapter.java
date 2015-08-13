@@ -46,21 +46,6 @@ import android.widget.Toast;
 
 public class PlannerDragNDropListAdapter extends BaseAdapter {
 
-	JSONParser jParser = new JSONParser();
-	
-	static ConnectToWebServices mConnect = new ConnectToWebServices();
-	static String ipadress = mConnect.GetIPadress();
-	
-	private static final String RETRIEVEID_URL = "http://" + ipadress + "/getAttractionIDByTitle.php";
-	private static final String GETPRICE_URL = "http://" + ipadress
-			+ "/getPrice.php";
-	
-	private static final String TAG_SUCCESS = "success";
-	private static final String TAG_AID = "attr_id";
-	private static final String TAG_PADULT = "price_adult";
-	private static final String TAG_PCHILD = "price_child";
-	private static final String TAG_ATTRACTION = "attractions";
-	private JSONArray mAttrID = null;
 	int success;
 
 	DBAdapter dbAdaptor;
@@ -88,9 +73,11 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 	}
 
 	public static final class Item extends Row {
+		public final String id;
 		public final String text;
 
-		public Item(String text) {
+		public Item(String id, String text) {
+			this.id = id;
 			this.text = text;
 		}
 	}
@@ -129,63 +116,7 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			return 0;
 		}
 	}
-
-	public String retrieveIdByTitle(String attr_title) {
-		String id = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_title", attr_title));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					id = c.getString(TAG_AID);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return id;
-	}
-
-	public float retrievePrice(String attr_id) {
-		String id = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_id", attr_id));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(GETPRICE_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					mPriceAdult = Float.valueOf(c.getString(TAG_PADULT)); 
-					mPriceChild =Float.valueOf(c.getString(TAG_PCHILD));
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		totalSinglePrice = (mPriceAdult * num_Adult)+(mPriceChild * num_Child);
-
-		return totalSinglePrice;
-	}
-		
+	
 	@Override
 	public void notifyDataSetChanged() {
 		super.notifyDataSetChanged();
@@ -209,6 +140,8 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			}
 
 			item = (Item) getItem(position);
+			final TextView mID = (TextView) view.findViewById(R.id.attrID);
+			mID.setText(item.id);
 			final TextView mTitle = (TextView) view.findViewById(R.id.name);
 			mTitle.setText(item.text);
 			
@@ -218,7 +151,34 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			num_Adult = Integer.parseInt(adultSpinner.getSelectedItem().toString());
 			
 			mSinglePrice = (TextView) view.findViewById(R.id.singlePrice);
-			mSinglePrice.setText("$" + df.format(retrievePrice(retrieveIdByTitle(item.text))));
+			try {
+				dbAdaptor.open();
+				cursor = dbAdaptor.getAllPlanner();
+				if (cursor != null && cursor.getCount() > 0) {
+					cursor.moveToFirst();
+					do {
+						String mAttrTitle = cursor.getString(2);
+						if (mAttrTitle.equalsIgnoreCase(mTitle.getText().toString())){
+							mPriceAdult = Float.valueOf(cursor.getString(3));
+							mPriceChild = Float.valueOf(cursor.getString(4));
+						}
+					} while (cursor.moveToNext());
+				} else {
+				}
+			} catch (Exception e) {
+				Log.d("City Guide", e.getMessage());
+			} finally {
+				if (cursor != null)
+					cursor.close();
+
+				if (dbAdaptor != null)
+					dbAdaptor.close();
+			}
+			
+			DecimalFormat df = new DecimalFormat("#0.00");
+			df.setMaximumFractionDigits(2);
+			totalSinglePrice = (mPriceAdult * num_Adult)+(mPriceChild * num_Child);
+			mSinglePrice.setText("$" + df.format(totalSinglePrice));
 			
 		} else { // Section
 			if (view == null) {
@@ -235,9 +195,7 @@ public class PlannerDragNDropListAdapter extends BaseAdapter {
 			view.setEnabled(false);
 			view.setOnClickListener(null);
 		}
-		
 		return view;
-
 	}
 
 	

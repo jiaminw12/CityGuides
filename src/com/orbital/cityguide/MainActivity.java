@@ -1,30 +1,66 @@
 package com.orbital.cityguide;
 
+import com.orbital.cityguide.adapter.CommentListAdapter;
 import com.orbital.cityguide.adapter.DBAdapter;
 import com.orbital.cityguide.adapter.NavDrawerListAdapter;
+import com.orbital.cityguide.model.CommentItem;
 import com.orbital.cityguide.model.NavDrawerItem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TableRow;
 
 public class MainActivity extends FragmentActivity {
 
 	private static final String TAG = MainActivity.class.getSimpleName();
+	
+	JSONParser jParser = new JSONParser();
+	
+	static ConnectToWebServices mConnect = new ConnectToWebServices();
+	static String ipadress = mConnect.GetIPadress();
+	private static final String GETATTRLIST_URL = "http://" + ipadress +"/getAllAttractionsFullDetails.php";
+	private static final String TAG_SUCCESS = "success";
+	private static final String TAG_ATTRACTION = "attractions";
+	private static final String TAG_AID = "attr_id";
+	private static final String TAG_TITLE = "attr_title";
+	private static final String TAG_PADULT = "price_adult";
+	private static final String TAG_PCHILD = "price_child";
+	// An array of all of our attractions
+	private JSONArray mAttractions = null;
+	int success;
+	// Progress Dialog
+	private ProgressDialog pDialog;
 
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -67,6 +103,7 @@ public class MainActivity extends FragmentActivity {
 				prefs.edit().putInt("NumOfChild", 0).commit();
 				dbAdaptor = new DBAdapter(this);
 				dbAdaptor.insertTag();
+				new GetAttrList().execute();
 			}
 		}
 
@@ -186,7 +223,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	/**
-	 * Diplaying fragment view for selected nav drawer list item
+	 * Displaying fragment view for selected nav drawer list item
 	 * */
 	private void displayView(int position) {
 		// update the main content by replacing fragments
@@ -243,7 +280,6 @@ public class MainActivity extends FragmentActivity {
 	 * When using the ActionBarDrawerToggle, you must call it during
 	 * onPostCreate() and onConfigurationChanged()...
 	 */
-
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
@@ -269,4 +305,68 @@ public class MainActivity extends FragmentActivity {
 		return dbFile.exists();
 	}
 
+	class GetAttrList extends AsyncTask<Object, Object, Cursor> {
+		
+		DBAdapter dbAdaptor = new DBAdapter(MainActivity.this);
+		
+		/* Before starting background thread Show Progress Dialog */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(MainActivity.this);
+			pDialog.setMessage("Downloading the info. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		/** Getting product details in background thread **/
+		protected Cursor doInBackground(Object... params) {
+			try {
+				dbAdaptor.open();
+				List<NameValuePair> params1 = new ArrayList<NameValuePair>();
+				StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+						.permitAll().build();
+				StrictMode.setThreadPolicy(policy);
+
+				JSONObject json = jParser.makeHttpRequest(GETATTRLIST_URL, "GET",
+						params1);
+				if (json != null) {
+					success = json.getInt(TAG_SUCCESS);
+					if (success == 1) {
+						// attractions found
+						// Getting Array of Products
+						mAttractions = json.getJSONArray(TAG_ATTRACTION);
+
+						// looping through All Attractions
+						for (int i = 0; i < mAttractions.length(); i++) {
+							JSONObject c = mAttractions.getJSONObject(i);
+
+							// Storing each json item in variable
+							String id = c.getString(TAG_AID);
+							String name = c.getString(TAG_TITLE);
+							double mAdult = Double.parseDouble(c.getString(TAG_PADULT));
+							double mChild = Double.parseDouble(c.getString(TAG_PCHILD));
+							
+							dbAdaptor.insertAttrList(id,name,mAdult,mChild);
+						}
+					}
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		/** After completing background task Dismiss the progress dialog **/
+		protected void onPostExecute(Cursor cursor) {
+			
+			if (dbAdaptor != null)
+				dbAdaptor.close();
+			
+			// dismiss the dialog once got all details
+			pDialog.dismiss();
+		}
+	}
+	
 }

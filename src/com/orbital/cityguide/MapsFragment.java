@@ -54,6 +54,8 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -89,7 +91,7 @@ public class MapsFragment extends Fragment implements LocationListener,
 	private int userIcon, foodIcon, drinkIcon, shopIcon, otherIcon;
 	// location manager
 	private LocationManager locMan;
-	
+
 	private Location loc;
 	// user marker
 	private Marker userMarker;
@@ -136,6 +138,14 @@ public class MapsFragment extends Fragment implements LocationListener,
 		shopIcon = R.drawable.green_point;
 		otherIcon = R.drawable.purple_point;
 
+		final int status = GooglePlayServicesUtil
+				.isGooglePlayServicesAvailable(getActivity());
+		if (status != ConnectionResult.SUCCESS) {
+			title = "Alert";
+			alertboxmsg = "Please update your google play services.";
+			popupMessage(title, alertboxmsg);
+		}
+
 		View rootView = inflater.inflate(R.layout.fragment_maps, container,
 				false);
 
@@ -144,14 +154,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 		autocompleteView.setThreshold(1);
 		autocompleteView.bringToFront();
 
-		/*mSprPlaceType = (Spinner) rootView
-				.findViewById(R.id.map_search_spinner);
-		this.mapPlaceAdapter = ArrayAdapter.createFromResource(
-				this.getActivity(), R.array.place_type_name,
-				android.R.layout.simple_spinner_item);
-		mSprPlaceType.setAdapter(this.mapPlaceAdapter);
-		mSprPlaceType.setOnItemSelectedListener(this);
-*/
 		ins = (ImageView) rootView.findViewById(R.id.imageView1);
 		ins.bringToFront();
 
@@ -243,7 +245,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 		updatePlaces();
 
 		return rootView;
-
 	}
 
 	@Override
@@ -527,36 +528,40 @@ public class MapsFragment extends Fragment implements LocationListener,
 		double lng = 0;
 
 		gps = new GPSTracker(this.getActivity());
+
 		loc = getLocation();
-		if (loc == null){
+		if (loc == null) {
 			// get location manager
 			locMan = (LocationManager) getActivity().getSystemService(
 					Context.LOCATION_SERVICE);
-		} 
-		
+		}
+
 		// remove any existing marker
 		if (userMarker != null) {
 			googleMap.clear();
 			userMarker.remove();
 		}
 
-		// check if GPS location can get
-		if (gps.canGetLocation()) {
-			lat = gps.getLatitude();
-			lng = gps.getLongitude();
-
-			SharedPreferences prefs = this.getActivity().getSharedPreferences(
-					"PREFERENCE", Context.MODE_PRIVATE);
-			prefs.edit().putFloat("latitude", (float) lat).commit();
-			prefs.edit().putFloat("longtitude", (float) lng).commit();
-
-		} else {
+		if (!(gps.canGetLocation())) {
+			locMan = (LocationManager) getActivity().getSystemService(
+					Context.LOCATION_SERVICE);
 			SharedPreferences pref = this.getActivity().getSharedPreferences(
 					"PREFERENCE", Context.MODE_PRIVATE);
 			float prev_lat = pref.getFloat("latitude", 0);
 			float prev_lng = pref.getFloat("longtitude", 0);
 			lat = prev_lat;
 			lng = prev_lng;
+		} else {
+			lat = gps.getLatitude();
+			lng = gps.getLongitude();
+
+			Log.v("lat :: ", String.valueOf(lat));
+			Log.v("long : ", String.valueOf(lng));
+
+			SharedPreferences prefs = this.getActivity().getSharedPreferences(
+					"PREFERENCE", Context.MODE_PRIVATE);
+			prefs.edit().putFloat("latitude", (float) lat).commit();
+			prefs.edit().putFloat("longtitude", (float) lng).commit();
 		}
 
 		// create LatLng
@@ -595,9 +600,29 @@ public class MapsFragment extends Fragment implements LocationListener,
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,30000, 1000, this);
-		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 1000, this);
+
+		// flag for GPS status
+		boolean isGPSEnabled = false;
+
+		// flag for network status
+		boolean isNetworkEnabled = false;
+
+		// getting GPS status
+		isGPSEnabled = locMan.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+		// getting network status
+		isNetworkEnabled = locMan
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+		if (isGPSEnabled) {
+			locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000,
+					1000, this);
+
+		} else if (isNetworkEnabled) {
+			locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+					30000, 1000, this);
+		}
+
 	}
 
 	class GetPlaces extends AsyncTask<String, String, String> {
@@ -773,7 +798,7 @@ public class MapsFragment extends Fragment implements LocationListener,
 
 		// Use map.animateCamera(update) if you want moving effect
 		googleMap.moveCamera(update);
-		//mMapView.onResume();
+		// mMapView.onResume();
 	}
 
 	public void onProviderDisabled(String provider) {
@@ -792,8 +817,10 @@ public class MapsFragment extends Fragment implements LocationListener,
 	public void onResume() {
 		super.onResume();
 		mMapView.onResume();
-		//locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000, 1000, this);
-		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 1000, this);
+		// locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+		// 30000, 1000, this);
+		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000,
+				1000, this);
 	}
 
 	@Override
@@ -843,7 +870,7 @@ public class MapsFragment extends Fragment implements LocationListener,
 				.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 		Location net_loc = null, gps_loc = null, finalLoc = null;
-		
+
 		if (gps_enabled)
 			gps_loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (network_enabled)
@@ -880,4 +907,5 @@ public class MapsFragment extends Fragment implements LocationListener,
 		}
 		return false;
 	}
+
 }

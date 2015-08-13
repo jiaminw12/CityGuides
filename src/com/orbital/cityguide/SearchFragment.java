@@ -218,10 +218,6 @@ public class SearchFragment extends ListFragment implements
 				}
 			}
 		});
-		
-		
-		
-		
 	}
 	
 	class LoadAllAttractions extends AsyncTask<String, String, String> {

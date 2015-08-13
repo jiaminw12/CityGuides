@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -36,6 +37,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ListFragment;
@@ -64,31 +66,8 @@ public class TripPlannerFragment extends ListFragment {
 	private HashMap<String, Integer> sections = new HashMap<String, Integer>();
 	List<Row> rows = new ArrayList<Row>();
 
-	static ConnectToWebServices mConnect = new ConnectToWebServices();
-	static String ipadress = mConnect.GetIPadress();
-
-	private static final String GET_ATRR_TITLE_URL = "http://" + ipadress
-			+ "/getAttractionByID.php";
-	private static final String RETRIEVEID_URL = "http://" + ipadress
-			+ "/getAttractionIDByTitle.php";
-	private static final String UPDATELIST_URL = "http://" + ipadress
-			+ "/updatePlannerList.php";
-	private static final String GETPRICE_URL = "http://" + ipadress
-			+ "/getPrice.php";
-	private static final String TAG_SUCCESS = "success";
-	private static final String TAG_AID = "attr_id";
-	private static final String TAG_TITLE = "attr_title";
-	private static final String TAG_PADULT = "price_adult";
-	private static final String TAG_PCHILD = "price_child";
-	private static final String TAG_ATTRACTION = "attractions";
-
-	// An array of all of our attractions
-	private JSONArray mAttrID = null;
-
-	JSONParser jParser = new JSONParser();
-
-	DBAdapter dbAdaptor;
 	Cursor cursor = null;
+	DBAdapter dbAdaptor;
 
 	static String name_profile;
 
@@ -99,6 +78,8 @@ public class TripPlannerFragment extends ListFragment {
 	Spinner daySpinner = null;
 	Spinner adultSpinner = null;
 	Spinner childSpinner = null;
+	// Progress Dialog
+	private ProgressDialog pDialog;
 	CharSequence[] planner_list;
 	TextView mFinalPrice;
 	float mPriceAdult, mPriceChild, totalSinglePrice, totalPrice = 0;
@@ -109,10 +90,10 @@ public class TripPlannerFragment extends ListFragment {
 
 	public TripPlannerFragment() {
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);;
+		super.onCreate(savedInstanceState);
 		mContext = getActivity();
 	}
 
@@ -138,16 +119,14 @@ public class TripPlannerFragment extends ListFragment {
 		if (name_profile != null && isNetworkAvailable()) {
 			name_profile = bundle.getString("profile_username");
 			username = name_profile;
-			//UploadPlannerList();
+			// UploadPlannerList();
 		} else {
 			name_profile = null;
 		}
 
 		View rootView = inflater.inflate(R.layout.fragment_planner, container,
 				false);
-
 		dbAdaptor = new DBAdapter(getActivity());
-
 		daySpinner = (Spinner) rootView.findViewById(R.id.day_spinner);
 		this.dayAdapter = ArrayAdapter.createFromResource(this.getActivity(),
 				R.array.arrayDay, android.R.layout.simple_spinner_item);
@@ -195,7 +174,7 @@ public class TripPlannerFragment extends ListFragment {
 				R.array.arrayPrice, android.R.layout.simple_spinner_item);
 		adultSpinner.setAdapter(this.adultAdapter);
 		final int numA = pref.getInt("NumOfAdult", 0);
-		adultSpinner.setSelection(numA);
+		adultSpinner.setSelection(numA, false);
 		num_Adult = Integer.parseInt(adultSpinner.getSelectedItem().toString());
 		adultSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -220,7 +199,7 @@ public class TripPlannerFragment extends ListFragment {
 				R.array.arrayPrice, android.R.layout.simple_spinner_item);
 		childSpinner.setAdapter(this.childAdapter);
 		final int numC = pref.getInt("NumOfChild", 0);
-		childSpinner.setSelection(numC);
+		childSpinner.setSelection(numC, false);
 		num_Child = Integer.parseInt(childSpinner.getSelectedItem().toString());
 		childSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -239,7 +218,7 @@ public class TripPlannerFragment extends ListFragment {
 		});
 
 		mFinalPrice = (TextView) rootView.findViewById(R.id.totalPrice);
-		LoadPlannerList();
+		new LoadPlannerList().execute();
 		return rootView;
 	}
 
@@ -305,13 +284,14 @@ public class TripPlannerFragment extends ListFragment {
 				case 0:
 					// edit
 					item = (Item) adapter.getItem(position);
-					diaBox = AskOption_Update(item.text);
+					Log.v("id ; ", item.id);
+					diaBox = AskOption_Update(item.id);
 					diaBox.show();
 					break;
 				case 1:
 					// delete
 					item = (Item) adapter.getItem(position);
-					diaBox = AskOption_Delete(item.text);
+					diaBox = AskOption_Delete(item.id);
 					diaBox.show();
 					break;
 				}
@@ -323,117 +303,92 @@ public class TripPlannerFragment extends ListFragment {
 
 	}
 
-	public void LoadPlannerList() {
-		ProgressDialog pDialog = new ProgressDialog(mContext);
-		pDialog.setMessage("Loading the list. Please wait...");
-		pDialog.setIndeterminate(false);
-		pDialog.setCancelable(true);
-		pDialog.show();
-		
-		mPlannerList.clear();
-		try {
-			dbAdaptor.open();
-			cursor = dbAdaptor.getAllPlanner();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-					String attr_title = retrieveTitleByID(cursor.getString(0));
-					String tag_title = cursor.getString(1);
+	class LoadPlannerList extends AsyncTask<Object, Object, Cursor> {
 
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put(tag_title, attr_title);
-					// adding HashList to ArrayList
-					mPlannerList.add(map);
-				} while (cursor.moveToNext());
-			}
-		} catch (Exception e) {
-			Log.e("City Guide", e.getMessage());
-		} finally {
-			if (cursor != null)
-				cursor.close();
+		DBAdapter dbAdaptor = new DBAdapter(getActivity());
 
-			if (dbAdaptor != null)
-				dbAdaptor.close();
+		/* Before starting background thread Show Progress Dialog */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(getActivity());
+			pDialog.setMessage("Loading the info. Please wait...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
 		}
 
-		int start = 0;
-		String previousLetter = null;
-
-		for (HashMap<String, String> map : mPlannerList) {
-			for (String str : map.keySet()) {
-				String key = str;
-				String value = map.get(key);
-				String firstTitle = key;
-				totalPrice = totalPrice
-						+ retrievePrice(retrieveIdByTitle(value));
-
-				// Check if we need to add a header row
-				if (!firstTitle.equals(previousLetter)) {
-					rows.add(new Section(firstTitle));
-					sections.put(firstTitle, start);
+		/** Getting product details in background thread **/
+		protected Cursor doInBackground(Object... params) {
+			mPlannerList.clear();
+			try {
+				dbAdaptor.open();
+				cursor = dbAdaptor.getAllPlanner();
+				if (cursor != null && cursor.getCount() > 0) {
+					cursor.moveToFirst();
+					do {
+						String mAttrID = cursor.getString(0);
+						String tag_title = cursor.getString(1);
+						Log.v("tag_title : ", tag_title);
+						String attr_title = cursor.getString(2);
+						float mPriceAdult = Float.valueOf(cursor.getString(3));
+						float mPriceChild = Float.valueOf(cursor.getString(4));
+						float singlePrice = (mPriceAdult * num_Adult)
+								+ (mPriceChild * num_Child);
+						totalPrice = totalPrice + singlePrice;
+						HashMap<String, String> map = new HashMap<String, String>();
+						map.put(tag_title, mAttrID+","+attr_title);
+						mPlannerList.add(map);
+					} while (cursor.moveToNext());
 				}
-
-				// Add the title to the list
-				rows.add(new Item(value));
-				previousLetter = firstTitle;
+			} catch (Exception e) {
+				Log.e("City Guide", e.getMessage());
 			}
+
+			return null;
 		}
-		adapter.setRows(rows);
-		setListAdapter(adapter);
 
-		DecimalFormat df = new DecimalFormat("#0.00");
-		df.setMaximumFractionDigits(2);
-		mFinalPrice.setText("Total Price : $" + df.format(totalPrice));
-		
-		pDialog.dismiss();
-	}
+		/** After completing background task Dismiss the progress dialog **/
+		protected void onPostExecute(Cursor cursor) {
 
-	public void UploadPlannerList() {
-
-		// Building Parameters
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
-		StrictMode.setThreadPolicy(policy);
-
-		// getting JSON string from URL
-		JSONObject json;
-
-		try {
-			dbAdaptor.open();
-			cursor = dbAdaptor.getAllPlannerList();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-					String attr_id = retrieveTitleByID(cursor.getString(0));
-					String tag_id = cursor.getString(1);
-					String created_date = cursor.getString(3);
-
-					params.add(new BasicNameValuePair("attr_id", attr_id));
-					params.add(new BasicNameValuePair("tag_id", tag_id));
-					params.add(new BasicNameValuePair("created_date",
-							created_date));
-					params.add(new BasicNameValuePair("username", username));
-
-					json = jParser.makeHttpRequest(UPDATELIST_URL, "POST",
-							params);
-					if (json != null) {
-						success = json.getInt(TAG_SUCCESS);
-						if (success == 1) {
-							Log.d("Successful!!!", "jshdjjshdj");
-						}
-					}
-				} while (cursor.moveToNext());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} finally {
-			if (cursor != null)
+			if (cursor != null) {
 				cursor.close();
+			}
 
-			if (dbAdaptor != null)
+			if (dbAdaptor != null) {
 				dbAdaptor.close();
+			}
+
+			int start = 0;
+			String previousLetter = null;
+			
+			for (HashMap<String, String> map : mPlannerList) {
+				for (String str : map.keySet()) {
+					String key = str;
+					String value = map.get(key);
+					String firstTitle = key;
+					
+					// Check if we need to add a header row
+					if (!firstTitle.equals(previousLetter)) {
+						rows.add(new Section(firstTitle));
+						sections.put(firstTitle, start);
+					}
+					
+					String[] detail = value.split(","); 
+					// Add the title to the list
+					rows.add(new Item(detail[0], detail[1]));
+					previousLetter = firstTitle;
+				}
+			}
+			adapter.setRows(rows);
+			setListAdapter(adapter);
+
+			DecimalFormat df = new DecimalFormat("#0.00");
+			df.setMaximumFractionDigits(2);
+			mFinalPrice.setText("Total Price : $" + df.format(totalPrice));
+
+			// dismiss the dialog once got all details
+			pDialog.dismiss();
 		}
 
 	}
@@ -449,8 +404,7 @@ public class TripPlannerFragment extends ListFragment {
 	}
 
 	// update planner item
-	private AlertDialog AskOption_Update(String attr_title) {
-		final String key = retrieveIdByTitle(attr_title);
+	private AlertDialog AskOption_Update(final String attr_id) {
 		Builder updateDialogBox = new AlertDialog.Builder(getActivity());
 		// set message, title
 		updateDialogBox.setTitle("Choose a day");
@@ -469,7 +423,7 @@ public class TripPlannerFragment extends ListFragment {
 					dbAdaptor.open();
 					cursor = dbAdaptor.getTagID(String
 							.valueOf(planner_list[which]));
-					cursor2 = dbAdaptor.getPlannerRowId(key);
+					cursor2 = dbAdaptor.getPlannerRowId(attr_id);
 					if (cursor != null && cursor.getCount() > 0
 							&& cursor2 != null && cursor2.getCount() > 0) {
 						cursor.moveToFirst();
@@ -480,7 +434,7 @@ public class TripPlannerFragment extends ListFragment {
 						} while (cursor.moveToNext() && cursor2.moveToNext());
 					}
 
-					dbAdaptor.updatePlannerItem(Integer.valueOf(row_id), key,
+					dbAdaptor.updatePlannerItem(Integer.valueOf(row_id), attr_id,
 							tag_id);
 				} catch (Exception e) {
 					Log.d("City Guide Singapore", e.getMessage());
@@ -515,8 +469,7 @@ public class TripPlannerFragment extends ListFragment {
 	}
 
 	// delete planner item
-	private AlertDialog AskOption_Delete(String attr_title) {
-		final String key = retrieveIdByTitle(attr_title);
+	private AlertDialog AskOption_Delete(final String attr_id) {
 		AlertDialog myQuittingDialogBox = new AlertDialog.Builder(getActivity())
 				// set message, title
 				.setTitle("Delete")
@@ -536,7 +489,7 @@ public class TripPlannerFragment extends ListFragment {
 								try {
 									dbAdaptor.open();
 
-									dbAdaptor.deletePlannerItem(key);
+									dbAdaptor.deletePlannerItem(attr_id);
 
 								} catch (Exception e) {
 									Log.d("City Guide Singapore",
@@ -571,84 +524,19 @@ public class TripPlannerFragment extends ListFragment {
 		return myQuittingDialogBox;
 	}
 
-	public String retrieveTitleByID(String attr_id) {
-		String title = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_id", attr_id));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(GET_ATRR_TITLE_URL,
-					"POST", params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					title = c.getString(TAG_TITLE);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return title;
-	}
-
-	public String retrieveIdByTitle(String attr_title) {
-		String id = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_title", attr_title));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					id = c.getString(TAG_AID);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return id;
-	}
-
 	public float retrievePrice(String attr_id) {
 		float totalSinglePrice = 0;
-		String id = null;
+		DBAdapter dbAdaptor = new DBAdapter(getActivity());
 		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_id", attr_id));
+			dbAdaptor.open();
+			cursor = dbAdaptor.getAllPlanner();
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
 
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(GETPRICE_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					mPriceAdult = Float.valueOf(c.getString(TAG_PADULT));
-					mPriceChild = Float.valueOf(c.getString(TAG_PCHILD));
-					Log.v("mPriceAdult", String.valueOf(mPriceAdult));
-				}
+				} while (cursor.moveToNext());
 			}
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -666,12 +554,17 @@ public class TripPlannerFragment extends ListFragment {
 			if (cursor != null && cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				do {
-					String attr_title = retrieveTitleByID(cursor.getString(0));
+					String mAttrID = cursor.getString(0);
 					String tag_title = cursor.getString(1);
-
+					Log.v("tag_title : ", tag_title);
+					String attr_title = cursor.getString(2);
+					float mPriceAdult = Float.valueOf(cursor.getString(3));
+					float mPriceChild = Float.valueOf(cursor.getString(4));
+					float singlePrice = (mPriceAdult * num_Adult)
+							+ (mPriceChild * num_Child);
+					totalPrice = totalPrice + singlePrice;
 					HashMap<String, String> map = new HashMap<String, String>();
-					map.put(tag_title, attr_title);
-					// adding HashList to ArrayList
+					map.put(tag_title, mAttrID+","+attr_title);
 					mPlannerList.add(map);
 				} while (cursor.moveToNext());
 			}
@@ -685,15 +578,6 @@ public class TripPlannerFragment extends ListFragment {
 				dbAdaptor.close();
 		}
 
-		for (HashMap<String, String> map : mPlannerList) {
-			for (String str : map.keySet()) {
-				String key = str;
-				String value = map.get(key);
-				String firstTitle = key;
-				totalPrice = totalPrice
-						+ retrievePrice(retrieveIdByTitle(value));
-			}
-		}
 		DecimalFormat df = new DecimalFormat("#0.00");
 		df.setMaximumFractionDigits(2);
 		mFinalPrice.setText("Total Price : $" + df.format(totalPrice));

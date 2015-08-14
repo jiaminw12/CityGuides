@@ -127,7 +127,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 				boolean result = dbAdaptor.getAttrID(key);
 				if (result) {
 					mPlanner.setText("-");
-					Log.v("jhfsh", "hsgdsahg");
 				} else {
 					mPlanner.setText("+");
 				}

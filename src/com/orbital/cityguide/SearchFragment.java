@@ -216,7 +216,7 @@ public class SearchFragment extends ListFragment implements
 			}
 		});
 	}
-	
+
 	class LoadAllAttractions extends AsyncTask<String, String, String> {
 
 		/* Before starting background thread Show Progress Dialog */
@@ -315,7 +315,7 @@ public class SearchFragment extends ListFragment implements
 					}
 
 					// Add the title to the list
-					rows.add(new Item(key,value));
+					rows.add(new Item(key, value));
 					previousLetter = firstLetter;
 				}
 			}
@@ -332,10 +332,10 @@ public class SearchFragment extends ListFragment implements
 			updateList(alphabet.size());
 			adapter.setRows(rows);
 			setListAdapter(adapter);
-			
-			if (pDialog.isShowing()) {
+
+			if (pDialog != null && pDialog.isShowing()) {
 				pDialog.dismiss();
-		    }
+			}
 		}
 
 		private Context getActivity() {
@@ -391,7 +391,7 @@ public class SearchFragment extends ListFragment implements
 
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put(category, id+","+name);
+						map.put(category, id + "," + name);
 
 						// adding HashList to ArrayList
 						mAttractionsList.add(map);
@@ -428,7 +428,7 @@ public class SearchFragment extends ListFragment implements
 					}
 					String[] details = value.split(",");
 					// Add the title to the list
-					rows.add(new Item(details[0],details[1]));
+					rows.add(new Item(details[0], details[1]));
 					previousLetter = firstLetter;
 				}
 			}
@@ -436,9 +436,9 @@ public class SearchFragment extends ListFragment implements
 			adapter.setRows(rows);
 			setListAdapter(adapter);
 
-			if (pDialog.isShowing()) {
+			if (pDialog != null && pDialog.isShowing()) {
 				pDialog.dismiss();
-		    }
+			}
 		}
 
 		private Context getActivity() {
@@ -452,7 +452,6 @@ public class SearchFragment extends ListFragment implements
 		/* Before starting background thread Show Progress Dialog */
 		@Override
 		protected void onPreExecute() {
-			super.onPreExecute();
 			super.onPreExecute();
 			pDialog = new ProgressDialog(mContext);
 			pDialog.setMessage("Loading the list. Please wait...");
@@ -495,7 +494,7 @@ public class SearchFragment extends ListFragment implements
 
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put(area, id+","+name);
+						map.put(area, id + "," + name);
 
 						// adding HashList to ArrayList
 						mAttractionsList.add(map);
@@ -531,7 +530,7 @@ public class SearchFragment extends ListFragment implements
 					}
 					String[] details = value.split(",");
 					// Add the title to the list
-					rows.add(new Item(details[0],details[1]));
+					rows.add(new Item(details[0], details[1]));
 					previousLetter = firstLetter;
 				}
 			}
@@ -541,7 +540,7 @@ public class SearchFragment extends ListFragment implements
 
 			if (pDialog.isShowing()) {
 				pDialog.dismiss();
-		    }
+			}
 		}
 
 		private Context getActivity() {

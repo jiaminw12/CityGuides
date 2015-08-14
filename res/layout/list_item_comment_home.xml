@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:padding="3dp" >
+
+    <ImageView
+        android:id="@+id/profile_pic"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="desc"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
+
+    <TextView
+        android:id="@+id/comment_attr_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/profile_pic"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#000000"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/comment_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_attr_title"
+        android:layout_toRightOf="@+id/profile_pic"
+        android:layout_weight="1"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000000" />
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment_title"
+        android:layout_toRightOf="@+id/profile_pic"
+        android:numStars="5"
+        android:rating="3.0"
+        android:stepSize="0.5" />
+
+    <TextView
+        android:id="@+id/comment_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ratingBar"
+        android:layout_toRightOf="@+id/profile_pic"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/attr_id"
+        android:layout_width="0dip"
+        android:layout_height="0dip"
+        android:layout_below="@+id/comment_desc"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/comment_id"
+        android:layout_width="0dip"
+        android:layout_height="0dip"
+        android:layout_below="@+id/attr_id"
+        android:visibility="invisible" />
+
+</RelativeLayout>

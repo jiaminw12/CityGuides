@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:shrinkColumns="*"
+        android:stretchColumns="*" >
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center"
+                android:text="I am a "
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/typeTraveller_spinner"
+                android:layout_width="700px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center"
+                android:text="traveller"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/LinearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tableLayout1"
+        android:background="#f4f4f4"
+        android:orientation="vertical" >
+
+        <ExpandableListView
+            android:id="@+id/expListView"
+            android:layout_width="match_parent"
+            android:layout_height="310dp"
+            android:layout_weight="0.14"
+            android:transcriptMode="normal" >
+        </ExpandableListView>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -542,16 +542,10 @@ public class MapsFragment extends Fragment implements LocationListener,
 			userMarker.remove();
 		}
 
-		if (!(gps.canGetLocation())) {
-			locMan = (LocationManager) getActivity().getSystemService(
-					Context.LOCATION_SERVICE);
-			SharedPreferences pref = this.getActivity().getSharedPreferences(
-					"PREFERENCE", Context.MODE_PRIVATE);
-			float prev_lat = pref.getFloat("latitude", 0);
-			float prev_lng = pref.getFloat("longtitude", 0);
-			lat = prev_lat;
-			lng = prev_lng;
-		} else {
+		boolean result = gps.canGetLocation();
+		Log.v("result : ", String.valueOf(result));
+
+		if (gps.canGetLocation()) {
 			lat = gps.getLatitude();
 			lng = gps.getLongitude();
 
@@ -562,6 +556,15 @@ public class MapsFragment extends Fragment implements LocationListener,
 					"PREFERENCE", Context.MODE_PRIVATE);
 			prefs.edit().putFloat("latitude", (float) lat).commit();
 			prefs.edit().putFloat("longtitude", (float) lng).commit();
+		} else {
+			SharedPreferences pref = this.getActivity().getSharedPreferences(
+					"PREFERENCE", Context.MODE_PRIVATE);
+			float prev_lat = pref.getFloat("latitude", 0);
+			float prev_lng = pref.getFloat("longtitude", 0);
+			Log.v("prev_lat :: ", String.valueOf(prev_lat));
+			Log.v("prev_lng : ", String.valueOf(prev_lng));
+			lat = prev_lat;
+			lng = prev_lng;
 		}
 
 		// create LatLng

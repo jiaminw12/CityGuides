@@ -74,8 +74,6 @@ public class SearchFragment extends ListFragment implements
 	static ConnectToWebServices mConnect = new ConnectToWebServices();
 	static String ipadress = mConnect.GetIPadress();
 
-	private static final String RETRIEVEID_URL = "http://" + ipadress
-			+ "/getAttractionIDByTitle.php";
 	private static final String READATTR_URL = "http://" + ipadress
 			+ "/getAllAttractions.php";
 	private static final String READATTRBYCATS_URL = "http://" + ipadress
@@ -205,14 +203,13 @@ public class SearchFragment extends ListFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				TextView text = (TextView) view.findViewById(R.id.name);
-				String title = text.getText().toString();
-				String key = retrieveId(title);
-				if (key != null) {
+				TextView mAttrid = (TextView) view.findViewById(R.id.attrID);
+				String mID = mAttrid.getText().toString();
+				if (mID != null) {
 					Intent in = new Intent(getActivity(),
 							AttractionDetails.class);
 					// sending aid to next activity
-					in.putExtra("AID", key);
+					in.putExtra("AID", mID);
 					in.putExtra("profile_username", username);
 					startActivity(in);
 				}
@@ -318,7 +315,7 @@ public class SearchFragment extends ListFragment implements
 					}
 
 					// Add the title to the list
-					rows.add(new Item(value));
+					rows.add(new Item(key,value));
 					previousLetter = firstLetter;
 				}
 			}
@@ -335,8 +332,10 @@ public class SearchFragment extends ListFragment implements
 			updateList(alphabet.size());
 			adapter.setRows(rows);
 			setListAdapter(adapter);
-
-			pDialog.dismiss();
+			
+			if (pDialog.isShowing()) {
+				pDialog.dismiss();
+		    }
 		}
 
 		private Context getActivity() {
@@ -386,12 +385,13 @@ public class SearchFragment extends ListFragment implements
 						JSONObject c = mAttractions.getJSONObject(i);
 
 						// Storing each json item in variable
+						String id = c.getString(TAG_AID);
 						String name = c.getString(TAG_TITLE);
 						String category = c.getString(TAG_CATEGORY);
 
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put(category, name);
+						map.put(category, id+","+name);
 
 						// adding HashList to ArrayList
 						mAttractionsList.add(map);
@@ -426,9 +426,9 @@ public class SearchFragment extends ListFragment implements
 						rows.add(new Section(firstLetter));
 						sections.put(firstLetter, start);
 					}
-
+					String[] details = value.split(",");
 					// Add the title to the list
-					rows.add(new Item(value));
+					rows.add(new Item(details[0],details[1]));
 					previousLetter = firstLetter;
 				}
 			}
@@ -436,7 +436,9 @@ public class SearchFragment extends ListFragment implements
 			adapter.setRows(rows);
 			setListAdapter(adapter);
 
-			pDialog.dismiss();
+			if (pDialog.isShowing()) {
+				pDialog.dismiss();
+		    }
 		}
 
 		private Context getActivity() {
@@ -487,12 +489,13 @@ public class SearchFragment extends ListFragment implements
 						JSONObject c = mAttractions.getJSONObject(i);
 
 						// Storing each json item in variable
+						String id = c.getString(TAG_AID);
 						String name = c.getString(TAG_TITLE);
 						String area = c.getString(TAG_AREA);
 
 						// creating new HashMap
 						HashMap<String, String> map = new HashMap<String, String>();
-						map.put(area, name);
+						map.put(area, id+","+name);
 
 						// adding HashList to ArrayList
 						mAttractionsList.add(map);
@@ -526,9 +529,9 @@ public class SearchFragment extends ListFragment implements
 						rows.add(new Section(firstLetter));
 						sections.put(firstLetter, start);
 					}
-
+					String[] details = value.split(",");
 					// Add the title to the list
-					rows.add(new Item(value));
+					rows.add(new Item(details[0],details[1]));
 					previousLetter = firstLetter;
 				}
 			}
@@ -536,7 +539,9 @@ public class SearchFragment extends ListFragment implements
 			adapter.setRows(rows);
 			setListAdapter(adapter);
 
-			pDialog.dismiss();
+			if (pDialog.isShowing()) {
+				pDialog.dismiss();
+		    }
 		}
 
 		private Context getActivity() {
@@ -615,33 +620,6 @@ public class SearchFragment extends ListFragment implements
 				return false;
 			}
 		});
-	}
-
-	public String retrieveId(String attr_title) {
-		String id = null;
-		try {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("attr_title", attr_title));
-
-			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-					.permitAll().build();
-			StrictMode.setThreadPolicy(policy);
-
-			JSONObject json = jParser.makeHttpRequest(RETRIEVEID_URL, "POST",
-					params);
-			if (json != null) {
-				success = json.getInt(TAG_SUCCESS);
-				if (success == 1) {
-					mAttrID = json.getJSONArray(TAG_ATTRACTION);
-					JSONObject c = mAttrID.getJSONObject(0);
-					id = c.getString(TAG_AID);
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return id;
 	}
 
 	@Override

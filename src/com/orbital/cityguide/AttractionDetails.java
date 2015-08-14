@@ -124,7 +124,7 @@ public class AttractionDetails extends Activity {
 		mImageView = (ImageView) findViewById(R.id.imageViewId);
 		mTitle = (TextView) findViewById(R.id.title_Attr);
 		mPlanner = (Button) findViewById(R.id.btnPlanner);
-		setmPlannerText();
+		setmPlannerText(mAttr_id);
 		mPlanner.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				updatePlanner();
@@ -166,23 +166,15 @@ public class AttractionDetails extends Activity {
 		new GetAttrDetails().execute();
 	}
 	
-	public void setmPlannerText() {
+	public void setmPlannerText(String mAttr_id) {
 		dbAdaptor = new DBAdapter(getApplicationContext());
 		try {
 			dbAdaptor.open();
-			cursor = dbAdaptor.getAttrID();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-					String mAttrID = cursor.getString(0);
-					if (mAttr_id.equals(mAttrID)) {
-						mPlanner.setText("-");
-						break;
-					} else {
-						mPlanner.setText("+");
-					}
-				} while (cursor.moveToNext());
+			boolean result = dbAdaptor.getAttrID(mAttr_id);
+			if (result) {
+				mPlanner.setText("-");
 			} else {
+				mPlanner.setText("+");
 			}
 		} catch (Exception e) {
 			Log.d("City Guide", e.getMessage());
@@ -199,12 +191,11 @@ public class AttractionDetails extends Activity {
 		dbAdaptor = new DBAdapter(getApplicationContext());
 		if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
 			mPlanner.setText("-");
-
 			try {
 				dbAdaptor.open();
 				dbAdaptor.insertPlannerList(mAttr_id, "1");
 				Toast.makeText(getApplicationContext(),
-						"Successfully Added!!! Attraction Details", Toast.LENGTH_SHORT)
+						"Successfully Added!!!", Toast.LENGTH_SHORT)
 						.show();
 			} catch (Exception e) {
 				Log.e("CityGuideSingapore", e.getMessage());
@@ -221,7 +212,7 @@ public class AttractionDetails extends Activity {
 				dbAdaptor.open();
 				dbAdaptor.deletePlannerItem(mAttr_id);
 				Toast.makeText(getApplicationContext(),
-						"Successfully Removed!!! Attraction Details",
+						"Successfully Removed!!!",
 						Toast.LENGTH_SHORT).show();
 			} catch (Exception e) {
 				Log.d("CityGuideSingapore", e.getMessage());

@@ -171,11 +171,27 @@ public class DBAdapter {
 		return mCursor;
 	}
 
-	// retrieve all attr_id
-	public Cursor getAttrID() {
+	// retrieve attr_id
+	public boolean getAttrID(String attr_id) {
 		Cursor mCursor = null;
 		if (db != null) {
-			mCursor = db.rawQuery("SELECT attr_id FROM plannerList", null);
+			mCursor = db.rawQuery(
+					"SELECT attr_id FROM plannerList WHERE attr_id = '"
+							+ attr_id + "'", null);
+			if (mCursor.getCount() <= 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// retrieve attr_id by title
+	public Cursor getAttrIDByTitle(String attr_title) {
+		Cursor mCursor = null;
+		if (db != null) {
+			mCursor = db.rawQuery(
+					"SELECT attr_id FROM attrList WHERE attr_title = '"
+							+ attr_title + "'", null);
 			if (mCursor != null) {
 				mCursor.moveToFirst();
 			}

@@ -329,7 +329,6 @@ public class TripPlannerFragment extends ListFragment {
 					do {
 						String mAttrID = cursor.getString(0);
 						String tag_title = cursor.getString(1);
-						Log.v("tag_title : ", tag_title);
 						String attr_title = cursor.getString(2);
 						float mPriceAdult = Float.valueOf(cursor.getString(3));
 						float mPriceChild = Float.valueOf(cursor.getString(4));
@@ -522,27 +521,6 @@ public class TripPlannerFragment extends ListFragment {
 							}
 						}).create();
 		return myQuittingDialogBox;
-	}
-
-	public float retrievePrice(String attr_id) {
-		float totalSinglePrice = 0;
-		DBAdapter dbAdaptor = new DBAdapter(getActivity());
-		try {
-			dbAdaptor.open();
-			cursor = dbAdaptor.getAllPlanner();
-			if (cursor != null && cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				do {
-
-				} while (cursor.moveToNext());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		totalSinglePrice = (mPriceAdult * num_Adult)
-				+ (mPriceChild * num_Child);
-		return totalSinglePrice;
 	}
 
 	public void updateTotalPrice() {

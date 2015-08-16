@@ -120,7 +120,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 			mTitle.setText(item.text);
 			final String key = mID.getText().toString();
 			final Button mPlanner = (Button) view.findViewById(R.id.btnPlanner);
-			Log.v("key_Alphabet : ", key);
 
 			try {
 				dbAdaptor.open();
@@ -145,7 +144,6 @@ public class AlphabetListAdapter extends BaseAdapter {
 					if (mPlanner.getText().toString().equalsIgnoreCase("+")) {
 						mPlanner.setText("-");
 						try {
-							Log.v("mAttrID_Alphabet 2 : ", key);
 							dbAdaptor.open();
 							dbAdaptor.insertPlannerList(key, "1");
 							Toast.makeText(mParent.getContext(),

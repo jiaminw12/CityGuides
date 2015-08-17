@@ -543,9 +543,8 @@ public class MapsFragment extends Fragment implements LocationListener,
 		}
 
 		boolean result = gps.canGetLocation();
-		Log.v("result : ", String.valueOf(result));
 
-		if (gps.canGetLocation()) {
+		if (result) {
 			lat = gps.getLatitude();
 			lng = gps.getLongitude();
 

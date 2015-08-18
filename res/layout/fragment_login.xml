@@ -32,16 +32,6 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#9F000F"
                 android:textSize="30sp" />
-
-            <!--
-                 <ImageView
-                android:id="@+id/Logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/logo" />
-            -->
         </LinearLayout>
 
         <LinearLayout
@@ -111,17 +101,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/linearLayout3"
+            android:layout_marginTop="15dp"
             android:orientation="vertical" >
 
-            <!--
-                 <com.facebook.login.widget.LoginButton
-                android:id="@+id/FBlogin_button"
-                android:layout_width="wrap_content"
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/btn_google_sign_in"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="30dp"
-                android:layout_marginTop="30dp" />
-            -->
+                android:layout_marginBottom="20dp" />
         </LinearLayout>
     </RelativeLayout>
 

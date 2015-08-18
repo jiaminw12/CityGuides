@@ -59,7 +59,6 @@ public class ViewProfileFragment extends Fragment {
 	TextView mGender;
 	Button mSubmit;
 
-	private LoginButton loginFacebook;
 	CallbackManager callbackManager;
 
 	String title, alertboxmsg;
@@ -197,9 +196,7 @@ public class ViewProfileFragment extends Fragment {
 
 							mUsername.setText(name);
 							mDate.setText(birthDate);
-							;
 							mGender.setText(gender);
-							;
 						}
 					} else if (success == 0) {
 						title = "Message";

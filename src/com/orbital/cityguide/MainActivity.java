@@ -175,7 +175,7 @@ public class MainActivity extends FragmentActivity {
 
 		if (savedInstanceState == null) {
 			// on first time display view for first nav item
-			displayView(0);
+			displayView(4);
 		}
 	}
 

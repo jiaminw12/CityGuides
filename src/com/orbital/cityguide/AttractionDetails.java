@@ -1,5 +1,6 @@
 package com.orbital.cityguide;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -366,8 +367,8 @@ public class AttractionDetails extends Activity {
 									String mlat = c.getString(TAG_LAT);
 									String mlong = c.getString(TAG_LONG);
 									String openHrs = c.getString(TAG_OHRS);
-									String adultP = c.getString(TAG_PADULT); 
-									String childP = c.getString(TAG_PCHILD);
+									float adultP = Float.valueOf(c.getString(TAG_PADULT)); 
+									float childP = Float.valueOf(c.getString(TAG_PCHILD));
 									String img = c.getString(TAG_IMG);
 									final String link = c.getString(TAG_LINK);
 
@@ -381,8 +382,10 @@ public class AttractionDetails extends Activity {
 									mTitle.setText(title);
 									mDetail.setText(desc);
 									mOpenHrs.setText(openHrs);
-									mAdultPrice.setText("Price of Adult : " + adultP);
-									mChildPrice.setText("Price of Children : " + childP);
+									DecimalFormat df = new DecimalFormat("#0.00");
+									df.setMaximumFractionDigits(2);
+									mAdultPrice.setText("Price of Adult :  $" + df.format(adultP));
+									mChildPrice.setText("Price of Children :  $" + df.format(childP));
 									if (!(link.equalsIgnoreCase("null"))) {
 										mLink.setText(link);
 										mLink.setOnClickListener(new View.OnClickListener() {

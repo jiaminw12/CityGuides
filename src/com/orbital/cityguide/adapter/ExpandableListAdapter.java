@@ -118,9 +118,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 						if (cursor != null) {
 							cursor.moveToFirst();
 							String mAttrID = cursor.getString(0);
-							Log.v("mAttrID: ", mAttrID);
 							dbAdaptor.insertPlannerList(mAttrID, "1");
-							Toast.makeText(mParent.getContext(),
+							Toast.makeText(_context,
 									"Successfully Added!", Toast.LENGTH_SHORT)
 									.show();
 						}
@@ -137,7 +136,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 					dbAdaptor = new DBAdapter(_context);
 					try {
 						dbAdaptor.open();
-						Cursor cursor = dbAdaptor.getAttrIDByTitle(childText);
+						Cursor cursor = dbAdaptor.getAttrIDByTitle(title);
 						if (cursor != null) {
 							cursor.moveToFirst();
 							String mAttrID = cursor.getString(0);
@@ -145,7 +144,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 								dbAdaptor.deletePlannerItem(mAttrID);
 							}
 						}
-						Toast.makeText(mParent.getContext(),
+						Toast.makeText(_context,
 								"Successfully Removed!", Toast.LENGTH_SHORT)
 								.show();
 					} catch (Exception e) {

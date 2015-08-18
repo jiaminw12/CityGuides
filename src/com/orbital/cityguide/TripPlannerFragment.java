@@ -119,7 +119,6 @@ public class TripPlannerFragment extends ListFragment {
 		if (name_profile != null && isNetworkAvailable()) {
 			name_profile = bundle.getString("profile_username");
 			username = name_profile;
-			// UploadPlannerList();
 		} else {
 			name_profile = null;
 		}
@@ -284,7 +283,6 @@ public class TripPlannerFragment extends ListFragment {
 				case 0:
 					// edit
 					item = (Item) adapter.getItem(position);
-					Log.v("id ; ", item.id);
 					diaBox = AskOption_Update(item.id);
 					diaBox.show();
 					break;

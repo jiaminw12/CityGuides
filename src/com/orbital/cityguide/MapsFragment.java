@@ -68,8 +68,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.orbital.cityguide.adapter.DBAdapter;
 
-public class MapsFragment extends Fragment implements LocationListener,
-		OnItemSelectedListener {
+public class MapsFragment extends Fragment implements LocationListener {
 
 	public static final String TAG = MapsFragment.class.getSimpleName();
 
@@ -245,19 +244,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 		updatePlaces();
 
 		return rootView;
-	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position,
-			long id) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> parent) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private String getAutoCompleteUrl(String place) {
@@ -548,9 +534,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 			lat = gps.getLatitude();
 			lng = gps.getLongitude();
 
-			Log.v("lat :: ", String.valueOf(lat));
-			Log.v("long : ", String.valueOf(lng));
-
 			SharedPreferences prefs = this.getActivity().getSharedPreferences(
 					"PREFERENCE", Context.MODE_PRIVATE);
 			prefs.edit().putFloat("latitude", (float) lat).commit();
@@ -560,8 +543,6 @@ public class MapsFragment extends Fragment implements LocationListener,
 					"PREFERENCE", Context.MODE_PRIVATE);
 			float prev_lat = pref.getFloat("latitude", 0);
 			float prev_lng = pref.getFloat("longtitude", 0);
-			Log.v("prev_lat :: ", String.valueOf(prev_lat));
-			Log.v("prev_lng : ", String.valueOf(prev_lng));
 			lat = prev_lat;
 			lng = prev_lng;
 		}
@@ -788,19 +769,19 @@ public class MapsFragment extends Fragment implements LocationListener,
 			userMarker.remove();
 		}
 
-		Log.v("MyMapActivity", "location changed");
 		LatLng position = new LatLng(location.getLatitude(),
 				location.getLongitude());
 		// create and set marker properties
 		userMarker = googleMap.addMarker(new MarkerOptions().position(position)
 				.title("You are here"));
 		updatePlaces();
-		// Zoom parameter is set to 14
 		CameraUpdate update = CameraUpdateFactory.newLatLng(position);
 
 		// Use map.animateCamera(update) if you want moving effect
 		googleMap.moveCamera(update);
-		// mMapView.onResume();
+		mMapView.onResume();
+		
+		locMan.removeUpdates(this);
 	}
 
 	public void onProviderDisabled(String provider) {
@@ -819,10 +800,18 @@ public class MapsFragment extends Fragment implements LocationListener,
 	public void onResume() {
 		super.onResume();
 		mMapView.onResume();
-		// locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-		// 30000, 1000, this);
-		locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000,
-				1000, this);
+
+		boolean result = gps.canGetLocation();
+
+		if (result) {
+			locMan.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000,
+					1000, this);
+
+		} else {
+			locMan.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+					30000, 1000, this);
+		}
+
 	}
 
 	@Override

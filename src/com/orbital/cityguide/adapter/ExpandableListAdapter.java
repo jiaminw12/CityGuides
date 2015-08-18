@@ -89,6 +89,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 			if (cursor != null) {
 				cursor.moveToFirst();
 				String mAttrID = cursor.getString(0);
+				Log.v("mAttrID: ", mAttrID);
 				boolean result = dbAdaptor.getAttrID(mAttrID);
 				if (result) {
 					mPlanner.setText("-");
@@ -115,11 +116,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 					try {
 						dbAdaptor.open();
 						Cursor cursor = dbAdaptor.getAttrIDByTitle(childText);
-						String mAttrID = cursor.getString(0);
-						dbAdaptor.insertPlannerList(mAttrID,"0");
-						Toast.makeText(mParent.getContext(),
-								"Successfully Added!", Toast.LENGTH_SHORT)
-								.show();
+						if (cursor != null) {
+							cursor.moveToFirst();
+							String mAttrID = cursor.getString(0);
+							dbAdaptor.insertPlannerList(mAttrID, "0");
+							Toast.makeText(mParent.getContext(),
+									"Successfully Added!", Toast.LENGTH_SHORT)
+									.show();
+						}
 					} catch (Exception e) {
 						Log.e("CityGuideSingapore", e.getMessage());
 					} finally {

@@ -106,8 +106,8 @@
                 <TextView android:id="@+id/open_hrs" >
                 </TextView>
             </TableRow>
-            
-             <TextView
+
+            <TextView
                 android:id="@+id/title_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -151,24 +151,6 @@
                     android:clickable="true"
                     android:textColor="#ff0000ff"
                     android:textSize="15sp" />
-            </TableRow>
-
-            <!-- Mapview -->
-
-            <TableRow
-                android:id="@+id/tableRow4"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginBottom="20dp"
-                android:gravity="center_horizontal|center_vertical"
-                android:minHeight="800px" >
-
-                <com.google.android.gms.maps.MapView
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/mapView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                     android:layerType="software" />
             </TableRow>
 
             <!-- Comments -->

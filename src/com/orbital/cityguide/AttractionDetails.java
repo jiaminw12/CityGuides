@@ -89,10 +89,8 @@ public class AttractionDetails extends Activity {
 	TextView mOpenHrs;
 	TextView mAdultPrice;
 	TextView mChildPrice;
-	MapView mMapView;
 	TextView mReview;
 	ListView mList;
-	private GoogleMap googleMap;
 	// Progress Dialog
 	private ProgressDialog pDialog;
 
@@ -136,16 +134,12 @@ public class AttractionDetails extends Activity {
 		mOpenHrs = (TextView) findViewById(R.id.open_hrs);
 		mAdultPrice = (TextView) findViewById(R.id.adult_price);
 		mChildPrice = (TextView) findViewById(R.id.child_price);
-		mMapView = (MapView) findViewById(R.id.mapView);
-		mMapView.onCreate(savedInstanceState);
-		mMapView.onResume();
 
 		try {
 			MapsInitializer.initialize(getApplicationContext());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		googleMap = mMapView.getMap();
 
 		mRatingbar = (RatingBar) findViewById(R.id.ratingBar);
 		mComment = (Button) findViewById(R.id.addComment);
@@ -405,8 +399,6 @@ public class AttractionDetails extends Activity {
 
 										});
 									}
-
-									setMap(mlat, mlong, title, addr);
 								}
 							} else if (success == 0) {
 								title = "Message";
@@ -475,22 +467,6 @@ public class AttractionDetails extends Activity {
 			// dismiss the dialog once got all details
 			pDialog.dismiss();
 		}
-	}
-
-	public void setMap(String mLatitude, String mLongtitude, String mTitle,
-			String mAddress) {
-		double latitude = Double.parseDouble(mLatitude);
-		double longitude = Double.parseDouble(mLongtitude);
-		// create marker
-		MarkerOptions marker = new MarkerOptions()
-				.position(new LatLng(latitude, longitude)).title(mTitle)
-				.snippet(mAddress);
-		googleMap.addMarker(marker);
-		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(new LatLng(latitude, longitude)).zoom(14).build();
-		googleMap.animateCamera(CameraUpdateFactory
-				.newCameraPosition(cameraPosition));
-
 	}
 
 	@Override
